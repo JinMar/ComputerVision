@@ -1,0 +1,144 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #2B2B2B;
+    height: 60px;
+    text-align: center;
+    color: #888888;
+}
+
+.footer p {
+    margin-top: 15px;
+
+}
+
+body {
+    padding-top: 50px;
+    margin-bottom: 60px;
+}
+
+.nav {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.nav > li > a:focus, .nav > li > a:hover {
+    text-decoration: none;
+
+}
+
+.navbar-fixed-top {
+    background: #2B2B2B;
+    color: #f07d00;
+}
+
+.navbar-fixed-top a {
+
+    color: #f07d00;
+}
+
+.icon-bar {
+    background: #f07d00;
+}
+
+.navbar-toggle {
+    border: 1px solid #f07d00;
+}
+
+.jumbotron {
+    background: #2B2B2B;
+    color: #f07d00;
+    padding-bottom: 20px;
+}
+
+.img_Border {
+
+    border: 20px solid #f07d00;
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+    background: #ffffff;
+
+}
+
+.wraper {
+    margin: 0 auto;
+    width: 250px;
+}
+
+.Button a {
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #FFFFFF;
+    display: inline-block;
+    margin-top: 30px;
+    padding: 7px 30px;
+    background: #f07d00;
+    border-radius: 5px;
+}
+
+@media only screen and (min-width: 320px) {
+    #logoTUL {
+        vertical-align: middle;
+        max-height: 350px;
+        max-width: 220px;
+        text-align: center;
+        margin: 10px;
+    }
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width: 480px) {
+    #logoTUL {
+        vertical-align: middle;
+        max-height: 500px;
+        max-width: 360px;
+        text-align: center;
+        margin: 25px;
+    }
+}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width: 768px) {
+    #logoTUL {
+        vertical-align: middle;
+        max-height: 800px;
+        max-width: 608px;
+        text-align: center;
+        margin: 30px
+    }
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (min-width: 992px) {
+    #logoTUL {
+        vertical-align: middle;
+        max-height: 800px;
+        max-width: 800px;
+        text-align: center;
+        margin: 50px;
+    }
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width: 1200px) {
+    #logoTUL {
+        vertical-align: middle;
+
+        max-height: 800px;
+        max-width: 1000px;
+        text-align: center;
+        margin: 50px;
+    }
+
+}
