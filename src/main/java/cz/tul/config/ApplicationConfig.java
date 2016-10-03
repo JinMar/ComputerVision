@@ -47,7 +47,7 @@ public class ApplicationConfig {
         LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
         sessionBuilder.addProperties(getHibernateProperties());
         //Sem se musí nasetovat všechny třídy oanotovane @Entity
-        sessionBuilder.addAnnotatedClasses(Atribute.class);
+        sessionBuilder.addAnnotatedClasses(Attribute.class);
         sessionBuilder.addAnnotatedClasses(Chain.class);
         sessionBuilder.addAnnotatedClasses(Method.class);
         sessionBuilder.addAnnotatedClasses(Part.class);

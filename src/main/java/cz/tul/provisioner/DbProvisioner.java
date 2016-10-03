@@ -34,7 +34,7 @@ public class DbProvisioner implements InitializingBean {
 
         Set<Method> methods = new HashSet<>();
         Set<MethodAttributes> methodAttributes = new HashSet<>();
-        Atribute atribute = new Atribute();
+        Attribute attribute = new Attribute();
 
         // RGB funkce
         Method redChannel = new Method();
@@ -135,11 +135,11 @@ public class DbProvisioner implements InitializingBean {
         ///// testing
 
 /*
-        Set<Atribute> atributes = new HashSet<>();
+        Set<Attribute> atributes = new HashSet<>();
 
-        atribute.setAtributeId(UUID.randomUUID().toString());
-        atribute.setMax(5);
-        atributes.add(atribute);
+        attribute.setAtributeId(UUID.randomUUID().toString());
+        attribute.setMax(5);
+        atributes.add(attribute);
 
         Chain chain = new Chain();
         Method method = new Method();
@@ -161,7 +161,7 @@ public class DbProvisioner implements InitializingBean {
         part.setMethod(method);
 
 
-        atributeDao.save(atribute);
+        atributeDao.save(attribute);
         chainDao.save(chain);
         methodDao.save(method);
         partDao.save(part);

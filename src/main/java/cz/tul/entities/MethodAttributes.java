@@ -20,12 +20,12 @@ public class MethodAttributes implements Serializable, CustomEntity {
     private Method method;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ATRIBUTE_ID")
-    private Atribute atribute;
+    @JoinColumn(name = "ATTRIBUTE_ID")
+    private Attribute attribute;
 
 
     @Column(name = "ATTRIBUTE_TYPE")
-    private AtributeType atributeType;
+    private AttributeType attributeType;
 
     //kdyz je -1 nebyla nastavena hodnota
     @Column(name = "DEFAULT_VALUE")
@@ -46,12 +46,12 @@ public class MethodAttributes implements Serializable, CustomEntity {
     }
 
 
-    public AtributeType getAtributeType() {
-        return atributeType;
+    public AttributeType getAttributeType() {
+        return attributeType;
     }
 
-    public void setAtributeType(AtributeType atributeType) {
-        this.atributeType = atributeType;
+    public void setAttributeType(AttributeType attributeType) {
+        this.attributeType = attributeType;
     }
 
     public String getDefaultValues() {
@@ -95,12 +95,12 @@ public class MethodAttributes implements Serializable, CustomEntity {
         this.method = method;
     }
 
-    public Atribute getAtribute() {
-        return atribute;
+    public Attribute getAttribute() {
+        return attribute;
     }
 
-    public void setAtribute(Atribute atribute) {
-        this.atribute = atribute;
+    public void setAttribute(Attribute attribute) {
+        this.attribute = attribute;
     }
 
 
