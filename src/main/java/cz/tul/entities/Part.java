@@ -41,67 +41,72 @@ public class Part implements Serializable, CustomEntity {
         partId = UUID.randomUUID().toString();
     }
 
-    public String getPartId() {
-        return partId;
-    }
+    //SETTERS
 
     public void setPartId(String partId) {
         this.partId = partId;
-    }
-
-    public Chain getChain() {
-        return chain;
     }
 
     public void setChain(Chain chain) {
         this.chain = chain;
     }
 
-    public MethodAttributes getMethodAttributes() {
-        return methodAttributes;
-    }
-
     public void setMethodAttributes(MethodAttributes methodAttributes) {
         this.methodAttributes = methodAttributes;
-    }
-
-    public int getPosition() {
-        return position;
     }
 
     public void setPosition(int position) {
         this.position = position;
     }
 
-    public String getCurrentValue() {
-        return currentValue;
-    }
-
     public void setCurrentValue(String currentValue) {
         this.currentValue = currentValue;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultVAlue(String defaultValue) {
+    public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
     }
 
     public void setMaxValue(double maxValue) {
         this.maxValue = maxValue;
     }
 
-    public double getMinValue() {
-        return minValue;
-    }
-
     public void setMinValue(double minValue) {
         this.minValue = minValue;
+    }
+
+    //GETTERS
+
+
+    public String getPartId() {
+        return partId;
+    }
+
+    public Chain getChain() {
+        return chain;
+    }
+
+    public MethodAttributes getMethodAttributes() {
+        return methodAttributes;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public String getCurrentValue() {
+        return currentValue;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+    public double getMinValue() {
+        return minValue;
     }
 }

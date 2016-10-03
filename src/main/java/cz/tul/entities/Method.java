@@ -26,29 +26,32 @@ public class Method implements Serializable, CustomEntity {
         methodId = UUID.randomUUID().toString();
     }
 
-    public Set<MethodAttributes> getMethodAttributes() {
-        return methodAttributes;
-    }
-
-    public void setMethodAttributes(Set<MethodAttributes> methodAttributes) {
-        this.methodAttributes = methodAttributes;
-    }
-
-    public String getMethodId() {
-        return methodId;
-    }
+    //SETTERS
 
     public void setMethodId(String methodId) {
         this.methodId = methodId;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public void setMethodAttributes(Set<MethodAttributes> methodAttributes) {
+        this.methodAttributes = methodAttributes;
+    }
 
+    //GETTERS
+
+
+    public String getMethodId() {
+        return methodId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Set<MethodAttributes> getMethodAttributes() {
+        return methodAttributes;
+    }
 }

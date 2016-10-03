@@ -46,62 +46,64 @@ public class MethodAttributes implements Serializable, CustomEntity {
     }
 
 
-    public AttributeType getAttributeType() {
-        return attributeType;
-    }
-
-    public void setAttributeType(AttributeType attributeType) {
-        this.attributeType = attributeType;
-    }
-
-    public String getDefaultValues() {
-        return defaultValues;
-    }
-
-    public void setDefaultValues(String defaultValues) {
-        this.defaultValues = defaultValues;
-    }
-
-    public double getMinValue() {
-        return minValue;
-    }
-
-    public void setMinValue(double minValue) {
-        this.minValue = minValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public String getMethodAttributesId() {
-        return methodAttributesId;
-    }
+    //SETTERS
 
     public void setMethodAttributesId(String methodAttributesId) {
         this.methodAttributesId = methodAttributesId;
-    }
-
-
-    public Method getMethod() {
-        return method;
     }
 
     public void setMethod(Method method) {
         this.method = method;
     }
 
-    public Attribute getAttribute() {
-        return attribute;
-    }
-
     public void setAttribute(Attribute attribute) {
         this.attribute = attribute;
     }
 
+    public void setAttributeType(AttributeType attributeType) {
+        this.attributeType = attributeType;
+    }
 
+    public void setDefaultValues(String defaultValues) {
+        this.defaultValues = defaultValues;
+    }
+
+    public void setMinValue(double minValue) {
+        this.minValue = minValue;
+    }
+
+    public void setMaxValue(double maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    //GETTERS
+
+
+    public String getMethodAttributesId() {
+        return methodAttributesId;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public Attribute getAttribute() {
+        return attribute;
+    }
+
+    public AttributeType getAttributeType() {
+        return attributeType;
+    }
+
+    public String getDefaultValues() {
+        return defaultValues;
+    }
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
 }

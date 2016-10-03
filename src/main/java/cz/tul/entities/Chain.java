@@ -28,29 +28,31 @@ public class Chain implements Serializable, CustomEntity {
         chainId = UUID.randomUUID().toString();
     }
 
-    public String getChainId() {
-        return chainId;
-    }
+    //SETTERS
 
     public void setChainId(String chainId) {
         this.chainId = chainId;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
     }
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    public Set<Part> getChainParts() {
-        return chainParts;
-    }
-
     public void setChainParts(Set<Part> chainParts) {
         this.chainParts = chainParts;
     }
 
+    //GETTERS
 
+    public String getChainId() {
+        return chainId;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public Set<Part> getChainParts() {
+        return chainParts;
+    }
 }
