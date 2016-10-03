@@ -1,4 +1,4 @@
-package cz.tul.config.view;
+package cz.tul.config;
 
 /**
  * Created by Marek on 21.07.2016.

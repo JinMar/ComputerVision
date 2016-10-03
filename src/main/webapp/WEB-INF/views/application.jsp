@@ -24,6 +24,14 @@
     <spring:url value="/img/logo-fm.png" var="logo"/>
 
 
+    <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
+    <spring:url value="/js/jquery.js" var="coreJs"/>
+    <spring:url value="/js/jquery-ui.js" var="coreJSUI"/>
+    <script src="${attributeSetup}"></script>
+    <script src="${coreJs}"></script>
+    <script src="${coreJSUI}"></script>
+
+
 </head>
 
 <body>
@@ -76,21 +84,18 @@
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
 
-            <h2>Vítejte na stránkách semestrálního projektu</h2>
+            <h2>Vítejte na stránkách diplomové práce</h2>
+            <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
+            <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
 
-            <p>Tato stránka vznikla v rámci semestrálního projektu a bude se
-                zabývat zpracováním obrazu.
-            </p>
-            <p>Nejprve na tìchto stánkách budou
-                implementovány jednodušší techniky pro zpracování obrazu, které
-                budou v prùbìhu roku rozvíjeny a stanou se základními kameny pro
-                techniky složitìjší. </p>
-            <p>Cílem této práce je vytvoøit komplexní systém,
-                který umožní uživateli zpracovávat obraz skrze webové rozhraní.
-            </p>
+            <!-- Here will be new methods -->
+            <div class="contentBody">
+                <ul id="sortable"></ul>
+            </div>
+
         </div>
     </div>
-    <div class="wraper"><p class="Button"><a href="/AplicationManySteps">Spustit aplikaci</a></p></div>
+    <div class="wraper"><p class="Button"><a href="/application">Spustit aplikaci</a></p></div>
 </div>
 <footer class="footer">
 
