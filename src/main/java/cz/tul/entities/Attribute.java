@@ -26,6 +26,12 @@ public class Attribute implements Serializable, CustomEntity {
         attributeId = UUID.randomUUID().toString();
     }
 
+    public Attribute(String name) {
+        attributeId = UUID.randomUUID().toString();
+        this.name = name;
+    }
+
+
     //SETTERS
 
     public void setAttributeId(String attributeId) {

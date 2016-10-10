@@ -1,9 +1,10 @@
 package cz.tul.repositories;
 
 import cz.tul.entities.Method;
+import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by Marek on 29.09.2016.
@@ -11,8 +12,10 @@ import java.util.Set;
 @Repository
 public class MethodDAO extends BasicRepositoryAbstract {
 
-    public Set<Method> getAllMethod() {
-
-        return null;
+    public List<Method> getAllMethods() {
+        Query query = getQuery("from Method");
+        return (List<Method>) query.list();
     }
+
+
 }

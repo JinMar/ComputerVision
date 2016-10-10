@@ -2,6 +2,7 @@ package cz.tul.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -37,6 +38,11 @@ public class MethodAttributes implements Serializable, CustomEntity {
     @Column(name = "MAX_VALUE")
     private double maxValue;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "options", joinColumns = @JoinColumn(name = "id"))
+    @MapKeyColumn(name = "keymap")
+    @Column(name = "valuemap")
+    private Map<String, String> options;
 
     public MethodAttributes() {
         methodAttributesId = UUID.randomUUID().toString();
@@ -76,6 +82,10 @@ public class MethodAttributes implements Serializable, CustomEntity {
         this.maxValue = maxValue;
     }
 
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
+    }
+
     //GETTERS
 
 
@@ -105,5 +115,9 @@ public class MethodAttributes implements Serializable, CustomEntity {
 
     public double getMaxValue() {
         return maxValue;
+    }
+
+    public Map<String, String> getOptions() {
+        return options;
     }
 }

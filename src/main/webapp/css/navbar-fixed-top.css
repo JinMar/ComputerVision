@@ -87,6 +87,63 @@ body {
     border-radius: 5px;
 }
 
+.methodItem {
+    padding: 5px;
+    width: 300px;
+    min-height: 200px;
+    border: 1px solid #7d7d7d;
+    border-radius: 3px;
+    background: #e8e8e8;
+    list-style: none;
+}
+
+.methodName {
+    float: left;
+    margin-left: 3px;
+    width: 130px;
+}
+
+.preview {
+    float: left
+}
+
+select {
+    height: 30px;
+    line-height: 30px;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0 2px;
+}
+
+input {
+    width: 115px;
+}
+
+td {
+    word-wrap: break-word
+}
+
+.closeB {
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+button.closeB {
+    padding: 0;
+    cursor: pointer;
+    background: 0 0;
+    border: 0
+}
+
+.clr {
+    clear: both;
+}
+
 @media only screen and (min-width: 320px) {
     #logoTUL {
         vertical-align: middle;

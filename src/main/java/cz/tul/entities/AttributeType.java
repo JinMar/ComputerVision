@@ -4,8 +4,8 @@ package cz.tul.entities;
  * Created by Marek on 27.09.2016.
  */
 public enum AttributeType {
-    SIMPLE("SIMPLE"),
-    MULTIPLEVALUES("MULTIPLEVALUES");
+    NUMBER("number"),
+    SELECT("select");
 
     private String attributeType;
 

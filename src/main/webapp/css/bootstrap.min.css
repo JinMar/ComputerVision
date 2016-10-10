@@ -267,8 +267,6 @@ td, th {
     }
 }
 
-
-
 .glyphicon {
     position: relative;
     top: 1px;
@@ -2908,7 +2906,8 @@ input[type=range] {
 }
 
 select[multiple], select[size] {
-    height: auto
+    height: 25px;
+    width: 115px;
 }
 
 input[type=file]:focus, input[type=checkbox]:focus, input[type=radio]:focus {
@@ -4290,8 +4289,6 @@ select[multiple].input-group-sm > .form-control, select[multiple].input-group-sm
     display: block;
     padding: 10px 15px
 }
-
-
 
 .nav > li.disabled > a {
     color: #777
@@ -6915,9 +6912,12 @@ button.close {
     }
 }
 
+display: table
 
-    display: table;
-    content: " "
+;
+content:
+
+" "
 }
 
 .btn-group-vertical > .btn-group:after, .btn-toolbar:after, .clearfix:after, .container-fluid:after, .container:after, .dl-horizontal dd:after, .form-horizontal .form-group:after, .modal-footer:after, .modal-header:after, .nav:after, .navbar-collapse:after, .navbar-header:after, .navbar:after, .pager:after, .panel-body:after, .row:after {

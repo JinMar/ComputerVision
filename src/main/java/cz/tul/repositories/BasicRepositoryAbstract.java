@@ -1,6 +1,7 @@
 package cz.tul.repositories;
 
 import cz.tul.entities.CustomEntity;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +36,10 @@ public abstract class BasicRepositoryAbstract {
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Transactional
+    protected Query getQuery(String hql) {
+        return getSessionFactory().getCurrentSession().createQuery(hql);
     }
 }

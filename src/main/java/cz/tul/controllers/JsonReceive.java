@@ -1,6 +1,6 @@
 package cz.tul.controllers;
 
-import cz.tul.controllers.transferObjects.DTO;
+import cz.tul.controllers.transferObjects.*;
 import cz.tul.services.ContentProviderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +35,29 @@ public class JsonReceive {
 
         return "aaa";
     }
-/*
+
     @RequestMapping(value = "/getMethods", method = RequestMethod.POST)
     public
     @ResponseBody
-    Set<MethodDTO> getMethods() {
-        System.out.println("getmethod");
-        contentProviderService.getAllMethod();
-        return "aaa";
+    List<MethodsDTO> getMethods() {
+        logger.info("getting methods");
+        List<MethodsDTO> result = contentProviderService.getAllMethod();
+        return result;
     }
-*/
+
+
+    @RequestMapping(value = "/getAttributes", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    WrappedAtrDTO getAttributes(@RequestBody final List<RequestData> requestData) {
+        logger.info("getting atributes for method with id {}", requestData.get(0).getIdMethod());
+
+        contentProviderService.getAtributesByMethodId(requestData.get(0).getIdMethod());
+
+        List<AttributesDTO> result = contentProviderService.getAtributesByMethodId(requestData.get(0).getIdMethod());
+        WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(result, requestData.get(0).getPageAttributeId());
+
+        return wrappedAtrDTO;
+    }
 
 }

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Created by Marek on 02.10.2016.
+ * Created by Marek Jindrak on 02.10.2016.
  */
 @Entity
 @Table(name = "CHAIN")
@@ -22,7 +22,7 @@ public class Chain implements Serializable, CustomEntity {
     private Date createDate;
 
     @OneToMany(mappedBy = "chain")
-    private Set<Part> chainParts = new HashSet<Part>();
+    private Set<Part> chainParts = new HashSet<>();
 
     public Chain() {
         chainId = UUID.randomUUID().toString();

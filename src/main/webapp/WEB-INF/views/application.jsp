@@ -22,6 +22,7 @@
     <spring:url value="/js/bootstrap.min.js" var="bootstrapJs"/>
     <script src="${bootstrapJs}"></script>
     <spring:url value="/img/logo-fm.png" var="logo"/>
+    <spring:url value="/img/test.png" var="tst"/>
 
 
     <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
@@ -82,13 +83,13 @@
 </div>
 <div class="container">
     <div class="row">
+        <h2>Vítejte na stránkách diplomové práce</h2>
+        <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
+        <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
         <div class="col-xs-12 col-sm-12 col-md-12">
-
-            <h2>Vítejte na stránkách diplomové práce</h2>
-            <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
-            <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
-
             <!-- Here will be new methods -->
+
+
             <div class="contentBody">
                 <ul id="sortable"></ul>
             </div>

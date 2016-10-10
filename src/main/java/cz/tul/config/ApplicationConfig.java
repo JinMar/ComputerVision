@@ -25,8 +25,8 @@ public class ApplicationConfig {
     public DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/computervision?createDatabaseIfNotExist=true&useSSL=false");
-        dataSource.setUsername("root");
+        dataSource.setUrl("jdbc:mysql://10.22.22.16:3306/computervision?createDatabaseIfNotExist=true&useSSL=false");
+        dataSource.setUsername("admin");
         dataSource.setPassword("admin");
         return dataSource;
     }
