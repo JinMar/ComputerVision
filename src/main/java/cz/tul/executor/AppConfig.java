@@ -16,19 +16,30 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AppConfig implements AsyncConfigurer {
 
+    private ThreadPoolTaskExecutor executor;
+
     @Bean
-    public MyAsyncBean asyncBean() {
-        return new MyAsyncBean();
+    public Task asyncTask() {
+
+        return new Task();
+    }
+
+    @Bean
+    public ThreadPoolTaskExecutor getExecutor() {
+
+        return (ThreadPoolTaskExecutor) getAsyncExecutor();
     }
 
     @Override
     public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(7);
-        executor.setMaxPoolSize(42);
-        executor.setQueueCapacity(11);
-        executor.setThreadNamePrefix("MyExecutor-");
-        executor.initialize();
+        if (executor == null) {
+            executor = new ThreadPoolTaskExecutor();
+            executor.setCorePoolSize(7);
+            executor.setMaxPoolSize(42);
+            executor.setQueueCapacity(11);
+            executor.setThreadNamePrefix("MyExecutor-");
+            executor.initialize();
+        }
         return executor;
     }
 
@@ -36,4 +47,6 @@ public class AppConfig implements AsyncConfigurer {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return null;
     }
+
+
 }

@@ -2,7 +2,9 @@ package cz.tul.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -24,6 +26,8 @@ public class MethodAttributes implements Serializable, CustomEntity {
     @JoinColumn(name = "ATTRIBUTE_ID")
     private Attribute attribute;
 
+    @OneToMany(mappedBy = "methodAttributes")
+    private Set<PartAttributeValue> partAttributeValues = new HashSet<PartAttributeValue>();
 
     @Column(name = "ATTRIBUTE_TYPE")
     private AttributeType attributeType;
@@ -86,6 +90,9 @@ public class MethodAttributes implements Serializable, CustomEntity {
         this.options = options;
     }
 
+    public void setPartAttributeValues(Set<PartAttributeValue> partAttributeValues) {
+        this.partAttributeValues = partAttributeValues;
+    }
     //GETTERS
 
 
@@ -119,5 +126,9 @@ public class MethodAttributes implements Serializable, CustomEntity {
 
     public Map<String, String> getOptions() {
         return options;
+    }
+
+    public Set<PartAttributeValue> getPartAttributeValues() {
+        return partAttributeValues;
     }
 }

@@ -18,10 +18,16 @@ public class MethodAttributesDAO extends BasicRepositoryAbstract {
         return methodAttributes;
     }
 
-    public List<MethodAttributes> getMethodAttributesById(String id) {
+    public List<MethodAttributes> getMethodAttributesByMethodId(String id) {
         String hql = "FROM MethodAttributes MA where MA.method ='" + id + "'";
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
         List<MethodAttributes> methodAttributes = (List<MethodAttributes>) query.list();
         return methodAttributes;
+    }
+
+    public MethodAttributes getMethodAttributesById(String id) {
+        String hql = "FROM MethodAttributes MA where MA.methodAttributesId ='" + id + "'";
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        return (MethodAttributes) query.list().get(0);
     }
 }

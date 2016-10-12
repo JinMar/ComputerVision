@@ -5,7 +5,8 @@ package cz.tul.entities;
  */
 public enum AttributeType {
     NUMBER("number"),
-    SELECT("select");
+    SELECT("select"),
+    TEXT("text");
 
     private String attributeType;
 

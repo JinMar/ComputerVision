@@ -24,13 +24,12 @@
     <spring:url value="/img/logo-fm.png" var="logo"/>
     <spring:url value="/img/test.png" var="tst"/>
 
-
-    <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
     <spring:url value="/js/jquery.js" var="coreJs"/>
     <spring:url value="/js/jquery-ui.js" var="coreJSUI"/>
-    <script src="${attributeSetup}"></script>
+    <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
     <script src="${coreJs}"></script>
     <script src="${coreJSUI}"></script>
+    <script src="${attributeSetup}"></script>
 
 
 </head>
@@ -86,18 +85,27 @@
         <h2>Vítejte na stránkách diplomové práce</h2>
         <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
         <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
+
+        <div id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
+            <img src="/img/test.png" class="img-thumbnail preview" alt="Cinque Terre" width="152">
+            <div class="methodName">
+                <p>ZÁKALDNÍ OBRÁZEK</p>
+            </div>
+            <form class="input-group" id="img2b64">
+                <input id="inputFileToLoad" type="file"/>
+            </form>
+        </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <!-- Here will be new methods -->
-
-
             <div class="contentBody">
                 <ul id="sortable"></ul>
             </div>
 
         </div>
     </div>
-    <div class="wraper"><p class="Button"><a href="/application">Spustit aplikaci</a></p></div>
+
 </div>
+<div class="clr"></div>
 <footer class="footer">
 
     <p>&copy; Semestrální projekt 2016. All rights reserved. Design by Marek Jindrák.</p>

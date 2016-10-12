@@ -21,6 +21,9 @@ public class Chain implements Serializable, CustomEntity {
     @Column(name = "CREATE_DATE")
     private Date createDate;
 
+    @Column(name = "STATE")
+    private StateEnum state;
+
     @OneToMany(mappedBy = "chain")
     private Set<Part> chainParts = new HashSet<>();
 
@@ -42,6 +45,9 @@ public class Chain implements Serializable, CustomEntity {
         this.chainParts = chainParts;
     }
 
+    public void setState(StateEnum state) {
+        this.state = state;
+    }
     //GETTERS
 
     public String getChainId() {
@@ -54,5 +60,9 @@ public class Chain implements Serializable, CustomEntity {
 
     public Set<Part> getChainParts() {
         return chainParts;
+    }
+
+    public StateEnum getState() {
+        return state;
     }
 }

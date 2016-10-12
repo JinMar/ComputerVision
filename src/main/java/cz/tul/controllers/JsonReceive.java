@@ -24,16 +24,14 @@ public class JsonReceive {
     @Autowired
     private ContentProviderService contentProviderService;
 
-    @RequestMapping(value = "/ajax", method = RequestMethod.POST)
+    @RequestMapping(value = "/createChain", method = RequestMethod.POST)
     public
     @ResponseBody
-    String receiveChain(@RequestBody final List<DTO> dtos, HttpServletRequest request) {
-        System.out.println("Velikost " + dtos.size());
-        for (DTO dto : dtos) {
-            logger.info(dto.toString());
-        }
-
-        return "aaa";
+    Message receiveChain(@RequestBody final List<ChainDTO> chainDtos, HttpServletRequest request) {
+        Message msg = new Message();
+        msg.setChainId(contentProviderService.createWholeChain(chainDtos));
+        msg.setMessage("OK");
+        return msg;
     }
 
     @RequestMapping(value = "/getMethods", method = RequestMethod.POST)

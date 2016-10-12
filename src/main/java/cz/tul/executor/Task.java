@@ -1,6 +1,8 @@
 package cz.tul.executor;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 
 
@@ -9,10 +11,12 @@ import org.springframework.scheduling.annotation.Async;
  */
 
 public class Task {
+    private static final Logger logger = LoggerFactory.getLogger(Task.class);
+
     @Async
-    public void asyn(int text) throws InterruptedException {
-        System.out.println(text + " Execute method asynchronously. "
-                + Thread.currentThread().getName());
+    public void execute(int text) throws InterruptedException {
+        logger.info(" Execute chain with id: " + text);
+        //   + Thread.currentThread().getName());
         Thread.sleep(3000 * text);
 
     }

@@ -25,7 +25,7 @@ public class ApplicationConfig {
     public DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://10.22.22.16:3306/computervision?createDatabaseIfNotExist=true&useSSL=false");
+        dataSource.setUrl("jdbc:mysql://10.22.22.16:3306/computervision?createDatabaseIfNotExist=true&useSSL=false&max_allowed_packet=33554432");
         dataSource.setUsername("admin");
         dataSource.setPassword("admin");
         return dataSource;
@@ -51,6 +51,7 @@ public class ApplicationConfig {
         sessionBuilder.addAnnotatedClasses(Chain.class);
         sessionBuilder.addAnnotatedClasses(Method.class);
         sessionBuilder.addAnnotatedClasses(Part.class);
+        sessionBuilder.addAnnotatedClasses(PartAttributeValue.class);
         sessionBuilder.addAnnotatedClasses(MethodAttributes.class);
         return sessionBuilder.buildSessionFactory();
     }

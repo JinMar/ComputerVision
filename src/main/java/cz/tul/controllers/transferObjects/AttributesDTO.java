@@ -17,6 +17,7 @@ public class AttributesDTO implements Serializable {
     private String name;
     private AttributeType attributeType;
     private Map<String, String> options;
+    private String methodAttributesId;
 
     //SETTERS
 
@@ -45,6 +46,9 @@ public class AttributesDTO implements Serializable {
         this.options = options;
     }
 
+    public void setMethodAttributesId(String methodAttributesId) {
+        this.methodAttributesId = methodAttributesId;
+    }
     //GETTERS
 
     public String getDefaultValues() {
@@ -69,5 +73,9 @@ public class AttributesDTO implements Serializable {
 
     public Map<String, String> getOptions() {
         return options;
+    }
+
+    public String getMethodAttributesId() {
+        return methodAttributesId;
     }
 }

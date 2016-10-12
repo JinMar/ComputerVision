@@ -24,6 +24,8 @@ public class DbProvisioner implements InitializingBean {
     PartDAO partDAO;
     @Autowired
     MethodAttributesDAO methodAttributesDAO;
+    @Autowired
+    PartAttributeValueDAO partAttributeValueDAO;
 
 
     @Override
@@ -142,15 +144,18 @@ public class DbProvisioner implements InitializingBean {
         Attribute attribute = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
         Attribute size = new Attribute("Velikost");
+        Attribute inputImg = new Attribute("Vstupní obraz");
 
         attributes.add(attribute);
         attributes.add(shape);
         attributes.add(size);
-
+        attributes.add(inputImg);
         attributeDAO.save(attributes);
 
         redMethodAttributes.setAttribute(attribute);
         redMethodAttributes.setAttributeType(AttributeType.NUMBER);
+        originalMethodAttributes.setAttribute(inputImg);
+        originalMethodAttributes.setAttributeType(AttributeType.TEXT);
 
         Map<String, String> shapes = new HashMap<>();
         shapes.put("oval", "Oval");
@@ -209,53 +214,24 @@ public class DbProvisioner implements InitializingBean {
 
         //Testing parts
         Part part = new Part();
-        part.setMethodAttributes(redMethodAttributes);
-        part.setCurrentValue("hoooooovno");
+        part.setState(StateEnum.ACTIVE);
         part.setChain(testChain);
         part.setPosition(0);
         Part part1 = new Part();
-        part1.setMethodAttributes(redMethodAttributes);
+        part1.setState(StateEnum.ACTIVE);
         part1.setChain(testChain);
         part1.setPosition(1);
         partDAO.save(part);
         partDAO.save(part1);
 
-
-        ///// testing
-
-/*
-        Set<Attribute> atributes = new HashSet<>();
-
-        attribute.setAtributeId(UUID.randomUUID().toString());
-        attribute.setMax(5);
-        atributes.add(attribute);
-
-        Chain chain = new Chain();
-        Method method = new Method();
-        Part part = new Part();
+        PartAttributeValue partAttributeValue = new PartAttributeValue();
+        partAttributeValue.setPart(part);
+        partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
+        partAttributeValue.setValue("Parada");
+        partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
+        partAttributeValueDAO.save(partAttributeValue);
 
 
-        chain.setChainId(UUID.randomUUID().toString());
-        chain.setCreateDate("ted");
-
-        method.setMethodId(UUID.randomUUID().toString());
-        method.setName("Blue");
-
-        method.setAtributes(atributes);
-
-
-        part.setPartId(UUID.randomUUID().toString());
-        part.setPosition(1);
-        part.setChain(chain);
-        part.setMethod(method);
-
-
-        atributeDao.save(attribute);
-        chainDao.save(chain);
-        methodDao.save(method);
-        partDao.save(part);
-        //partDao.save(part2);
-*/
     }
 
     public AttributeDAO getAttributeDAO() {

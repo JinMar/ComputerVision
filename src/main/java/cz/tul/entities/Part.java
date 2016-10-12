@@ -2,6 +2,8 @@ package cz.tul.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -18,24 +20,14 @@ public class Part implements Serializable, CustomEntity {
     @JoinColumn(name = "CHAIN_ID")
     private Chain chain;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "METHODATTRIBUTE_ID")
-    private MethodAttributes methodAttributes;
+    @OneToMany(mappedBy = "part")
+    private Set<PartAttributeValue> partAttributeValues = new HashSet<>();
 
     @Column(name = "POSITION")
     private int position;
 
-    @Column(name = "CURRENTVALUE")
-    private String currentValue;
-
-    @Column(name = "DEFAUELT_VALUE")
-    private String defaultValue;
-
-    @Column(name = "MAX_VALUE")
-    private double maxValue;
-
-    @Column(name = "MIN_VALUe")
-    private double minValue;
+    @Column(name = "STATE")
+    private StateEnum state;
 
     public Part() {
         partId = UUID.randomUUID().toString();
@@ -51,28 +43,16 @@ public class Part implements Serializable, CustomEntity {
         this.chain = chain;
     }
 
-    public void setMethodAttributes(MethodAttributes methodAttributes) {
-        this.methodAttributes = methodAttributes;
+    public void setPartAttributeValues(Set<PartAttributeValue> partAttributeValues) {
+        this.partAttributeValues = partAttributeValues;
     }
 
     public void setPosition(int position) {
         this.position = position;
     }
 
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public void setMinValue(double minValue) {
-        this.minValue = minValue;
+    public void setState(StateEnum state) {
+        this.state = state;
     }
 
     //GETTERS
@@ -86,27 +66,15 @@ public class Part implements Serializable, CustomEntity {
         return chain;
     }
 
-    public MethodAttributes getMethodAttributes() {
-        return methodAttributes;
+    public Set<PartAttributeValue> getPartAttributeValues() {
+        return partAttributeValues;
     }
 
     public int getPosition() {
         return position;
     }
 
-    public String getCurrentValue() {
-        return currentValue;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public double getMinValue() {
-        return minValue;
+    public StateEnum getState() {
+        return state;
     }
 }
