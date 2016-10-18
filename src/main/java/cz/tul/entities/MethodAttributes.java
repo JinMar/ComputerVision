@@ -11,7 +11,7 @@ import java.util.UUID;
  * Created by Marek on 03.10.2016.
  */
 @Entity
-@Table(name = "METHODATTRIBUTES")
+@Table(name = "methodattributes")
 public class MethodAttributes implements Serializable, CustomEntity {
 
     @Id

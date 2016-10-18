@@ -1,12 +1,21 @@
 package cz.tul.provisioner;
 
-import cz.tul.entities.*;
+import cz.tul.bussiness.register.MethodRegister;
+import cz.tul.bussiness.workers.*;
+import cz.tul.entities.Attribute;
+import cz.tul.entities.AttributeType;
+import cz.tul.entities.Method;
+import cz.tul.entities.MethodAttributes;
 import cz.tul.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import javax.servlet.ServletContext;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Marek on 29.09.2016.
@@ -26,89 +35,90 @@ public class DbProvisioner implements InitializingBean {
     MethodAttributesDAO methodAttributesDAO;
     @Autowired
     PartAttributeValueDAO partAttributeValueDAO;
+    @Autowired
+    ServletContext servletContext;
 
+    private MethodRegister methodRegister = MethodRegister.getInstance();
 
     @Override
-
     public void afterPropertiesSet() throws Exception {
+        String test = servletContext.getRealPath("/");
+        methodRegister.registerContextPath(test);
 
         Set<Method> methods = new HashSet<>();
         Set<MethodAttributes> methodAttributes = new HashSet<>();
         Set<Attribute> attributes = new HashSet<>();
 
         // RGB funkce
-        Method redChannel = new Method();
-        Method greenChannel = new Method();
-        Method blueChannel = new Method();
+        Method RGB = new Method();
         Method original = new Method();
-        Method gray = new Method();
-
         // YCBCR funkce
-        Method yChannel = new Method();
-        Method crChannel = new Method();
-        Method cbChannel = new Method();
-
+        Method YCBCR = new Method();
         // HSV
-        Method hChannel = new Method();
+        Method HSV = new Method();
+        //EDGE DETECTORS
+        Method detectors = new Method();
+        //NOISE
+        Method noise = new Method();
 
         //MORPOHOLOGY
-        Method erode = new Method();
+      /*  Method erode = new Method();
         Method dilate = new Method();
         Method open = new Method();
-        Method close = new Method();
+        Method close = new Method();*/
+
 
 
         // inicializace základních metoda ulozeni
 
-        redChannel.setName("redChannel");
-        greenChannel.setName("greenChannel");
-        blueChannel.setName("blueChannel");
-        yChannel.setName("yChannel");
-        crChannel.setName("crChannel");
-        cbChannel.setName("cbChannel");
-        hChannel.setName("hChannel");
+        RGB.setName("RGB");
+        YCBCR.setName("YCBCR");
+        HSV.setName("HSV");
         original.setName("original");
-        gray.setName("gray");
-        erode.setName("Eroze");
+        detectors.setName("Edge Detectors");
+        noise.setName("Noise reducer");
+
+       /* erode.setName("Eroze");
         dilate.setName("Dilatace");
         open.setName("Otevření");
-        close.setName("Uzavření");
+        close.setName("Uzavření");*/
         //ulozeni metod do databaze
-        methods.add(redChannel);
-        methods.add(greenChannel);
-        methods.add(blueChannel);
-        methods.add(yChannel);
-        methods.add(crChannel);
-        methods.add(cbChannel);
-        methods.add(hChannel);
+        methods.add(RGB);
+        methods.add(YCBCR);
+        methods.add(HSV);
+        methods.add(detectors);
+        methods.add(noise);
+
         methods.add(original);
-        methods.add(dilate);
+       /* methods.add(dilate);
         methods.add(erode);
         methods.add(close);
-        methods.add(gray);
-        methods.add(open);
+
+        methods.add(open);*/
         methodDAO.save(methods);
+        //test
+        methodRegister.register(original.getMethodId(), OriginalRGB.class);
+        methodRegister.register(RGB.getMethodId(), RGBChannel.class);
+        methodRegister.register(YCBCR.getMethodId(), YCBCRChannel.class);
+        methodRegister.register(HSV.getMethodId(), HSVChannel.class);
+        methodRegister.register(detectors.getMethodId(), EdgeDetector.class);
+        methodRegister.register(noise.getMethodId(), NoiseReducer.class);
 
 
-        //Testing chain
-        Chain testChain = new Chain();
-        testChain.setCreateDate(new Date());
-
-        chainDAO.save(testChain);
         //RGB
-        MethodAttributes redMethodAttributes = new MethodAttributes();
-        MethodAttributes greenMethodAttributes = new MethodAttributes();
-        MethodAttributes blueMethodAttributes = new MethodAttributes();
+        MethodAttributes rgbMethodAttributes = new MethodAttributes();
         //YCBCR
-        MethodAttributes yMethodAttributes = new MethodAttributes();
-        MethodAttributes cbMethodAttributes = new MethodAttributes();
-        MethodAttributes crMethodAttributes = new MethodAttributes();
-        //BASIC
-        MethodAttributes grayMethodAttributes = new MethodAttributes();
-        MethodAttributes originalMethodAttributes = new MethodAttributes();
+        MethodAttributes ycbcrMethodAttributes = new MethodAttributes();
         //HSV
-        MethodAttributes hMethodAttributes = new MethodAttributes();
+        MethodAttributes hsvMethodAttributes = new MethodAttributes();
+        //BASIC
+        MethodAttributes originalMethodAttributes = new MethodAttributes();
+        //EDGEDETECTORS
+        MethodAttributes detectorsMethodAttributes = new MethodAttributes();
+        //NOSISEDETOCTOR
+        MethodAttributes noiseMethodAttributes = new MethodAttributes();
 
+/*
         //MORPHOLOGY
         MethodAttributes erodeAttributesAtr1 = new MethodAttributes();
         MethodAttributes dilateAttributesAtr1 = new MethodAttributes();
@@ -117,19 +127,17 @@ public class DbProvisioner implements InitializingBean {
         MethodAttributes erodeAttributesAtr2 = new MethodAttributes();
         MethodAttributes dilateAttributesAtr2 = new MethodAttributes();
         MethodAttributes openAttributesAtr2 = new MethodAttributes();
-        MethodAttributes closeAttributesAtr2 = new MethodAttributes();
+        MethodAttributes closeAttributesAtr2 = new MethodAttributes();*/
 
         //inicializace
-        redMethodAttributes.setMethod(redChannel);
-        greenMethodAttributes.setMethod(greenChannel);
-        blueMethodAttributes.setMethod(blueChannel);
-        yMethodAttributes.setMethod(yChannel);
-        cbMethodAttributes.setMethod(cbChannel);
-        crMethodAttributes.setMethod(cbChannel);
-        grayMethodAttributes.setMethod(gray);
+        rgbMethodAttributes.setMethod(RGB);
+        ycbcrMethodAttributes.setMethod(YCBCR);
+        hsvMethodAttributes.setMethod(HSV);
         originalMethodAttributes.setMethod(original);
-        hMethodAttributes.setMethod(hChannel);
+        detectorsMethodAttributes.setMethod(detectors);
+        noiseMethodAttributes.setMethod(noise);
 
+/*
         erodeAttributesAtr1.setMethod(erode);
         dilateAttributesAtr1.setMethod(dilate);
         openAttributesAtr1.setMethod(open);
@@ -139,21 +147,24 @@ public class DbProvisioner implements InitializingBean {
         dilateAttributesAtr2.setMethod(dilate);
         openAttributesAtr2.setMethod(open);
         closeAttributesAtr2.setMethod(close);
+*/
 
-
-        Attribute attribute = new Attribute("Krok");
+        Attribute step = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
         Attribute size = new Attribute("Velikost");
         Attribute inputImg = new Attribute("Vstupní obraz");
+        Attribute channel = new Attribute("Vrstva");
+        Attribute type = new Attribute("Typ");
 
-        attributes.add(attribute);
+        attributes.add(type);
+        attributes.add(channel);
+        attributes.add(step);
         attributes.add(shape);
         attributes.add(size);
         attributes.add(inputImg);
         attributeDAO.save(attributes);
 
-        redMethodAttributes.setAttribute(attribute);
-        redMethodAttributes.setAttributeType(AttributeType.NUMBER);
+
         originalMethodAttributes.setAttribute(inputImg);
         originalMethodAttributes.setAttributeType(AttributeType.TEXT);
 
@@ -162,6 +173,55 @@ public class DbProvisioner implements InitializingBean {
         shapes.put("circle", "Kruh");
         shapes.put("square", "Čtverec");
         shapes.put("rectangle", "Obdelník");
+
+        Map<String, String> RGBChannels = new HashMap<>();
+        RGBChannels.put(ChannelsEnum.RED.getChannelName(), ChannelsEnum.RED.getChannelName());
+        RGBChannels.put(ChannelsEnum.GREEN.getChannelName(), ChannelsEnum.GREEN.getChannelName());
+        RGBChannels.put(ChannelsEnum.BLUE.getChannelName(), ChannelsEnum.BLUE.getChannelName());
+        RGBChannels.put(ChannelsEnum.GRAY.getChannelName(), ChannelsEnum.GRAY.getChannelName());
+        rgbMethodAttributes.setAttribute(channel);
+        rgbMethodAttributes.setAttributeType(AttributeType.SELECT);
+        rgbMethodAttributes.setOptions(RGBChannels);
+
+        Map<String, String> YCBCRChannels = new HashMap<>();
+        YCBCRChannels.put(ChannelsEnum.Y.getChannelName(), ChannelsEnum.Y.getChannelName());
+        YCBCRChannels.put(ChannelsEnum.CB.getChannelName(), ChannelsEnum.CB.getChannelName());
+        YCBCRChannels.put(ChannelsEnum.CR.getChannelName(), ChannelsEnum.CR.getChannelName());
+        ycbcrMethodAttributes.setAttribute(channel);
+        ycbcrMethodAttributes.setAttributeType(AttributeType.SELECT);
+        ycbcrMethodAttributes.setOptions(YCBCRChannels);
+
+        Map<String, String> HSVChannels = new HashMap<>();
+        HSVChannels.put(ChannelsEnum.H.getChannelName(), ChannelsEnum.H.getChannelName());
+        hsvMethodAttributes.setAttribute(channel);
+        hsvMethodAttributes.setAttributeType(AttributeType.SELECT);
+        hsvMethodAttributes.setOptions(HSVChannels);
+
+        Map<String, String> detectorTypes = new HashMap<>();
+        detectorTypes.put(EdgeDetectorEnum.LAPLACIAN.getDetectorlName(), EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        detectorTypes.put(EdgeDetectorEnum.SOBEL.getDetectorlName(), EdgeDetectorEnum.SOBEL.getDetectorlName());
+        detectorsMethodAttributes.setAttribute(type);
+        detectorsMethodAttributes.setAttributeType(AttributeType.SELECT);
+        detectorsMethodAttributes.setOptions(detectorTypes);
+
+        Map<String, String> noiseReducerTypes = new HashMap<>();
+        noiseReducerTypes.put(NoiseReducerEnum.MEDIAN.getReducerName(), NoiseReducerEnum.MEDIAN.getReducerName());
+        noiseReducerTypes.put(NoiseReducerEnum.SIMPLEAVERAGING.getReducerName(), NoiseReducerEnum.SIMPLEAVERAGING.getReducerName());
+        noiseMethodAttributes.setAttribute(type);
+        noiseMethodAttributes.setAttributeType(AttributeType.SELECT);
+        noiseMethodAttributes.setOptions(noiseReducerTypes);
+
+        methodAttributes.add(rgbMethodAttributes);
+        methodAttributes.add(ycbcrMethodAttributes);
+        methodAttributes.add(hsvMethodAttributes);
+        methodAttributes.add(originalMethodAttributes);
+        methodAttributes.add(detectorsMethodAttributes);
+        methodAttributes.add(noiseMethodAttributes);
+        methodAttributesDAO.save(methodAttributes);
+
+
+
+/*
 
         erodeAttributesAtr1.setAttribute(size);
         erodeAttributesAtr1.setOptions(shapes);
@@ -189,18 +249,11 @@ public class DbProvisioner implements InitializingBean {
         closeAttributesAtr2.setAttribute(shape);
         closeAttributesAtr2.setOptions(shapes);
         closeAttributesAtr2.setAttributeType(AttributeType.SELECT);
-
+*/
 
         //ulozeni atributu metod do databaze
-        methodAttributes.add(redMethodAttributes);
-        methodAttributes.add(greenMethodAttributes);
-        methodAttributes.add(blueMethodAttributes);
-        methodAttributes.add(yMethodAttributes);
-        methodAttributes.add(cbMethodAttributes);
-        methodAttributes.add(crMethodAttributes);
-        methodAttributes.add(grayMethodAttributes);
-        methodAttributes.add(originalMethodAttributes);
-        methodAttributes.add(hMethodAttributes);
+
+/*
         methodAttributes.add(erodeAttributesAtr1);
         methodAttributes.add(dilateAttributesAtr1);
         methodAttributes.add(openAttributesAtr1);
@@ -208,12 +261,12 @@ public class DbProvisioner implements InitializingBean {
         methodAttributes.add(erodeAttributesAtr2);
         methodAttributes.add(dilateAttributesAtr2);
         methodAttributes.add(openAttributesAtr2);
-        methodAttributes.add(closeAttributesAtr2);
+        methodAttributes.add(closeAttributesAtr2);*/
 
-        methodAttributesDAO.save(methodAttributes);
+
 
         //Testing parts
-        Part part = new Part();
+       /* Part part = new Part();
         part.setState(StateEnum.ACTIVE);
         part.setChain(testChain);
         part.setPosition(0);
@@ -222,14 +275,14 @@ public class DbProvisioner implements InitializingBean {
         part1.setChain(testChain);
         part1.setPosition(1);
         partDAO.save(part);
-        partDAO.save(part1);
-
+        partDAO.save(part1);*/
+/*
         PartAttributeValue partAttributeValue = new PartAttributeValue();
         partAttributeValue.setPart(part);
         partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
         partAttributeValue.setValue("Parada");
         partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
-        partAttributeValueDAO.save(partAttributeValue);
+        partAttributeValueDAO.save(partAttributeValue);*/
 
 
     }

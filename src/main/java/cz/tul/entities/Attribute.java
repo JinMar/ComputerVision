@@ -10,7 +10,7 @@ import java.util.UUID;
  * Created by Marek on 02.10.2016.
  */
 @Entity
-@Table(name = "ATTRIBUTE")
+@Table(name = "attribute")
 public class Attribute implements Serializable, CustomEntity {
     @Id
     @Column(name = "ATTRIBUTE_ID")

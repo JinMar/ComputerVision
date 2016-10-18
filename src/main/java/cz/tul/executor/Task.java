@@ -1,9 +1,15 @@
 package cz.tul.executor;
 
 
+import cz.tul.bussiness.workflow.Workflow;
+import cz.tul.entities.Chain;
+import cz.tul.repositories.ChainDAO;
+import cz.tul.repositories.PartDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+
+import java.util.Date;
 
 
 /**
@@ -14,10 +20,12 @@ public class Task {
     private static final Logger logger = LoggerFactory.getLogger(Task.class);
 
     @Async
-    public void execute(int text) throws InterruptedException {
-        logger.info(" Execute chain with id: " + text);
-        //   + Thread.currentThread().getName());
-        Thread.sleep(3000 * text);
+    public void execute(Chain chin, ChainDAO chainDAO, PartDAO partDAO) throws InterruptedException {
+        logger.info("Start executing:" + new Date());
+        Workflow workflow = new Workflow(chin, chainDAO, partDAO);
 
+        //   + Thread.currentThread().getName());
+        Thread.sleep(20000);
+        logger.info("End executing:" + new Date());
     }
 }

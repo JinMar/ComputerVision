@@ -10,7 +10,7 @@ import java.util.UUID;
  * Created by Marek on 02.10.2016.
  */
 @Entity
-@Table(name = "METHOD")
+@Table(name = "method")
 public class Method implements Serializable, CustomEntity {
     @Id
     @Column(name = "METHOD_ID")
@@ -21,6 +21,9 @@ public class Method implements Serializable, CustomEntity {
 
     @OneToMany(mappedBy = "method")
     private Set<MethodAttributes> methodAttributes = new HashSet<MethodAttributes>();
+
+    @OneToMany(mappedBy = "method")
+    private Set<MethodAttributes> methodPart = new HashSet<MethodAttributes>();
 
     public Method() {
         methodId = UUID.randomUUID().toString();
@@ -40,6 +43,10 @@ public class Method implements Serializable, CustomEntity {
         this.methodAttributes = methodAttributes;
     }
 
+    public void setMethodPart(Set<MethodAttributes> methodPart) {
+        this.methodPart = methodPart;
+    }
+
     //GETTERS
 
 
@@ -53,5 +60,9 @@ public class Method implements Serializable, CustomEntity {
 
     public Set<MethodAttributes> getMethodAttributes() {
         return methodAttributes;
+    }
+
+    public Set<MethodAttributes> getMethodPart() {
+        return methodPart;
     }
 }

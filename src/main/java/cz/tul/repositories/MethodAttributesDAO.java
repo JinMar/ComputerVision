@@ -28,6 +28,11 @@ public class MethodAttributesDAO extends BasicRepositoryAbstract {
     public MethodAttributes getMethodAttributesById(String id) {
         String hql = "FROM MethodAttributes MA where MA.methodAttributesId ='" + id + "'";
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
-        return (MethodAttributes) query.list().get(0);
+        List<MethodAttributes> results = query.list();
+        if (results.size() > 0) {
+            return (MethodAttributes) query.list().get(0);
+        } else {
+            return null;
+        }
     }
 }

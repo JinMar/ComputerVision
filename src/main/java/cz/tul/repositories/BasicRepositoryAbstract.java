@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,6 +27,19 @@ public abstract class BasicRepositoryAbstract {
     public <T extends CustomEntity> void save(Set<T> entities) {
         for (T entity : entities) {
             sessionFactory.getCurrentSession().save(entity);
+        }
+
+    }
+
+    @Transactional
+    public <T extends CustomEntity> void update(T entity) {
+        sessionFactory.getCurrentSession().update(entity);
+    }
+
+    @Transactional
+    public <T extends CustomEntity> void update(List<T> entities) {
+        for (T entity : entities) {
+            sessionFactory.getCurrentSession().update(entity);
         }
 
     }

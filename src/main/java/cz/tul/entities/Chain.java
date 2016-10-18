@@ -12,7 +12,7 @@ import java.util.UUID;
  * Created by Marek Jindrak on 02.10.2016.
  */
 @Entity
-@Table(name = "CHAIN")
+@Table(name = "chain")
 public class Chain implements Serializable, CustomEntity {
     @Id
     @Column(name = "CHAIN_ID")
@@ -24,7 +24,7 @@ public class Chain implements Serializable, CustomEntity {
     @Column(name = "STATE")
     private StateEnum state;
 
-    @OneToMany(mappedBy = "chain")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chain")
     private Set<Part> chainParts = new HashSet<>();
 
     public Chain() {

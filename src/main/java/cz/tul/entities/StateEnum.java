@@ -6,7 +6,8 @@ package cz.tul.entities;
 public enum StateEnum {
     COMPLETE("complete"),
     ERROR("error"),
-    ACTIVE("active");
+    ACTIVE("active"),
+    PROCESSING("processing");
     private String state;
 
     StateEnum(String key) {

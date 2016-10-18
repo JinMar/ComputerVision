@@ -6,6 +6,7 @@ import cz.tul.controllers.transferObjects.MethodAttributeDTO;
 import cz.tul.controllers.transferObjects.MethodsDTO;
 import cz.tul.entities.*;
 import cz.tul.repositories.*;
+import org.opencv.core.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ public class ContentProviderService {
     private PartDAO partDAO;
     @Autowired
     private PartAttributeValueDAO partAttributeValueDAO;
+
+    public ContentProviderService() {
+
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 
     /**
      * Ziska vsechny metody
@@ -124,12 +130,15 @@ public class ContentProviderService {
     public String createWholeChain(List<ChainDTO> chainDtos) {
         Chain chain = new Chain();
         chain.setCreateDate(new Date());
+        chain.setState(StateEnum.ACTIVE);
         chainDAO.save(chain);
         for (ChainDTO data : chainDtos) {
             Part part = new Part();
             part.setChain(chain);
             part.setPosition(data.getPosition());
             part.setState(StateEnum.ACTIVE);
+            logger.info(data.getMethodId());
+            part.setMethod(methodDAO.getMethodById(data.getMethodId()));
             partDAO.save(part);
             for (MethodAttributeDTO mAttribute : data.getAttributes()) {
                 PartAttributeValue partAttributeValue = new PartAttributeValue();
@@ -139,6 +148,7 @@ public class ContentProviderService {
                 partAttributeValue.setPart(part);
                 partAttributeValueDAO.save(partAttributeValue);
             }
+
             logger.debug(data.toString());
         }
         return chain.getChainId();

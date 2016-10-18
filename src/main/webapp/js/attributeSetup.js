@@ -5,11 +5,11 @@
 $(document).ready(function () {
 
     var count = 1;
-    var index = 2;
+    var index = 1;
     var arraz1 = [];
     var allmethod = [];
     var firstItem = {
-        "position": 1,
+        "position": 0,
         "methodId": "",
         "attributes": []
     };
@@ -146,7 +146,7 @@ $(document).ready(function () {
         arraz1.push(firstItem);
         var countLoop = $('#sortable li').size();
         var currentLoop = 0;
-        alert("count loop: " + countLoop);
+        //alert("count loop: " + countLoop);
         $('#sortable li').each(function () {
             var number = this.id.split("-")[1];
 
@@ -189,7 +189,7 @@ $(document).ready(function () {
                     if (currentLoop == countLoop) {
                         sendAjax(arraz1);
                         arraz1 = [];
-                        index = 0
+                        index = 1
                     }
                 },
                 error: function (data, status, er) {
@@ -203,7 +203,7 @@ $(document).ready(function () {
 
     });
     function sendAjax(dataToSend) {
-        alert(JSON.stringify(dataToSend));
+        // alert(JSON.stringify(dataToSend));
 
         $.ajax({
             url: "/rest/createChain",
@@ -237,7 +237,7 @@ $(document).ready(function () {
 
             if (allmethod[key].name.toLowerCase() == initialIMG) {
                 initialMethod = allmethod[key].idMethod;
-                alert(allmethod[key].name);
+                //alert(allmethod[key].name);
             }
         }
         var dataToSend = [];
@@ -266,12 +266,12 @@ $(document).ready(function () {
                 };
                 inputData.push(inputDataItem);
                 firstItem = {
-                    "position": 1,
+                    "position": 0,
                     "methodId": initialMethod,
                     "attributes": inputData
                 };
 
-                alert(JSON.stringify(firstItem));
+                //alert(JSON.stringify(firstItem));
             },
             error: function (data, status, er) {
                 alert("error: " + data + " status: " + status + " er:" + er);

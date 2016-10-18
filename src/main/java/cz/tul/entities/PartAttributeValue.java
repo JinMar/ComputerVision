@@ -8,7 +8,7 @@ import java.util.UUID;
  * Created by Bc. Marek Jindrák on 12.10.2016.
  */
 @Entity
-@Table(name = "PARTATTRIBUTEVALUE")
+@Table(name = "partattributevalue")
 public class PartAttributeValue implements Serializable, CustomEntity {
     @Id
     @Column(name = "PARTATTRIBUTEVALUE_ID")

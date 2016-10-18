@@ -10,7 +10,7 @@ import java.util.UUID;
  * Created by Marek on 03.10.2016.
  */
 @Entity
-@Table(name = "PART")
+@Table(name = "part")
 public class Part implements Serializable, CustomEntity {
     @Id
     @Column(name = "PART_ID")
@@ -20,7 +20,11 @@ public class Part implements Serializable, CustomEntity {
     @JoinColumn(name = "CHAIN_ID")
     private Chain chain;
 
-    @OneToMany(mappedBy = "part")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "METHOD_ID")
+    private Method method;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "part")
     private Set<PartAttributeValue> partAttributeValues = new HashSet<>();
 
     @Column(name = "POSITION")
@@ -55,6 +59,9 @@ public class Part implements Serializable, CustomEntity {
         this.state = state;
     }
 
+    public void setMethod(Method method) {
+        this.method = method;
+    }
     //GETTERS
 
 
@@ -76,5 +83,9 @@ public class Part implements Serializable, CustomEntity {
 
     public StateEnum getState() {
         return state;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 }
