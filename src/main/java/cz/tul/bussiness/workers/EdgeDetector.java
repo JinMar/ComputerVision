@@ -1,6 +1,6 @@
 package cz.tul.bussiness.workers;
 
-import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
+import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -27,7 +27,7 @@ public class EdgeDetector extends Worker {
     private Mat channelFinal;
 
     @Override
-    public void work() throws SelectionLayerException {
+    public void work() {
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         BGR.put(0, 0, sourceData);

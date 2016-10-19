@@ -1,5 +1,6 @@
 package cz.tul.bussiness.workers;
 
+import cz.tul.bussiness.workers.enums.ChannelsEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;

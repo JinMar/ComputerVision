@@ -1,5 +1,6 @@
 package cz.tul.bussiness.workers;
 
+import cz.tul.bussiness.workers.enums.NoiseReducerEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import cz.tul.bussiness.workers.helper.Dispersion;
 import cz.tul.entities.PartAttributeValue;

@@ -2,11 +2,16 @@ package cz.tul.provisioner;
 
 import cz.tul.bussiness.register.MethodRegister;
 import cz.tul.bussiness.workers.*;
+import cz.tul.bussiness.workers.enums.ChannelsEnum;
+import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
+import cz.tul.bussiness.workers.enums.NoiseReducerEnum;
+import cz.tul.bussiness.workers.enums.SegmentorEnum;
 import cz.tul.entities.Attribute;
 import cz.tul.entities.AttributeType;
 import cz.tul.entities.Method;
 import cz.tul.entities.MethodAttributes;
 import cz.tul.repositories.*;
+import org.opencv.imgproc.Imgproc;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,6 +65,8 @@ public class DbProvisioner implements InitializingBean {
         Method detectors = new Method();
         //NOISE
         Method noise = new Method();
+        //SEGMENTATION
+        Method segmentation = new Method();
 
         //MORPOHOLOGY
       /*  Method erode = new Method();
@@ -77,32 +84,28 @@ public class DbProvisioner implements InitializingBean {
         original.setName("original");
         detectors.setName("Edge Detectors");
         noise.setName("Noise reducer");
+        segmentation.setName("Segmentation");
 
-       /* erode.setName("Eroze");
-        dilate.setName("Dilatace");
-        open.setName("Otevření");
-        close.setName("Uzavření");*/
+
         //ulozeni metod do databaze
         methods.add(RGB);
         methods.add(YCBCR);
         methods.add(HSV);
         methods.add(detectors);
         methods.add(noise);
-
+        methods.add(segmentation);
         methods.add(original);
-       /* methods.add(dilate);
-        methods.add(erode);
-        methods.add(close);
 
-        methods.add(open);*/
         methodDAO.save(methods);
         //test
+
         methodRegister.register(original.getMethodId(), OriginalRGB.class);
         methodRegister.register(RGB.getMethodId(), RGBChannel.class);
         methodRegister.register(YCBCR.getMethodId(), YCBCRChannel.class);
         methodRegister.register(HSV.getMethodId(), HSVChannel.class);
         methodRegister.register(detectors.getMethodId(), EdgeDetector.class);
         methodRegister.register(noise.getMethodId(), NoiseReducer.class);
+        methodRegister.register(segmentation.getMethodId(), Segmentation.class);
 
 
         //RGB
@@ -117,6 +120,10 @@ public class DbProvisioner implements InitializingBean {
         MethodAttributes detectorsMethodAttributes = new MethodAttributes();
         //NOSISEDETOCTOR
         MethodAttributes noiseMethodAttributes = new MethodAttributes();
+        //SEGMENTATION
+        MethodAttributes thresholdMethodAttributes = new MethodAttributes();
+        MethodAttributes typeMethodAttributes = new MethodAttributes();
+        MethodAttributes segmentorMethodAttributes = new MethodAttributes();
 
 /*
         //MORPHOLOGY
@@ -136,25 +143,20 @@ public class DbProvisioner implements InitializingBean {
         originalMethodAttributes.setMethod(original);
         detectorsMethodAttributes.setMethod(detectors);
         noiseMethodAttributes.setMethod(noise);
+        //
+        thresholdMethodAttributes.setMethod(segmentation);
+        typeMethodAttributes.setMethod(segmentation);
+        segmentorMethodAttributes.setMethod(segmentation);
 
-/*
-        erodeAttributesAtr1.setMethod(erode);
-        dilateAttributesAtr1.setMethod(dilate);
-        openAttributesAtr1.setMethod(open);
-        closeAttributesAtr1.setMethod(close);
-
-        erodeAttributesAtr2.setMethod(erode);
-        dilateAttributesAtr2.setMethod(dilate);
-        openAttributesAtr2.setMethod(open);
-        closeAttributesAtr2.setMethod(close);
-*/
 
         Attribute step = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
         Attribute size = new Attribute("Velikost");
         Attribute inputImg = new Attribute("Vstupní obraz");
         Attribute channel = new Attribute("Vrstva");
+        Attribute segmentor = new Attribute("Segmentor");
         Attribute type = new Attribute("Typ");
+        Attribute threshold = new Attribute("Práh");
 
         attributes.add(type);
         attributes.add(channel);
@@ -162,6 +164,7 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(shape);
         attributes.add(size);
         attributes.add(inputImg);
+        attributes.add(threshold);
         attributeDAO.save(attributes);
 
 
@@ -212,12 +215,36 @@ public class DbProvisioner implements InitializingBean {
         noiseMethodAttributes.setAttributeType(AttributeType.SELECT);
         noiseMethodAttributes.setOptions(noiseReducerTypes);
 
+        thresholdMethodAttributes.setAttribute(threshold);
+        thresholdMethodAttributes.setAttributeType(AttributeType.NUMBER);
+
+
+        Map<String, String> tresholdTypes = new HashMap<>();
+        tresholdTypes.put("" + Imgproc.THRESH_BINARY, "THRESH_BINARY");
+        tresholdTypes.put("" + Imgproc.THRESH_BINARY_INV, "THRESH_BINARY_INV");
+        tresholdTypes.put("" + Imgproc.THRESH_TRUNC, "THRESH_TRUNC");
+        tresholdTypes.put("" + Imgproc.THRESH_TOZERO, "THRESH_TOZERO");
+        typeMethodAttributes.setAttribute(type);
+        typeMethodAttributes.setAttributeType(AttributeType.SELECT);
+        typeMethodAttributes.setOptions(tresholdTypes);
+
+
+        Map<String, String> segmentorTypes = new HashMap<>();
+        segmentorTypes.put(SegmentorEnum.TRESHHOLDING.getSegmentorName(), SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        segmentorMethodAttributes.setAttribute(segmentor);
+        segmentorMethodAttributes.setAttributeType(AttributeType.SELECT);
+        segmentorMethodAttributes.setOptions(segmentorTypes);
+
+
         methodAttributes.add(rgbMethodAttributes);
         methodAttributes.add(ycbcrMethodAttributes);
         methodAttributes.add(hsvMethodAttributes);
         methodAttributes.add(originalMethodAttributes);
         methodAttributes.add(detectorsMethodAttributes);
         methodAttributes.add(noiseMethodAttributes);
+        methodAttributes.add(thresholdMethodAttributes);
+        methodAttributes.add(typeMethodAttributes);
+        methodAttributes.add(segmentorMethodAttributes);
         methodAttributesDAO.save(methodAttributes);
 
 
