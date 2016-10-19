@@ -1,6 +1,7 @@
 package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
+import cz.tul.bussiness.workers.helper.Dispersion;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -36,6 +37,9 @@ public class NoiseReducer extends Worker {
             if (att.getValue().equals(NoiseReducerEnum.MEDIAN.getReducerName())) {
                 median();
             }
+            if (att.getValue().equals(NoiseReducerEnum.ROTATINGMASK.getReducerName())) {
+                rotatingMask();
+            }
 
 
         }
@@ -47,6 +51,7 @@ public class NoiseReducer extends Worker {
         double[] average = new double[1];
         for (Mat channel : channels) {
             Mat simpleAvrFinal = Mat.zeros(channel.rows(), channel.cols(), channel.type());
+
 
             for (int i = 1; i < channel.rows() - 2; i++) {
                 for (int j = 1; j < channel.cols() - 2; j++) {
@@ -100,10 +105,132 @@ public class NoiseReducer extends Worker {
         save();
     }
 
+    public void rotatingMask() {
+
+        double values[][] = new double[3][3];
+        List<Dispersion> listOfDispersion = new ArrayList<>();
+        Mat SimpleAvrFinal;
+        double min, minrozpt;
+
+        double[] average = new double[1];
+        for (Mat channel : channels) {
+
+            SimpleAvrFinal = Mat.zeros(channel.rows(), channel.cols(), channel.type());
+
+            for (int i = 2; i < channel.rows() - 3; i++) {
+                for (int j = 2; j < channel.cols() - 3; j++) {
+
+                    values[0][0] = channel.get(i - 2, j - 2)[0];
+                    values[0][1] = channel.get(i - 2, j - 1)[0];
+                    values[0][2] = channel.get(i - 2, j)[0];
+                    values[1][0] = channel.get(i - 1, j - 2)[0];
+                    values[1][1] = channel.get(i - 1, j - 1)[0];
+                    values[1][2] = channel.get(i - 1, j)[0];
+                    values[2][0] = channel.get(i, j - 2)[0];
+                    values[2][1] = channel.get(i, j - 1)[0];
+                    values[2][2] = channel.get(i, j)[0];
+                    listOfDispersion.add(new Dispersion(values));
+
+                    values[0][0] = channel.get(i - 2, j - 1)[0];
+                    values[0][1] = channel.get(i - 2, j)[0];
+                    values[0][2] = channel.get(i - 2, j + 1)[0];
+                    values[1][0] = channel.get(i - 1, j - 1)[0];
+                    values[1][1] = channel.get(i - 1, j)[0];
+                    values[1][2] = channel.get(i - 1, j + 1)[0];
+                    values[2][0] = channel.get(i, j - 1)[0];
+                    values[2][1] = channel.get(i, j)[0];
+                    values[2][2] = channel.get(i, j + 1)[0];
+                    listOfDispersion.add(new Dispersion(values));
+
+                    values[0][0] = channel.get(i - 2, j)[0];
+                    values[0][1] = channel.get(i - 2, j + 1)[0];
+                    values[0][2] = channel.get(i - 2, j + 2)[0];
+                    values[1][0] = channel.get(i - 1, j)[0];
+                    values[1][1] = channel.get(i - 1, j + 1)[0];
+                    values[1][2] = channel.get(i - 1, j + 2)[0];
+                    values[2][0] = channel.get(i, j)[0];
+                    values[2][1] = channel.get(i, j + 1)[0];
+                    values[2][2] = channel.get(i, j + 2)[0];
+                    listOfDispersion.add(new Dispersion(values));
+                    ////////////////////
+                    values[0][0] = channel.get(i + 2, j - 2)[0];
+                    values[0][1] = channel.get(i + 2, j - 1)[0];
+                    values[0][2] = channel.get(i + 2, j)[0];
+                    values[1][0] = channel.get(i + 1, j - 2)[0];
+                    values[1][1] = channel.get(i + 1, j - 1)[0];
+                    values[1][2] = channel.get(i + 1, j)[0];
+                    values[2][0] = channel.get(i, j - 2)[0];
+                    values[2][1] = channel.get(i, j - 1)[0];
+                    values[2][2] = channel.get(i, j)[0];
+                    listOfDispersion.add(new Dispersion(values));
+
+                    values[0][0] = channel.get(i + 2, j - 1)[0];
+                    values[0][1] = channel.get(i + 2, j)[0];
+                    values[0][2] = channel.get(i + 2, j + 1)[0];
+                    values[1][0] = channel.get(i + 1, j - 1)[0];
+                    values[1][1] = channel.get(i + 1, j)[0];
+                    values[1][2] = channel.get(i + 1, j + 1)[0];
+                    values[2][0] = channel.get(i, j - 1)[0];
+                    values[2][1] = channel.get(i, j)[0];
+                    values[2][2] = channel.get(i, j + 1)[0];
+                    listOfDispersion.add(new Dispersion(values));
+
+                    values[0][0] = channel.get(i + 2, j)[0];
+                    values[0][1] = channel.get(i + 2, j + 1)[0];
+                    values[0][2] = channel.get(i + 2, j + 2)[0];
+                    values[1][0] = channel.get(i + 1, j)[0];
+                    values[1][1] = channel.get(i + 1, j + 1)[0];
+                    values[1][2] = channel.get(i + 1, j + 2)[0];
+                    values[2][0] = channel.get(i, j)[0];
+                    values[2][1] = channel.get(i, j + 1)[0];
+                    values[2][2] = channel.get(i, j + 2)[0];
+                    listOfDispersion.add(new Dispersion(values));
+                    //////
+                    values[0][0] = channel.get(i - 1, j - 2)[0];
+                    values[0][1] = channel.get(i - 1, j - 1)[0];
+                    values[0][2] = channel.get(i - 1, j)[0];
+                    values[1][0] = channel.get(i, j - 2)[0];
+                    values[1][1] = channel.get(i, j - 1)[0];
+                    values[1][2] = channel.get(i, j)[0];
+                    values[2][0] = channel.get(i + 1, j - 2)[0];
+                    values[2][1] = channel.get(i + 1, j - 1)[0];
+                    values[2][2] = channel.get(i + 1, j)[0];
+                    listOfDispersion.add(new Dispersion(values));
+
+                    values[0][0] = channel.get(i - 1, j + 2)[0];
+                    values[0][1] = channel.get(i - 1, j + 1)[0];
+                    values[0][2] = channel.get(i - 1, j)[0];
+                    values[1][0] = channel.get(i, j + 2)[0];
+                    values[1][1] = channel.get(i, j + 1)[0];
+                    values[1][2] = channel.get(i, j + 1)[0];
+                    values[2][0] = channel.get(i + 1, j + 2)[0];
+                    values[2][1] = channel.get(i + 1, j + 1)[0];
+                    values[2][2] = channel.get(i + 1, j)[0];
+                    listOfDispersion.add(new Dispersion(values));
+                    min = Double.MAX_VALUE;
+                    minrozpt = 0;
+
+                    for (Dispersion listOfDispersion1 : listOfDispersion) {
+
+                        if (listOfDispersion1.getRozptyl() < min) {
+                            min = listOfDispersion1.getRozptyl();
+                            minrozpt = listOfDispersion1.getPrumer();
+                        }
+                    }
+                    average[0] = minrozpt;
+                    SimpleAvrFinal.put(i, j, average);
+                    listOfDispersion.clear();
+                }
+            }
+            newChannels.add(SimpleAvrFinal);
+        }
+        save();
+    }
+
+
     private void save() {
-        Mat BGR = new Mat(newChannels.get(0).rows(), newChannels.get(0).cols(), CvType.CV_8UC3);
+        Mat BGR = new Mat(channels.get(0).rows(), channels.get(0).cols(), CvType.CV_8UC3);
         List<Mat> RGB = new ArrayList<>();
-        Core.split(BGR, newChannels);
         RGB.add(newChannels.get(2));
         RGB.add(newChannels.get(1));
         RGB.add(newChannels.get(0));

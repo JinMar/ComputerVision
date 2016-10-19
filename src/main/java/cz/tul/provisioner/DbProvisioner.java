@@ -207,6 +207,7 @@ public class DbProvisioner implements InitializingBean {
         Map<String, String> noiseReducerTypes = new HashMap<>();
         noiseReducerTypes.put(NoiseReducerEnum.MEDIAN.getReducerName(), NoiseReducerEnum.MEDIAN.getReducerName());
         noiseReducerTypes.put(NoiseReducerEnum.SIMPLEAVERAGING.getReducerName(), NoiseReducerEnum.SIMPLEAVERAGING.getReducerName());
+        noiseReducerTypes.put(NoiseReducerEnum.ROTATINGMASK.getReducerName(), NoiseReducerEnum.ROTATINGMASK.getReducerName());
         noiseMethodAttributes.setAttribute(type);
         noiseMethodAttributes.setAttributeType(AttributeType.SELECT);
         noiseMethodAttributes.setOptions(noiseReducerTypes);

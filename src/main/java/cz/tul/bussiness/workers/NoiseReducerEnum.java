@@ -7,7 +7,8 @@ public enum NoiseReducerEnum {
 
 
     SIMPLEAVERAGING("simpleaveraging"),
-    MEDIAN("median");
+    MEDIAN("median"),
+    ROTATINGMASK("rotatingmask");
 
 
     private String reducerName;
