@@ -18,14 +18,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class BasicController {
     private static final Logger logger = LoggerFactory.getLogger(BasicController.class);
 
-    @RequestMapping(value = "/computervision", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView index(Model model) {
         ModelAndView view = new ModelAndView(ViewConst.INDEX);
         logger.info("Index načten");
         return view;
     }
 
-    @RequestMapping(value = "/computervision/application", method = RequestMethod.GET)
+    @RequestMapping(value = "/application", method = RequestMethod.GET)
     public String application(Model model) {
 
         logger.info("Aplikační stránka načtena");

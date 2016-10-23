@@ -90,7 +90,7 @@
             </p>
         </div>
     </div>
-    <div class="wraper"><p class="Button"><a href="/computervision/application">Spustit aplikaci</a></p></div>
+    <div class="wraper"><p class="Button"><a href="/application">Spustit aplikaci</a></p></div>
 </div>
 <footer class="footer">
 

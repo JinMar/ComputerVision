@@ -1,5 +1,7 @@
 package cz.tul.provisioner;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import cz.tul.bussiness.register.MethodRegister;
 import cz.tul.bussiness.workers.*;
 import cz.tul.bussiness.workers.enums.ChannelsEnum;
@@ -12,6 +14,7 @@ import cz.tul.entities.Method;
 import cz.tul.entities.MethodAttributes;
 import cz.tul.repositories.*;
 import org.opencv.imgproc.Imgproc;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 /**
  * Created by Marek on 29.09.2016.
  */
@@ -47,6 +49,9 @@ public class DbProvisioner implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
+
         String test = servletContext.getRealPath("/");
         methodRegister.registerContextPath(test);
 
