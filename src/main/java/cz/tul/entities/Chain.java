@@ -22,7 +22,7 @@ public class Chain implements Serializable, CustomEntity {
     private Date createDate;
 
     @Column(name = "STATE")
-    private StateEnum state;
+    private String state;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chain")
     private Set<Part> chainParts = new HashSet<>();
@@ -45,7 +45,7 @@ public class Chain implements Serializable, CustomEntity {
         this.chainParts = chainParts;
     }
 
-    public void setState(StateEnum state) {
+    public void setState(String state) {
         this.state = state;
     }
     //GETTERS
@@ -62,7 +62,7 @@ public class Chain implements Serializable, CustomEntity {
         return chainParts;
     }
 
-    public StateEnum getState() {
+    public String getState() {
         return state;
     }
 }

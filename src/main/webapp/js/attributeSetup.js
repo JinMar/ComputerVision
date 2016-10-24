@@ -6,6 +6,8 @@ $(document).ready(function () {
 
     var count = 1;
     var index = 1;
+    var interval;
+    var testData;
     var arraz1 = [];
     var allmethod = [];
     var firstItem = {
@@ -213,7 +215,9 @@ $(document).ready(function () {
             contentType: 'application/json',
             mimeType: 'application/json',
             success: function (data) {
-                alert(JSON.stringify(data))
+                testData = data;
+                console.log(data);
+                setTimeout(loadChain, 1000);
             },
             error: function (data, status, er) {
                 alert("error: " + data + " status: " + status + " er:" + er);
@@ -221,6 +225,41 @@ $(document).ready(function () {
         });
     }
 
+    function loadChain() {
+
+        var dataToSend = [];
+        var newItem = {
+            'chainId': testData.chainId,
+            'message': testData.message
+        };
+
+        dataToSend.push(newItem);
+        alert(JSON.stringify(dataToSend));
+        console.log(JSON.stringify(dataToSend));
+        $.ajax({
+            url: "/rest/isChainReady",
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(dataToSend),
+            contentType: 'application/json',
+            mimeType: 'application/json',
+            cache: false,
+            success: function (data) {
+                alert(JSON.stringify(data));
+                console.log("je to: " + data.ready);
+                if (data.ready == true) {
+                    clearInterval(interval);
+                } else {
+                    setTimeout(loadChain, 5000);
+                }
+
+                //  ;
+            },
+            error: function (data, status, er) {
+                alert("error: " + data + " status: " + status + " er:" + er);
+            }
+        });
+    }
 
     function removeAtribute(par) {
         $("#" + par).remove();

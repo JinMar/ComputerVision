@@ -33,7 +33,7 @@ public class Workflow {
         this.partDAO = partDAO;
         sortedParts = getSortPart(chain.getChainParts());
         startWorkFlow();
-        //  finishWorkflow();
+        finishWorkflow();
     }
 
 
@@ -55,26 +55,41 @@ public class Workflow {
     }
 
     private BufferedImage processStep(BufferedImage data, Part part, boolean firstStep) throws NoDataFound, SelectionLayerException {
-        WorkflowStep processedStep = new WorkflowStep(data, part, firstStep);
-        return processedStep.getData();
+        WorkflowStep processedStep = new WorkflowStep(data, part, firstStep, partDAO);
+        BufferedImage result = processedStep.getData();
+        if (result != null) {
+
+            part.setState(StateEnum.COMPLETE.getState());
+        } else {
+            if (firstStep) {
+                part.setState(StateEnum.COMPLETE.getState());
+            } else {
+                part.setState(StateEnum.ERROR.getState());
+            }
+        }
+        partDAO.update(part);
+        return result;
 
     }
 
     private void finishWorkflow() {
-        boolean hasError = false;
-        boolean finalState = true;
-        for (Part part : sortedParts) {
-            if (part.getState() == StateEnum.ERROR) {
-                hasError = true;
-            } else if (part.getState() == StateEnum.PROCESSING || part.getState() == StateEnum.ACTIVE) {
-                finalState = false;
-            }
-            if (!hasError && finalState) {
-                partDAO.update(sortedParts);
-                chain.setState(StateEnum.ACTIVE);
-                chainDAO.save(chain);
-            }
+        switch (chainDAO.isChainProcessed(chain.getChainId())) {
+            case ACTIVE:
+                logger.error("Some steps have been not processed ---> part in state " + StateEnum.ACTIVE.getState());
+                break;
+            case PROCESSING:
+                logger.error("Some steps have been not processed ---> part in state " + StateEnum.PROCESSING.getState());
+            case ERROR:
+                chain.setState(StateEnum.ERROR.getState());
+                logger.error("Error occurred");
+            case COMPLETE:
+                logger.info("Chain with id: " + chain.getChainId() + " is completed");
+                chain.setState(StateEnum.COMPLETE.getState());
         }
+
+
+        chainDAO.update(chain);
+
     }
 
 
@@ -91,7 +106,10 @@ public class Workflow {
                 return 0;
             }
         });
-
+        for (Part part : result) {
+            part.setState(StateEnum.PROCESSING.getState());
+        }
+        partDAO.update(result);
         return result;
     }
 

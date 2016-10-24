@@ -130,13 +130,13 @@ public class ContentProviderService {
     public String createWholeChain(List<ChainDTO> chainDtos) {
         Chain chain = new Chain();
         chain.setCreateDate(new Date());
-        chain.setState(StateEnum.ACTIVE);
+        chain.setState(StateEnum.ACTIVE.getState());
         chainDAO.save(chain);
         for (ChainDTO data : chainDtos) {
             Part part = new Part();
             part.setChain(chain);
             part.setPosition(data.getPosition());
-            part.setState(StateEnum.ACTIVE);
+            part.setState(StateEnum.ACTIVE.getState());
             logger.info(data.getMethodId());
             part.setMethod(methodDAO.getMethodById(data.getMethodId()));
             partDAO.save(part);
@@ -152,6 +152,12 @@ public class ContentProviderService {
             logger.debug(data.toString());
         }
         return chain.getChainId();
+    }
+
+    public boolean isChainReady(String idChain) {
+        boolean result = chainDAO.isChainCompleted(idChain);
+        logger.info("Chain is ready: " + result);
+        return result;
     }
 
 

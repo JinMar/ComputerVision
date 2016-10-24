@@ -28,6 +28,7 @@ public class ApplicationConfig {
         dataSource.setUrl("jdbc:mysql://10.22.22.16:3306/computervision?createDatabaseIfNotExist=true&useSSL=false&max_allowed_packet=33554432");
         dataSource.setUsername("admin");
         dataSource.setPassword("admin");
+
         return dataSource;
     }
 

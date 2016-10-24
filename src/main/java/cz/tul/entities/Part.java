@@ -16,6 +16,9 @@ public class Part implements Serializable, CustomEntity {
     @Column(name = "PART_ID")
     private String partId;
 
+    @Column(name = "URL")
+    private String url;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "CHAIN_ID")
     private Chain chain;
@@ -31,7 +34,7 @@ public class Part implements Serializable, CustomEntity {
     private int position;
 
     @Column(name = "STATE")
-    private StateEnum state;
+    private String state;
 
     public Part() {
         partId = UUID.randomUUID().toString();
@@ -55,15 +58,23 @@ public class Part implements Serializable, CustomEntity {
         this.position = position;
     }
 
-    public void setState(StateEnum state) {
+    public void setState(String state) {
         this.state = state;
     }
 
     public void setMethod(Method method) {
         this.method = method;
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
     //GETTERS
 
+
+    public String getUrl() {
+        return url;
+    }
 
     public String getPartId() {
         return partId;
@@ -81,7 +92,7 @@ public class Part implements Serializable, CustomEntity {
         return position;
     }
 
-    public StateEnum getState() {
+    public String getState() {
         return state;
     }
 

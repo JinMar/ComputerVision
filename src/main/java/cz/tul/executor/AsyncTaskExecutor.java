@@ -35,7 +35,8 @@ public class AsyncTaskExecutor {
     @Autowired
     ChainDAO chainDAO;
 
-    @Scheduled(fixedDelay = 2000)
+
+    @Scheduled(fixedDelay = 20000)
     public void execute() {
 
         int temp = executor.getMaxPoolSize() - executor.getActiveCount() - 1;
@@ -43,7 +44,7 @@ public class AsyncTaskExecutor {
         logger.info("pool: " + temp);
         if (temp > 0) {
             List<Chain> chains = changeState(chainDAO.getLastActiveChains(temp));
-
+            logger.info("Coutnt of chain to processes: " + chains.size());
             if (chains.size() > 0) {
                 logger.info("Count of task:" + chains.size());
                 chainDAO.update(chains);
@@ -61,10 +62,14 @@ public class AsyncTaskExecutor {
     }
 
     private List<Chain> changeState(List<Chain> chains) {
+
         List<Chain> result = new ArrayList<>();
-        for (Chain chain : chains) {
-            chain.setState(StateEnum.PROCESSING);
-            result.add(chain);
+        if (chains.size() > 0) {
+            for (Chain chain : chains) {
+                chain.setState(StateEnum.PROCESSING.getState());
+                result.add(chain);
+            }
+            chainDAO.update(result);
         }
         return result;
     }

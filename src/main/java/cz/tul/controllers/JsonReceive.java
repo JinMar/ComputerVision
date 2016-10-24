@@ -48,14 +48,33 @@ public class JsonReceive {
     public
     @ResponseBody
     WrappedAtrDTO getAttributes(@RequestBody final List<RequestData> requestData) {
-        logger.info("getting atributes for method with id {}", requestData.get(0).getIdMethod());
-
-        contentProviderService.getAtributesByMethodId(requestData.get(0).getIdMethod());
-
-        List<AttributesDTO> result = contentProviderService.getAtributesByMethodId(requestData.get(0).getIdMethod());
+        String idMethod = requestData.get(0).getIdMethod();
+        logger.info("getting atributes for method with id {}", idMethod);
+        List<AttributesDTO> result = contentProviderService.getAtributesByMethodId(idMethod);
         WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(result, requestData.get(0).getPageAttributeId());
 
         return wrappedAtrDTO;
     }
+
+    @RequestMapping(value = "/isChainReady", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    WrappedChainDTO isChainReady(@RequestBody final List<Message> requestData) {
+        String chainId = requestData.get(0).getChainId();
+        logger.info("Chain screening {}", chainId);
+        WrappedChainDTO result = new WrappedChainDTO();
+
+        if (contentProviderService.isChainReady(chainId)) {
+            result.setMessage("Chain is ready !!!");
+            result.setReady(true);
+        } else {
+            result.setMessage("Chain is not ready !!!");
+            result.setReady(false);
+        }
+
+
+        return result;
+    }
+
 
 }
