@@ -7,6 +7,7 @@ public class MethodAttributeDTO {
     private String value;
     private String methodAttributeId;
 
+
     public MethodAttributeDTO() {
     }
 
@@ -20,6 +21,7 @@ public class MethodAttributeDTO {
         this.methodAttributeId = methodAttributeId;
     }
 
+
     //GETTERS
 
     public String getValue() {
@@ -29,6 +31,7 @@ public class MethodAttributeDTO {
     public String getMethodAttributeId() {
         return methodAttributeId;
     }
+
 
     @Override
     public String toString() {

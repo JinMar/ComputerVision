@@ -9,6 +9,7 @@ import java.util.List;
 public class ChainDTO implements Serializable {
     private String methodId;
     private int position;
+    private String URL;
     private List<MethodAttributeDTO> attributes;
 
     public ChainDTO() {
@@ -28,6 +29,10 @@ public class ChainDTO implements Serializable {
         this.attributes = attributes;
     }
 
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
+
     //GETTERS
     public String getMethodId() {
         return methodId;
@@ -39,6 +44,10 @@ public class ChainDTO implements Serializable {
 
     public List<MethodAttributeDTO> getAttributes() {
         return attributes;
+    }
+
+    public String getURL() {
+        return URL;
     }
 
     @Override

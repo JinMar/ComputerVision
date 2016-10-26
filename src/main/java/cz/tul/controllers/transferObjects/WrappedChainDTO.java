@@ -13,7 +13,7 @@ public class WrappedChainDTO implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(WrappedChainDTO.class);
     private boolean ready;
     private String message;
-    private List<ChainDTO> parts;
+    private List<PartData> parts;
 
     public WrappedChainDTO() {
 
@@ -24,7 +24,7 @@ public class WrappedChainDTO implements Serializable {
         this.ready = ready;
     }
 
-    public void setParts(List<ChainDTO> parts) {
+    public void setParts(List<PartData> parts) {
         this.parts = parts;
     }
 
@@ -37,7 +37,7 @@ public class WrappedChainDTO implements Serializable {
         return ready;
     }
 
-    public List<ChainDTO> getParts() {
+    public List<PartData> getParts() {
         return parts;
     }
 

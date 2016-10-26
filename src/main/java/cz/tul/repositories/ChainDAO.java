@@ -30,7 +30,7 @@ public class ChainDAO extends BasicRepositoryAbstract {
     }
 
     @Transactional
-    public StateEnum isChainProcessed(String key) {
+    public StateEnum isChainState(String key) {
         int count = -1;
         String hql = " FROM Part p where p.partId = :part and p.state != :state1 ";
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
@@ -72,5 +72,13 @@ public class ChainDAO extends BasicRepositoryAbstract {
         query.setParameter("chain", id);
         count = query.list().size();
         return count == 1;
+    }
+
+    public Chain getChainById(String key) {
+        String hql = " FROM Chain c where c.chainId = :chain";
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        query.setParameter("chain", key);
+
+        return (Chain) query.uniqueResult();
     }
 }

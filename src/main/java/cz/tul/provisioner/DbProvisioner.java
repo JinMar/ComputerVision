@@ -2,7 +2,9 @@ package cz.tul.provisioner;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import cz.tul.bussiness.register.MethodAttributeRegister;
 import cz.tul.bussiness.register.MethodRegister;
+import cz.tul.bussiness.register.exceptions.IllegalInputException;
 import cz.tul.bussiness.workers.*;
 import cz.tul.bussiness.workers.enums.ChannelsEnum;
 import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
@@ -12,6 +14,7 @@ import cz.tul.entities.Attribute;
 import cz.tul.entities.AttributeType;
 import cz.tul.entities.Method;
 import cz.tul.entities.MethodAttributes;
+import cz.tul.provisioner.holder.DataHolder;
 import cz.tul.repositories.*;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 /**
  * Created by Marek on 29.09.2016.
  */
@@ -46,6 +50,7 @@ public class DbProvisioner implements InitializingBean {
     ServletContext servletContext;
 
     private MethodRegister methodRegister = MethodRegister.getInstance();
+    private MethodAttributeRegister methodAttributeRegister = MethodAttributeRegister.getInstance();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -78,7 +83,6 @@ public class DbProvisioner implements InitializingBean {
         Method dilate = new Method();
         Method open = new Method();
         Method close = new Method();*/
-
 
 
         // inicializace základních metoda ulozeni
@@ -250,74 +254,24 @@ public class DbProvisioner implements InitializingBean {
         methodAttributes.add(thresholdMethodAttributes);
         methodAttributes.add(typeMethodAttributes);
         methodAttributes.add(segmentorMethodAttributes);
+        registerMethodAtributes(methodAttributes);
         methodAttributesDAO.save(methodAttributes);
 
 
+    }
 
-/*
-
-        erodeAttributesAtr1.setAttribute(size);
-        erodeAttributesAtr1.setOptions(shapes);
-        erodeAttributesAtr1.setAttributeType(AttributeType.NUMBER);
-        dilateAttributesAtr1.setAttribute(size);
-        dilateAttributesAtr1.setOptions(shapes);
-        dilateAttributesAtr1.setAttributeType(AttributeType.NUMBER);
-        openAttributesAtr1.setAttribute(size);
-        openAttributesAtr1.setOptions(shapes);
-        openAttributesAtr1.setAttributeType(AttributeType.NUMBER);
-        closeAttributesAtr1.setAttribute(size);
-        closeAttributesAtr1.setOptions(shapes);
-        closeAttributesAtr1.setAttributeType(AttributeType.NUMBER);
-
-
-        erodeAttributesAtr2.setAttribute(shape);
-        erodeAttributesAtr2.setOptions(shapes);
-        erodeAttributesAtr2.setAttributeType(AttributeType.SELECT);
-        dilateAttributesAtr2.setAttribute(shape);
-        dilateAttributesAtr2.setOptions(shapes);
-        dilateAttributesAtr2.setAttributeType(AttributeType.SELECT);
-        openAttributesAtr2.setAttribute(shape);
-        openAttributesAtr2.setOptions(shapes);
-        openAttributesAtr2.setAttributeType(AttributeType.SELECT);
-        closeAttributesAtr2.setAttribute(shape);
-        closeAttributesAtr2.setOptions(shapes);
-        closeAttributesAtr2.setAttributeType(AttributeType.SELECT);
-*/
-
-        //ulozeni atributu metod do databaze
-
-/*
-        methodAttributes.add(erodeAttributesAtr1);
-        methodAttributes.add(dilateAttributesAtr1);
-        methodAttributes.add(openAttributesAtr1);
-        methodAttributes.add(closeAttributesAtr1);
-        methodAttributes.add(erodeAttributesAtr2);
-        methodAttributes.add(dilateAttributesAtr2);
-        methodAttributes.add(openAttributesAtr2);
-        methodAttributes.add(closeAttributesAtr2);*/
-
-
-
-        //Testing parts
-       /* Part part = new Part();
-        part.setState(StateEnum.ACTIVE);
-        part.setChain(testChain);
-        part.setPosition(0);
-        Part part1 = new Part();
-        part1.setState(StateEnum.ACTIVE);
-        part1.setChain(testChain);
-        part1.setPosition(1);
-        partDAO.save(part);
-        partDAO.save(part1);*/
-/*
-        PartAttributeValue partAttributeValue = new PartAttributeValue();
-        partAttributeValue.setPart(part);
-        partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
-        partAttributeValue.setValue("Parada");
-        partAttributeValue.setMethodAttributes(erodeAttributesAtr1);
-        partAttributeValueDAO.save(partAttributeValue);*/
-
-
+    private void registerMethodAtributes(Set<MethodAttributes> input) {
+        for (MethodAttributes ma : input) {
+            try {
+                DataHolder dh = new DataHolder();
+                dh.setName(ma.getAttribute().getName());
+                dh.setOptions(ma.getOptions());
+                dh.setType(ma.getAttributeType());
+                methodAttributeRegister.register(ma.getMethodAttributesId(), dh);
+            } catch (IllegalInputException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public AttributeDAO getAttributeDAO() {

@@ -7,11 +7,12 @@ import cz.tul.entities.Part;
 import cz.tul.entities.StateEnum;
 import cz.tul.repositories.ChainDAO;
 import cz.tul.repositories.PartDAO;
+import cz.tul.utilities.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created by Bc. Marek Jindrák on 13.10.2016.
@@ -31,7 +32,7 @@ public class Workflow {
         this.chain = chin;
         this.chainDAO = chainDAO;
         this.partDAO = partDAO;
-        sortedParts = getSortPart(chain.getChainParts());
+        sortedParts = Utility.getSortPart(chain.getChainParts(), partDAO);
         startWorkFlow();
         finishWorkflow();
     }
@@ -73,7 +74,7 @@ public class Workflow {
     }
 
     private void finishWorkflow() {
-        switch (chainDAO.isChainProcessed(chain.getChainId())) {
+        switch (chainDAO.isChainState(chain.getChainId())) {
             case ACTIVE:
                 logger.error("Some steps have been not processed ---> part in state " + StateEnum.ACTIVE.getState());
                 break;
@@ -93,24 +94,6 @@ public class Workflow {
     }
 
 
-    private List<Part> getSortPart(Set<Part> chainParts) {
-        List<Part> result = new ArrayList(chainParts);
 
-        Collections.sort(result, new Comparator<Part>() {
-            @Override
-            public int compare(Part p1, Part p2) {
-                if (p1.getPosition() > p2.getPosition())
-                    return 1;
-                if (p1.getPosition() < p2.getPosition())
-                    return -1;
-                return 0;
-            }
-        });
-        for (Part part : result) {
-            part.setState(StateEnum.PROCESSING.getState());
-        }
-        partDAO.update(result);
-        return result;
-    }
 
 }

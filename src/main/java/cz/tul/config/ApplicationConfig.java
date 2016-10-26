@@ -36,7 +36,7 @@ public class ApplicationConfig {
         Properties properties = new Properties();
         properties.put("hibernate.show_sql", "false");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        properties.put("hibernate.ddl-auto", "create-drop");
+        properties.put("hibernate.hbm2ddl.auto", "create-drop");
         properties.put("hibernate.cascade", "save-update");
 
         return properties;

@@ -66,6 +66,7 @@ public class JsonReceive {
 
         if (contentProviderService.isChainReady(chainId)) {
             result.setMessage("Chain is ready !!!");
+            result.setParts(contentProviderService.getCompletedParts(chainId));
             result.setReady(true);
         } else {
             result.setMessage("Chain is not ready !!!");

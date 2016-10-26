@@ -1,11 +1,12 @@
 package cz.tul.services;
 
-import cz.tul.controllers.transferObjects.AttributesDTO;
-import cz.tul.controllers.transferObjects.ChainDTO;
-import cz.tul.controllers.transferObjects.MethodAttributeDTO;
-import cz.tul.controllers.transferObjects.MethodsDTO;
+import cz.tul.bussiness.register.MethodAttributeRegister;
+import cz.tul.bussiness.workflow.exceptions.NoDataFound;
+import cz.tul.controllers.transferObjects.*;
 import cz.tul.entities.*;
+import cz.tul.provisioner.holder.DataHolder;
 import cz.tul.repositories.*;
+import cz.tul.utilities.Utility;
 import org.opencv.core.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,9 +155,49 @@ public class ContentProviderService {
         return chain.getChainId();
     }
 
-    public boolean isChainReady(String idChain) {
-        boolean result = chainDAO.isChainCompleted(idChain);
+    public boolean isChainReady(String chainId) {
+        boolean result = chainDAO.isChainCompleted(chainId);
         logger.info("Chain is ready: " + result);
+        return result;
+    }
+
+
+    public List<PartData> getCompletedParts(String chainId) {
+        List<PartData> result = new ArrayList<>();
+        Chain chain = chainDAO.getChainById(chainId);
+        List<Part> sortedParts = Utility.getSortPart(chain.getChainParts());
+
+        for (Part part : sortedParts) {
+            if (part.getPosition() != 0) {
+                PartData partData = new PartData();
+                partData.setPosition(part.getPosition());
+                partData.setURL(part.getUrl());
+                partData.setMethodId(part.getMethod().getMethodId());
+                List<PartValue> partValueList = new ArrayList<>();
+                for (PartAttributeValue pv : part.getPartAttributeValues()) {
+                    PartValue partValue = new PartValue();
+                    DataHolder dataHolder = null;
+                    try {
+                        MethodAttributeRegister temp = MethodAttributeRegister.getInstance();
+                        dataHolder = temp.getData(pv.getMethodAttributes().getMethodAttributesId());
+
+                    } catch (NoDataFound noDataFound) {
+                        noDataFound.printStackTrace();
+                    }
+                    partValue.setValue(pv.getValue());
+                    partValue.setName(dataHolder.getName());
+                    partValue.setOptions(dataHolder.getOptions());
+                    partValue.setType(dataHolder.getType());
+                    partValue.setMax(pv.getMethodAttributes().getMaxValue());
+                    partValue.setMin(pv.getMethodAttributes().getMinValue());
+                    partValueList.add(partValue);
+
+                }
+                partData.setPartValueList(partValueList);
+                result.add(partData);
+            }
+
+        }
         return result;
     }
 
@@ -187,8 +228,8 @@ public class ContentProviderService {
         this.partAttributeValueDAO = partAttributeValueDAO;
     }
 
-    //GETTERS
 
+    //GETTERS
 
     public MethodAttributesDAO getMethodAttributesDAO() {
         return methodAttributesDAO;
