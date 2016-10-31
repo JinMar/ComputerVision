@@ -23,8 +23,6 @@ import java.util.List;
 public class AsyncTaskExecutor {
     private static final Logger logger = LoggerFactory.getLogger(AsyncTaskExecutor.class);
 
-    @Autowired
-    Task asyncTask;
 
     @Autowired
     PartDAO partDAO;
@@ -36,17 +34,17 @@ public class AsyncTaskExecutor {
     ChainDAO chainDAO;
 
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedDelay = 2000)
     public void execute() {
-
+        Task asyncTask = new Task();
         int temp = executor.getMaxPoolSize() - executor.getActiveCount() - 1;
 
-        logger.info("pool: " + temp);
         if (temp > 0) {
             List<Chain> chains = changeState(chainDAO.getLastActiveChains(temp));
             logger.info("Coutnt of chain to processes: " + chains.size());
             if (chains.size() > 0) {
                 logger.info("Count of task:" + chains.size());
+                logger.info("Processing:" + chains.size());
                 chainDAO.update(chains);
                 try {
                     for (Chain chain : chains) {

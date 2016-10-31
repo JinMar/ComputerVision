@@ -10,10 +10,7 @@ import cz.tul.bussiness.workers.enums.ChannelsEnum;
 import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
 import cz.tul.bussiness.workers.enums.NoiseReducerEnum;
 import cz.tul.bussiness.workers.enums.SegmentorEnum;
-import cz.tul.entities.Attribute;
-import cz.tul.entities.AttributeType;
-import cz.tul.entities.Method;
-import cz.tul.entities.MethodAttributes;
+import cz.tul.entities.*;
 import cz.tul.provisioner.holder.DataHolder;
 import cz.tul.repositories.*;
 import org.opencv.imgproc.Imgproc;
@@ -37,6 +34,8 @@ public class DbProvisioner implements InitializingBean {
     @Autowired
     AttributeDAO attributeDAO;
     @Autowired
+    AllowStepDAO allowStepDAO;
+    @Autowired
     ChainDAO chainDAO;
     @Autowired
     MethodDAO methodDAO;
@@ -48,6 +47,7 @@ public class DbProvisioner implements InitializingBean {
     PartAttributeValueDAO partAttributeValueDAO;
     @Autowired
     ServletContext servletContext;
+
 
     private MethodRegister methodRegister = MethodRegister.getInstance();
     private MethodAttributeRegister methodAttributeRegister = MethodAttributeRegister.getInstance();
@@ -61,6 +61,7 @@ public class DbProvisioner implements InitializingBean {
         methodRegister.registerContextPath(test);
 
         Set<Method> methods = new HashSet<>();
+        Set<AllowStep> grayScale = new HashSet<>();
         Set<MethodAttributes> methodAttributes = new HashSet<>();
         Set<Attribute> attributes = new HashSet<>();
 
@@ -194,6 +195,9 @@ public class DbProvisioner implements InitializingBean {
         rgbMethodAttributes.setAttribute(channel);
         rgbMethodAttributes.setAttributeType(AttributeType.SELECT);
         rgbMethodAttributes.setOptions(RGBChannels);
+        rgbMethodAttributes.setMinValue(0);
+        rgbMethodAttributes.setMaxValue(255);
+
 
         Map<String, String> YCBCRChannels = new HashMap<>();
         YCBCRChannels.put(ChannelsEnum.Y.getChannelName(), ChannelsEnum.Y.getChannelName());
@@ -240,6 +244,7 @@ public class DbProvisioner implements InitializingBean {
 
         Map<String, String> segmentorTypes = new HashMap<>();
         segmentorTypes.put(SegmentorEnum.TRESHHOLDING.getSegmentorName(), SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        segmentorTypes.put(SegmentorEnum.COLORING.getSegmentorName(), SegmentorEnum.COLORING.getSegmentorName());
         segmentorMethodAttributes.setAttribute(segmentor);
         segmentorMethodAttributes.setAttributeType(AttributeType.SELECT);
         segmentorMethodAttributes.setOptions(segmentorTypes);
@@ -257,8 +262,101 @@ public class DbProvisioner implements InitializingBean {
         registerMethodAtributes(methodAttributes);
         methodAttributesDAO.save(methodAttributes);
 
+        AllowStep allowStep_org = new AllowStep(ChannelsEnum.ORIGINAL.getChannelName());
+        allowStep_org.setMethod(original.getMethodId());
+        allowStep_org.setAllowStep(null);
+        grayScale.add(allowStep_org);
 
+        AllowStep allowStep_R = new AllowStep(ChannelsEnum.RED.getChannelName());
+        allowStep_R.setMethod(RGB.getMethodId());
+        allowStep_R.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_R);
+
+        AllowStep allowStep_G = new AllowStep(ChannelsEnum.GREEN.getChannelName());
+        allowStep_G.setMethod(RGB.getMethodId());
+        allowStep_G.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_G);
+
+        AllowStep allowStep_B = new AllowStep(ChannelsEnum.BLUE.getChannelName());
+        allowStep_B.setMethod(RGB.getMethodId());
+        allowStep_B.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_B);
+
+        AllowStep allowStep_GRAY = new AllowStep(ChannelsEnum.GRAY.getChannelName());
+        allowStep_GRAY.setMethod(RGB.getMethodId());
+        allowStep_GRAY.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_GRAY);
+
+        AllowStep allowStep_Y = new AllowStep(ChannelsEnum.Y.getChannelName());
+        allowStep_Y.setMethod(YCBCR.getMethodId());
+        allowStep_Y.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_Y);
+
+        AllowStep allowStep_CB = new AllowStep(ChannelsEnum.CB.getChannelName());
+        allowStep_CB.setMethod(YCBCR.getMethodId());
+        allowStep_CB.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_CB);
+
+        AllowStep allowStep_CR = new AllowStep(ChannelsEnum.CR.getChannelName());
+        allowStep_CR.setMethod(YCBCR.getMethodId());
+        allowStep_CR.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_CR);
+
+        AllowStep allowStep_H = new AllowStep(ChannelsEnum.H.getChannelName());
+        allowStep_H.setMethod(HSV.getMethodId());
+        allowStep_H.setAllowStep(original.getMethodId());
+        grayScale.add(allowStep_H);
+
+        ///////////////////////////////////
+        AllowStep allowStep_sobel_a = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
+        allowStep_sobel_a.setMethod(detectors.getMethodId());
+        allowStep_sobel_a.setAllowStep(RGB.getMethodId());
+        grayScale.add(allowStep_sobel_a);
+        AllowStep allowStep_sobel_b = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
+        allowStep_sobel_b.setMethod(detectors.getMethodId());
+        allowStep_sobel_b.setAllowStep(YCBCR.getMethodId());
+        grayScale.add(allowStep_sobel_b);
+        AllowStep allowStep_sobel_c = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
+        allowStep_sobel_c.setMethod(detectors.getMethodId());
+        allowStep_sobel_c.setAllowStep(HSV.getMethodId());
+        grayScale.add(allowStep_sobel_c);
+        ////////////////////////////////////
+        AllowStep allowStep_laplace_a = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        allowStep_laplace_a.setMethod(detectors.getMethodId());
+        allowStep_laplace_a.setAllowStep(RGB.getMethodId());
+        grayScale.add(allowStep_laplace_a);
+        AllowStep allowStep_laplace_b = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        allowStep_laplace_b.setMethod(detectors.getMethodId());
+        allowStep_laplace_b.setAllowStep(YCBCR.getMethodId());
+        grayScale.add(allowStep_laplace_b);
+        AllowStep allowStep_laplace_c = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        allowStep_laplace_c.setMethod(detectors.getMethodId());
+        allowStep_laplace_c.setAllowStep(HSV.getMethodId());
+        grayScale.add(allowStep_laplace_c);
+        ////////////////////////////////////
+        AllowStep allowStep_threshold_a = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        allowStep_threshold_a.setMethod(segmentation.getMethodId());
+        allowStep_threshold_a.setAllowStep(RGB.getMethodId());
+        grayScale.add(allowStep_threshold_a);
+        AllowStep allowStep_threshold_b = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        allowStep_threshold_b.setMethod(segmentation.getMethodId());
+        allowStep_threshold_b.setAllowStep(YCBCR.getMethodId());
+        grayScale.add(allowStep_threshold_b);
+        AllowStep allowStep_threshold_c = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        allowStep_threshold_c.setMethod(segmentation.getMethodId());
+        allowStep_threshold_c.setAllowStep(HSV.getMethodId());
+        grayScale.add(allowStep_threshold_c);
+        //////////////////////////////////
+        AllowStep allowStep_coloring = new AllowStep(SegmentorEnum.COLORING.getSegmentorName());
+        allowStep_coloring.setMethod(segmentation.getMethodId());
+        allowStep_coloring.setAllowStep(segmentation.getMethodId());
+        allowStep_coloring.setSelfRelation(true);
+        allowStep_coloring.setSelfParam(SegmentorEnum.TRESHHOLDING.getSegmentorName());
+        grayScale.add(allowStep_coloring);
+
+        allowStepDAO.save(grayScale);
     }
+
 
     private void registerMethodAtributes(Set<MethodAttributes> input) {
         for (MethodAttributes ma : input) {
@@ -304,6 +402,14 @@ public class DbProvisioner implements InitializingBean {
 
     public void setPartDAO(PartDAO partDAO) {
         this.partDAO = partDAO;
+    }
+
+    public AllowStepDAO getAllowStepDAO() {
+        return allowStepDAO;
+    }
+
+    public void setAllowStepDAO(AllowStepDAO allowStepDAO) {
+        this.allowStepDAO = allowStepDAO;
     }
 
     public MethodAttributesDAO getMethodAttributesDAO() {

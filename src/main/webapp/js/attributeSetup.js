@@ -41,7 +41,7 @@ $(document).ready(function () {
 
         count = count + 1;
         $("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
-            "<img class='img-thumbnail preview' alt='Cinque Terre' width='152'/>" +
+            "<img class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
             "<div class='methodName'>" +
             "<table cellspacing='0'>" +
             " <tr>" +
@@ -104,7 +104,7 @@ $(document).ready(function () {
                                         $(
                                             "<tr class='tabRow-" + currentPositionElement + "'>" +
                                             "<td>" + recieveData.name + "</td>" +
-                                            "<td><select  id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
+                                            "<td><select class='sel' id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
                                             " <option disabled selected value> -- selection -- </option>" +
                                             "</select></tr>"));
 
@@ -164,6 +164,7 @@ $(document).ready(function () {
                 "value": "",
                 "methodAttributeId": ""
             };
+
             $.ajax({
                 url: "/rest/getAttributes",
                 type: 'POST',
@@ -206,7 +207,8 @@ $(document).ready(function () {
     });
     function sendAjax(dataToSend) {
         // alert(JSON.stringify(dataToSend));
-
+        console.log("data to send:   " + JSON.stringify(dataToSend));
+        $("#wait").css("display", "block");
         $.ajax({
             url: "/rest/createChain",
             type: 'POST',
@@ -217,10 +219,25 @@ $(document).ready(function () {
             success: function (data) {
                 testData = data;
                 console.log(data);
-                setTimeout(loadChain, 1000);
+                if (data.state) {
+
+                    $(".message").append("<div class='alert alert-success'>" +
+                        "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" +
+                        " <strong>Saved!</strong> " + data.message + "</div>");
+                    setTimeout(loadChain, 1000);
+                } else {
+
+                    $(".message").append("<div class='alert alert-danger'>" +
+                        "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" +
+                        " <strong>FAILED!</strong> " + data.message + "</div>");
+                    $("#wait").css("display", "none");
+                }
             },
             error: function (data, status, er) {
                 alert("error: " + data + " status: " + status + " er:" + er);
+                console.log(JSON.stringify(data));
+                console.log(JSON.stringify(status));
+                console.log(JSON.stringify(er));
             }
         });
     }
@@ -234,7 +251,7 @@ $(document).ready(function () {
         };
 
         dataToSend.push(newItem);
-        alert(JSON.stringify(dataToSend));
+
         console.log(JSON.stringify(dataToSend));
         $.ajax({
             url: "/rest/isChainReady",
@@ -245,10 +262,14 @@ $(document).ready(function () {
             mimeType: 'application/json',
             cache: false,
             success: function (data) {
-                alert(JSON.stringify(data));
-                console.log("je to: " + data.ready);
+
                 if (data.ready == true) {
+                    console.log("je to: " + data.ready);
+                    console.log(JSON.stringify(data));
+                    $("#wait").css("display", "none");
+                    reDraw(data);
                     clearInterval(interval);
+
                 } else {
                     setTimeout(loadChain, 5000);
                 }
@@ -259,6 +280,159 @@ $(document).ready(function () {
                 alert("error: " + data + " status: " + status + " er:" + er);
             }
         });
+    }
+
+    function reDraw(data) {
+        $('#sortable li').each(function () {
+            var number = this.id.split("-")[1];
+            removeFCE(number)
+        });
+        count = 1;
+
+        for (var key in data.parts) {
+            var recieveData = data.parts[key];
+
+            count += 1;
+            $("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
+                "<img src='" + recieveData.url + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
+                "<div class='methodName'>" +
+                "<table cellspacing='0'>" +
+                " <tr>" +
+                "<td width='90%'>" +
+                "<select class='sel' id='method-" + count + "' name='comp'>" +
+
+                "</select>" +
+                "</td>" +
+                "<td width='10%'>" +
+                "    <button onclick='removeFCE(" + count + ")' class='close'>" + '&times' +
+                "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</button></div>" +
+                "<table id='tbl-" + count + "' cellspacing='0' width='100%' ></table>" +
+                "</li>").appendTo("#sortable");
+            $.each(allmethod, function (key, value) {
+                if (value.idMethod == recieveData.methodId) {
+                    $('#method-' + count)
+                        .append($("<option selected></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                } else {
+                    $('#method-' + count)
+                        .append($("<option></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                }
+            });
+            for (var key in recieveData.partValueList) {
+                var stored = recieveData.partValueList[key];
+                if (stored.type.toLowerCase() == "select".toLowerCase()) {
+                    $("#tbl-" + count).append(
+                        $(
+                            "<tr class='tabRow-" + count + "'>" +
+                            "<td>" + stored.name + "</td>" +
+                            "<td><select   id='param-" + key + "-" + count + "' name='comp'>" +
+                            " <option disabled selected value> -- selection -- </option>" +
+                            "</select></tr>"));
+
+                    for (var keyOption in stored.options) {
+                        if (keyOption == stored.value) {
+                            $('#param-' + key + "-" + count)
+                                .append($("<option selected></option>")
+                                    .attr("value", keyOption)
+                                    .text(stored.options[keyOption]));
+                        } else {
+                            $('#param-' + key + "-" + count)
+                                .append($("<option></option>")
+                                    .attr("value", keyOption)
+                                    .text(stored.options[keyOption]));
+                        }
+
+
+                    }
+                }
+                else {
+                    $("#tbl-" + count)
+                        .append($(
+                            "<tr class='tabRow-" + count + "'>" +
+                            "<td>" + stored.name + "</td>" +
+                            "<td><input  id='param-" + key + "-" + count + "' type='" + stored.type.toLowerCase() + "'  value='" + stored.value + "'></td>" +
+                            "</tr>"
+                        ));
+                }
+
+            }
+        }
+        $('.sel').on('change', function () {
+            var dataToSend = [];
+            var item = {
+                "pageAttributeId": this.id,
+                "idMethod": this.value
+            };
+            var temp = this.id.split("-");
+            alert("t");
+            var currentPositionElement = temp[1];
+            dataToSend.push(item);
+            $.ajax({
+                url: "/rest/getAttributes",
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                dataType: 'json',
+                contentType: 'application/json',
+                mimeType: 'application/json',
+                success: function (data) {
+
+                    if (data.pageAttributeId == item.pageAttributeId) {
+                        $(".tabRow-" + currentPositionElement).remove();
+                        for (var key in data.attributesDTOs) {
+                            var recieveData = data.attributesDTOs[key];
+                            if (recieveData.name.length != 0) {
+                                if (recieveData.attributeType.toLowerCase() == "select".toLowerCase()) {
+
+                                    $("#tbl-" + currentPositionElement).append(
+                                        $(
+                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
+                                            "<td>" + recieveData.name + "</td>" +
+                                            "<td><select  id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
+                                            " <option disabled selected value> -- selection -- </option>" +
+                                            "</select></tr>"));
+
+                                    for (var keyOption in recieveData.options) {
+
+                                        $('#param-' + key + "-" + currentPositionElement)
+                                            .append($("<option></option>")
+                                                .attr("value", keyOption)
+                                                .text(recieveData.options[keyOption]));
+
+                                    }
+                                }
+                                else {
+
+                                    $("#tbl-" + currentPositionElement)
+                                        .append($(
+                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
+                                            "<td>" + recieveData.name + "</td>" +
+                                            "<td><input  id='param-" + key + "-" + currentPositionElement + "' type='" + recieveData.attributeType.toLowerCase() + "'  value='61'></td>" +
+                                            "</tr>"
+                                        ));
+                                }
+
+                            }
+                        }
+                    }
+
+                },
+                error: function (data, status, er) {
+                    alert("error: " + data + " status: " + status + " er:" + er);
+                }
+            });
+
+        })
+        ;
+        function removeFCE(par) {
+
+            $("#attachment-" + par).remove();
+        }
     }
 
     function removeAtribute(par) {

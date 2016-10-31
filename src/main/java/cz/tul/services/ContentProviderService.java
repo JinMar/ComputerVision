@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -174,7 +175,13 @@ public class ContentProviderService {
                 partData.setURL(part.getUrl());
                 partData.setMethodId(part.getMethod().getMethodId());
                 List<PartValue> partValueList = new ArrayList<>();
-                for (PartAttributeValue pv : part.getPartAttributeValues()) {
+                List<PartAttributeValue> list = new ArrayList<>(part.getPartAttributeValues());
+                Collections.sort(list, (o1, o2) -> {
+                    String name1 = o1.getMethodAttributes().getAttribute().getName();
+                    String name2 = o2.getMethodAttributes().getAttribute().getName();
+                    return name1.compareTo(name2);
+                });
+                for (PartAttributeValue pv : list) {
                     PartValue partValue = new PartValue();
                     DataHolder dataHolder = null;
                     try {

@@ -34,6 +34,7 @@ public class WorkflowStep {
     }
 
     private void makeStep(boolean firstStep) throws NoDataFound, SelectionLayerException {
+        logger.info("WorkflowStep started");
         IMethodWorker methodWorker = null;
         if (sourceImage == null && !firstStep) {
             throw new NoDataFound("Couldn't load image data for current step");
@@ -50,7 +51,9 @@ public class WorkflowStep {
             methodWorker.work();
             part.setUrl("/img/" + part.getPartId() + ".jpg");
             partDAO.update(part);
-
+        } catch (NullPointerException np) {
+            part.setState("ERROR");
+            partDAO.update(part);
         } catch (IllegalInputException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -60,6 +63,7 @@ public class WorkflowStep {
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
+
         if (methodWorker != null) {
             sourceImage = methodWorker.getImgData();
         }

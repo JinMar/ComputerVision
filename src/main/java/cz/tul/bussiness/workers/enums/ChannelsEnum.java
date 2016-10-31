@@ -11,7 +11,8 @@ public enum ChannelsEnum {
     Y("y"),
     CB("cb"),
     CR("cr"),
-    H("h");
+    H("h"),
+    ORIGINAL("original");
 
 
     private String channelName;

@@ -13,7 +13,7 @@ import java.util.List;
 public class MethodDAO extends BasicRepositoryAbstract {
 
     public List<Method> getAllMethods() {
-        Query query = getQuery("from Method");
+        Query query = getQuery("from Method m order by m.name");
         return (List<Method>) query.list();
     }
 

@@ -24,8 +24,6 @@ public class Task {
         logger.info("Start executing:" + new Date());
         Workflow workflow = new Workflow(chin, chainDAO, partDAO);
 
-        //   + Thread.currentThread().getName());
-        Thread.sleep(20000);
         logger.info("End executing:" + new Date());
     }
 }

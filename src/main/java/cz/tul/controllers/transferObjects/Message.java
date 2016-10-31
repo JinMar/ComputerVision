@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
     private String chainId;
     private String message;
+    private boolean state;
 
     public Message() {
     }
@@ -20,6 +21,10 @@ public class Message implements Serializable {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
     //GETTERS
 
     public String getChainId() {
@@ -28,5 +33,9 @@ public class Message implements Serializable {
 
     public String getMessage() {
         return message;
+    }
+
+    public boolean isState() {
+        return state;
     }
 }

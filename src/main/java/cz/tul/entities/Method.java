@@ -25,6 +25,7 @@ public class Method implements Serializable, CustomEntity {
     @OneToMany(mappedBy = "method")
     private Set<MethodAttributes> methodPart = new HashSet<MethodAttributes>();
 
+
     public Method() {
         methodId = UUID.randomUUID().toString();
     }

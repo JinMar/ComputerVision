@@ -23,6 +23,8 @@
     <script src="${bootstrapJs}"></script>
     <spring:url value="/img/logo-fm.png" var="logo"/>
     <spring:url value="/img/test.png" var="tst"/>
+    <spring:url value="/img/wait.gif" var="waitingBar"/>
+
 
     <spring:url value="/js/jquery.js" var="coreJs"/>
     <spring:url value="/js/jquery-ui.js" var="coreJSUI"/>
@@ -82,9 +84,12 @@
 </div>
 <div class="container">
     <div class="row">
+        <div class="message">
+        </div>
         <h2>Vítejte na stránkách diplomové práce</h2>
         <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
         <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
+
 
         <div id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
             <img src="/img/test.png" class="img-thumbnail preview" alt="Cinque Terre" width="152">
@@ -95,6 +100,13 @@
                 <input id="inputFileToLoad" type="file"/>
             </form>
         </div>
+
+        <div id="wait"
+             style="display:none;border:1px solid #5e5e5e;position:absolute;
+             top:50%;left:50%;padding:2px;background: #7d7d7d">
+            <img src=${waitingBar} width="234" height="130"/><br>Loading..
+        </div>
+
         <div class="col-xs-12 col-sm-12 col-md-12">
             <!-- Here will be new methods -->
             <div class="contentBody">

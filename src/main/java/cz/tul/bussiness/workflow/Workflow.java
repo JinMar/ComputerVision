@@ -39,6 +39,7 @@ public class Workflow {
 
 
     private void startWorkFlow() {
+        logger.info("Workflow strated");
         BufferedImage data = null;
         boolean firstStep = true;
         for (Part part : sortedParts) {

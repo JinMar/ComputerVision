@@ -20,11 +20,6 @@ public class AppConfig implements AsyncConfigurer {
 
     private ThreadPoolTaskExecutor executor;
 
-    @Bean
-    public Task asyncTask() {
-
-        return new Task();
-    }
 
     @Bean
     public ThreadPoolTaskExecutor getExecutor() {
