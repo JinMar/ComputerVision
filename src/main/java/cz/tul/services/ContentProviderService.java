@@ -1,10 +1,9 @@
 package cz.tul.services;
 
-import cz.tul.bussiness.register.MethodAttributeRegister;
-import cz.tul.bussiness.workflow.exceptions.NoDataFound;
+import cz.tul.bussiness.register.OperationRegister;
+import cz.tul.bussiness.register.exceptions.IllegalInputException;
 import cz.tul.controllers.transferObjects.*;
 import cz.tul.entities.*;
-import cz.tul.provisioner.holder.DataHolder;
 import cz.tul.repositories.*;
 import cz.tul.utilities.Utility;
 import org.opencv.core.Core;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +25,7 @@ import java.util.List;
 public class ContentProviderService {
     private static final Logger logger = LoggerFactory.getLogger(ContentProviderService.class);
     private final String METHOD_WITHOUT_ATTRIBUTE = "-2";
-    @Autowired
-    private MethodAttributesDAO methodAttributesDAO;
+
     @Autowired
     private MethodDAO methodDAO;
     @Autowired
@@ -37,6 +34,12 @@ public class ContentProviderService {
     private ChainDAO chainDAO;
     @Autowired
     private PartDAO partDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
+    @Autowired
+    private OperationDAO operationDAO;
+    @Autowired
+    private OperationAttributesDAO operationAttributesDAO;
     @Autowired
     private PartAttributeValueDAO partAttributeValueDAO;
 
@@ -48,10 +51,53 @@ public class ContentProviderService {
     /**
      * Ziska vsechny metody
      *
-     * @return List<MethodsDTO>
+     * @return List<ListDataDTO>
      */
-    public List<MethodsDTO> getAllMethod() {
-        return getWrappedMethod(methodDAO.getAllMethods());
+    public List<ListDataDTO> getAllFunctions() {
+        return getWrappedFunctions(functionDAO.getAllFunctions());
+    }
+
+    /**
+     * Ziska vsechny metody
+     *
+     * @param functionId
+     * @return List<ListDataDTO>
+     */
+    public List<ListDataDTO> getAllMethodByFunctionId(String functionId) {
+        return getWrappedMethods(methodDAO.getMethodsById(functionId));
+    }
+
+    private List<ListDataDTO> getWrappedMethods(List<Method> methods) {
+        List<ListDataDTO> listDataDTOs = new ArrayList<>();
+
+        for (Method method : methods) {
+            ListDataDTO tmp = new ListDataDTO();
+            tmp.setName(method.getName());
+            tmp.setIdMethod(method.getMethodId());
+            listDataDTOs.add(tmp);
+        }
+        return listDataDTOs;
+    }
+
+    public List<ListDataDTO> getOperationByMethodId(String methodId) {
+        return getWrappedOperations(operationDAO.getOperationsById(methodId));
+    }
+
+    private List<ListDataDTO> getWrappedOperations(List<Operation> operationsByIds) {
+        List<ListDataDTO> listDataDTOs = new ArrayList<>();
+
+        for (Operation operation : operationsByIds) {
+            ListDataDTO tmp = new ListDataDTO();
+            tmp.setName(operation.getName());
+            tmp.setIdMethod(operation.getOperationId());
+            listDataDTOs.add(tmp);
+        }
+
+        return listDataDTOs;
+    }
+
+    public List<AttributesDTO> getAttributesByOperationId(String idOperation) {
+        return getWrappedMethodAttributes(operationAttributesDAO.getAttributesById(idOperation));
     }
 
     /**
@@ -59,36 +105,37 @@ public class ContentProviderService {
      *
      * @param id - identifikátor metody
      * @return
-     */
+     *//*
     public List<AttributesDTO> getAtributesByMethodId(String id) {
         return getWrappedMethodAttributes(methodAttributesDAO.getMethodAttributesByMethodId(id));
     }
+*/
 
     /**
-     * @param methods - List<Method> set  zdrojovych entit
+     * @param functions - List<Function> list  zdrojovych entit
      * @return - Metoda vraci set metod, které jsou owrepovane, tak aby se nepracovalo se zakladni entitou.
      * Pracovat se zdrojovou entitou by se melo jen v nejtutnejsich pripadech.
      */
-    private List<MethodsDTO> getWrappedMethod(List<Method> methods) {
-        List<MethodsDTO> methodsDTOs = new ArrayList<>();
+    private List<ListDataDTO> getWrappedFunctions(List<Function> functions) {
+        List<ListDataDTO> listDataDTOs = new ArrayList<>();
 
-        for (Method method : methods) {
-            MethodsDTO tmp = new MethodsDTO();
-            tmp.setName(method.getName());
-            tmp.setIdMethod(method.getMethodId());
-            methodsDTOs.add(tmp);
+        for (Function function : functions) {
+            ListDataDTO tmp = new ListDataDTO();
+            tmp.setName(function.getName());
+            tmp.setIdMethod(function.getFunctionId());
+            listDataDTOs.add(tmp);
         }
 
-        return methodsDTOs;
+        return listDataDTOs;
     }
 
     /**
      * @param methodAttributes
      * @return
      */
-    private List<AttributesDTO> getWrappedMethodAttributes(List<MethodAttributes> methodAttributes) {
+    private List<AttributesDTO> getWrappedMethodAttributes(List<OperationAttributes> methodAttributes) {
         List<AttributesDTO> attributesDTOs = new ArrayList<>();
-        for (MethodAttributes attributes : methodAttributes) {
+        for (OperationAttributes attributes : methodAttributes) {
             AttributesDTO tmp = new AttributesDTO();
             if (attributes.getAttribute() == null) {
                 tmp.setName("");
@@ -96,7 +143,7 @@ public class ContentProviderService {
             } else {
                 tmp.setName(attributes.getAttribute().getName());
                 tmp.setDefaultValues(attributes.getDefaultValues());
-                tmp.setMethodAttributesId(attributes.getMethodAttributesId());
+                tmp.setOperationAttributesId(attributes.getOperationAttributesId());
                 switch (attributes.getAttributeType()) {
                     case NUMBER:
                         tmp.setAttributeType(AttributeType.NUMBER);
@@ -123,6 +170,7 @@ public class ContentProviderService {
         return attributesDTOs;
     }
 
+
     /**
      * Vytváří samotný řetěz i jeho části
      *
@@ -134,19 +182,32 @@ public class ContentProviderService {
         chain.setCreateDate(new Date());
         chain.setState(StateEnum.ACTIVE.getState());
         chainDAO.save(chain);
+        boolean firstItem = true;
         for (ChainDTO data : chainDtos) {
             Part part = new Part();
             part.setChain(chain);
             part.setPosition(data.getPosition());
             part.setState(StateEnum.ACTIVE.getState());
-            logger.info(data.getMethodId());
-            part.setMethod(methodDAO.getMethodById(data.getMethodId()));
+            logger.info(data.getOperationId());
+            if (firstItem) {
+                OperationRegister or = OperationRegister.getInstance();
+
+                try {
+                    part.setOperation(operationDAO.getOperationById(or.getOriginal()));
+                } catch (IllegalInputException e) {
+                    e.printStackTrace();
+                }
+                firstItem = false;
+            } else {
+                part.setOperation(operationDAO.getOperationById(data.getOperationId()));
+            }
+            part.setMethodId(data.getMethodId());
+            part.setFunctionId(data.getFunctionId());
             partDAO.save(part);
-            for (MethodAttributeDTO mAttribute : data.getAttributes()) {
+            for (OperationAttributeDTO mAttribute : data.getAttributes()) {
                 PartAttributeValue partAttributeValue = new PartAttributeValue();
                 partAttributeValue.setValue(mAttribute.getValue());
-                partAttributeValue.setMethodAttributes(
-                        methodAttributesDAO.getMethodAttributesById(mAttribute.getMethodAttributeId()));
+                partAttributeValue.setOperationAttributes(operationAttributesDAO.getAttributById(mAttribute.getOperationAttributeId()));
                 partAttributeValue.setPart(part);
                 partAttributeValueDAO.save(partAttributeValue);
             }
@@ -168,36 +229,33 @@ public class ContentProviderService {
         Chain chain = chainDAO.getChainById(chainId);
         List<Part> sortedParts = Utility.getSortPart(chain.getChainParts());
 
+
         for (Part part : sortedParts) {
             if (part.getPosition() != 0) {
                 PartData partData = new PartData();
                 partData.setPosition(part.getPosition());
                 partData.setURL(part.getUrl());
-                partData.setMethodId(part.getMethod().getMethodId());
+                partData.setOperationId(part.getOperation().getOperationId());
+                partData.setMethodId(part.getMethodId());
+                partData.setFunctionId(part.getFunctionId());
+                partData.setMethods(getAllMethodByFunctionId(part.getFunctionId()));
+                partData.setOperations(getOperationByMethodId(part.getMethodId()));
                 List<PartValue> partValueList = new ArrayList<>();
-                List<PartAttributeValue> list = new ArrayList<>(part.getPartAttributeValues());
-                Collections.sort(list, (o1, o2) -> {
-                    String name1 = o1.getMethodAttributes().getAttribute().getName();
-                    String name2 = o2.getMethodAttributes().getAttribute().getName();
-                    return name1.compareTo(name2);
-                });
+                List<PartAttributeValue> list = Utility.getSortPartAttributeValue(part.getPartAttributeValues());
+
                 for (PartAttributeValue pv : list) {
                     PartValue partValue = new PartValue();
-                    DataHolder dataHolder = null;
-                    try {
-                        MethodAttributeRegister temp = MethodAttributeRegister.getInstance();
-                        dataHolder = temp.getData(pv.getMethodAttributes().getMethodAttributesId());
 
-                    } catch (NoDataFound noDataFound) {
-                        noDataFound.printStackTrace();
-                    }
+
                     partValue.setValue(pv.getValue());
-                    partValue.setName(dataHolder.getName());
-                    partValue.setOptions(dataHolder.getOptions());
-                    partValue.setType(dataHolder.getType());
-                    partValue.setMax(pv.getMethodAttributes().getMaxValue());
-                    partValue.setMin(pv.getMethodAttributes().getMinValue());
+                    partValue.setOperationAttributesId(pv.getOperationAttributes().getOperationAttributesId());
+                    partValue.setOptions(pv.getOperationAttributes().getOptions());
+                    partValue.setType(pv.getOperationAttributes().getAttributeType());
+                    partValue.setMax(pv.getOperationAttributes().getMaxValue());
+                    partValue.setName(pv.getOperationAttributes().getAttribute().getName());
+                    partValue.setMin(pv.getOperationAttributes().getMinValue());
                     partValueList.add(partValue);
+
 
                 }
                 partData.setPartValueList(partValueList);
@@ -211,9 +269,6 @@ public class ContentProviderService {
 
     //SETTERS
 
-    public void setMethodAttributesDAO(MethodAttributesDAO methodAttributesDAO) {
-        this.methodAttributesDAO = methodAttributesDAO;
-    }
 
     public void setMethodDAO(MethodDAO methodDAO) {
         this.methodDAO = methodDAO;
@@ -238,9 +293,6 @@ public class ContentProviderService {
 
     //GETTERS
 
-    public MethodAttributesDAO getMethodAttributesDAO() {
-        return methodAttributesDAO;
-    }
 
     public MethodDAO getMethodDAO() {
         return methodDAO;
@@ -261,4 +313,6 @@ public class ContentProviderService {
     public PartAttributeValueDAO getPartAttributeValueDAO() {
         return partAttributeValueDAO;
     }
+
+
 }

@@ -1,6 +1,6 @@
 package cz.tul.bussiness.workers;
 
-import cz.tul.bussiness.register.MethodRegister;
+import cz.tul.bussiness.register.OperationRegister;
 import cz.tul.entities.PartAttributeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,16 @@ public abstract class AMethodWorker implements IMethodWorker {
     protected Set<PartAttributeValue> attributes;
     protected String imgName;
     protected BufferedImage imgData;
+    protected String classifier;
+
+    @Override
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
 
     @Override
     public String getRealPath() {
-        return MethodRegister.getInstance().getRealContextPath();
+        return OperationRegister.getInstance().getRealContextPath();
     }
 
     @Override

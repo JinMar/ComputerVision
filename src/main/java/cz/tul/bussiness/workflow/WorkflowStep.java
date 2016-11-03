@@ -43,8 +43,7 @@ public class WorkflowStep {
 
 
         try {
-
-            methodWorker = MethodFactory.getMethod(part.getMethod().getMethodId());
+            methodWorker = MethodFactory.getMethod(part.getOperation().getOperationId());
             methodWorker.setAttributes(attributesPart);
             methodWorker.setImgName(part.getPartId());
             methodWorker.setImgData(sourceImage);

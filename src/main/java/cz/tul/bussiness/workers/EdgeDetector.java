@@ -1,7 +1,6 @@
 package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
-import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -36,14 +35,14 @@ public class EdgeDetector extends Worker {
         Core.split(gray, channels);
         channelFinal = Mat.zeros(channels.get(0).rows(), channels.get(0).cols(), channels.get(0).type());
 
-        for (PartAttributeValue att : getAttributes()) {
-            if (att.getValue().equals(EdgeDetectorEnum.LAPLACIAN.getDetectorlName())) {
-                Laplacian();
-            }
-            if (att.getValue().equals(EdgeDetectorEnum.SOBEL.getDetectorlName())) {
-                Sobel();
-            }
+
+        if (classifier.equals(EdgeDetectorEnum.LAPLACIAN.getDetectorlName())) {
+            Laplacian();
         }
+        if (classifier.equals(EdgeDetectorEnum.SOBEL.getDetectorlName())) {
+            Sobel();
+        }
+
 
     }
 

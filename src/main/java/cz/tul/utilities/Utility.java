@@ -1,6 +1,7 @@
 package cz.tul.utilities;
 
 import cz.tul.entities.Part;
+import cz.tul.entities.PartAttributeValue;
 import cz.tul.entities.StateEnum;
 import cz.tul.repositories.PartDAO;
 import org.slf4j.Logger;
@@ -36,6 +37,18 @@ public class Utility {
                 if (p1.getPosition() < p2.getPosition())
                     return -1;
                 return 0;
+            }
+        });
+        return result;
+    }
+
+
+    public static List<PartAttributeValue> getSortPartAttributeValue(Set<PartAttributeValue> atributes) {
+        List<PartAttributeValue> result = new ArrayList(atributes);
+
+        Collections.sort(result, new Comparator<PartAttributeValue>() {
+            public int compare(PartAttributeValue o1, PartAttributeValue o2) {
+                return o1.getOperationAttributes().getAttribute().getName().compareTo(o2.getOperationAttributes().getAttribute().getName());
             }
         });
         return result;

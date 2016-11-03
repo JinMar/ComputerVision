@@ -1,6 +1,6 @@
 package cz.tul.controllers;
 
-import cz.tul.bussiness.register.MethodRegister;
+import cz.tul.bussiness.register.OperationRegister;
 import cz.tul.config.ViewConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class BasicController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public void test(Model model) {
-        MethodRegister methodRegister = MethodRegister.getInstance();
+        OperationRegister operationRegister = OperationRegister.getInstance();
 
         logger.info("test bezi");
 

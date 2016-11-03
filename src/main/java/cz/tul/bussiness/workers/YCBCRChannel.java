@@ -2,7 +2,6 @@ package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.workers.enums.ChannelsEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
-import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -24,17 +23,17 @@ public class YCBCRChannel extends Worker {
     @Override
     public void work() throws SelectionLayerException {
         int layer = -1;
-        for (PartAttributeValue att : getAttributes()) {
-            if (att.getValue().equals(ChannelsEnum.Y.getChannelName())) {
-                layer = 0;
-            }
-            if (att.getValue().equals(ChannelsEnum.CB.getChannelName())) {
-                layer = 2;
-            }
-            if (att.getValue().equals(ChannelsEnum.CR.getChannelName())) {
-                layer = 1;
-            }
+
+        if (classifier.equals(ChannelsEnum.Y.getChannelName())) {
+            layer = 0;
         }
+        if (classifier.equals(ChannelsEnum.CB.getChannelName())) {
+            layer = 2;
+        }
+        if (classifier.equals(ChannelsEnum.CR.getChannelName())) {
+            layer = 1;
+        }
+
         if (layer < 0) {
             throw new SelectionLayerException("Cannot select layer id: " + layer);
         }

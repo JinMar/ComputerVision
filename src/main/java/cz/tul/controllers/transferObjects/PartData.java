@@ -11,9 +11,14 @@ import java.util.List;
 public class PartData {
     private static final Logger logger = LoggerFactory.getLogger(PartData.class);
     private List<PartValue> partValueList;
+    List<ListDataDTO> operations;
+    List<ListDataDTO> methods;
     private String URL;
     private String methodId;
+    private String functionId;
+    private String operationId;
     private int position;
+
 
 
     public void setURL(String URL) {
@@ -33,6 +38,37 @@ public class PartData {
         this.position = position;
     }
 
+    public String getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(String functionId) {
+        this.functionId = functionId;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public List<ListDataDTO> getOperations() {
+        return operations;
+    }
+
+    public void setOperations(List<ListDataDTO> operations) {
+        this.operations = operations;
+    }
+
+    public List<ListDataDTO> getMethods() {
+        return methods;
+    }
+
+    public void setMethods(List<ListDataDTO> methods) {
+        this.methods = methods;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
+    }
 
     public String getURL() {
         return URL;
@@ -49,4 +85,6 @@ public class PartData {
     public int getPosition() {
         return position;
     }
+
+
 }

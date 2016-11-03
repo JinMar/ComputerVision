@@ -53,8 +53,10 @@ public class ApplicationConfig {
         sessionBuilder.addAnnotatedClasses(Method.class);
         sessionBuilder.addAnnotatedClasses(Part.class);
         sessionBuilder.addAnnotatedClasses(PartAttributeValue.class);
-        sessionBuilder.addAnnotatedClasses(MethodAttributes.class);
         sessionBuilder.addAnnotatedClasses(AllowStep.class);
+        sessionBuilder.addAnnotatedClasses(Function.class);
+        sessionBuilder.addAnnotatedClasses(Operation.class);
+        sessionBuilder.addAnnotatedClasses(OperationAttributes.class);
         return sessionBuilder.buildSessionFactory();
     }
 

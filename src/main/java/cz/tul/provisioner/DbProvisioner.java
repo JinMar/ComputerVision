@@ -2,18 +2,11 @@ package cz.tul.provisioner;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import cz.tul.bussiness.register.MethodAttributeRegister;
-import cz.tul.bussiness.register.MethodRegister;
-import cz.tul.bussiness.register.exceptions.IllegalInputException;
+import cz.tul.bussiness.register.OperationRegister;
 import cz.tul.bussiness.workers.*;
-import cz.tul.bussiness.workers.enums.ChannelsEnum;
-import cz.tul.bussiness.workers.enums.EdgeDetectorEnum;
-import cz.tul.bussiness.workers.enums.NoiseReducerEnum;
-import cz.tul.bussiness.workers.enums.SegmentorEnum;
+import cz.tul.bussiness.workers.enums.*;
 import cz.tul.entities.*;
-import cz.tul.provisioner.holder.DataHolder;
 import cz.tul.repositories.*;
-import org.opencv.imgproc.Imgproc;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +29,23 @@ public class DbProvisioner implements InitializingBean {
     @Autowired
     AllowStepDAO allowStepDAO;
     @Autowired
+    FunctionDAO functionDAO;
+    @Autowired
     ChainDAO chainDAO;
     @Autowired
     MethodDAO methodDAO;
     @Autowired
     PartDAO partDAO;
     @Autowired
-    MethodAttributesDAO methodAttributesDAO;
+    OperationDAO operationDAO;
     @Autowired
     PartAttributeValueDAO partAttributeValueDAO;
     @Autowired
     ServletContext servletContext;
 
 
-    private MethodRegister methodRegister = MethodRegister.getInstance();
-    private MethodAttributeRegister methodAttributeRegister = MethodAttributeRegister.getInstance();
+    private OperationRegister operationRegister = OperationRegister.getInstance();
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -58,105 +53,246 @@ public class DbProvisioner implements InitializingBean {
         root.setLevel(Level.INFO);
 
         String test = servletContext.getRealPath("/");
-        methodRegister.registerContextPath(test);
+        operationRegister.registerContextPath(test);
 
         Set<Method> methods = new HashSet<>();
         Set<AllowStep> grayScale = new HashSet<>();
-        Set<MethodAttributes> methodAttributes = new HashSet<>();
+        Set<Operation> operations = new HashSet<>();
         Set<Attribute> attributes = new HashSet<>();
+        Set<Function> functions = new HashSet<>();
+        Set<OperationAttributes> operationAttributes = new HashSet<>();
+
+        Function colorSpaces = new Function();
+        colorSpaces.setName("Color Spaces");
+        functions.add(colorSpaces);
+        Function edgeDetectors = new Function();
+        edgeDetectors.setName("Edge Detectors");
+        functions.add(edgeDetectors);
+        Function denoiser = new Function();
+        denoiser.setName("Denoiser");
+        functions.add(denoiser);
+        Function morphology = new Function();
+        morphology.setName("Morphology operations");
+        functions.add(morphology);
+        Function segment = new Function();
+        segment.setName("Segmentor");
+        functions.add(segment);
+        functionDAO.save(functions);
 
         // RGB funkce
         Method RGB = new Method();
-        Method original = new Method();
-        // YCBCR funkce
-        Method YCBCR = new Method();
-        // HSV
-        Method HSV = new Method();
-        //EDGE DETECTORS
-        Method detectors = new Method();
-        //NOISE
-        Method noise = new Method();
-        //SEGMENTATION
-        Method segmentation = new Method();
-
-        //MORPOHOLOGY
-      /*  Method erode = new Method();
-        Method dilate = new Method();
-        Method open = new Method();
-        Method close = new Method();*/
-
-
-        // inicializace základních metoda ulozeni
-
+        RGB.setFunction(colorSpaces);
         RGB.setName("RGB");
-        YCBCR.setName("YCBCR");
-        HSV.setName("HSV");
-        original.setName("original");
-        detectors.setName("Edge Detectors");
-        noise.setName("Noise reducer");
-        segmentation.setName("Segmentation");
-
-
-        //ulozeni metod do databaze
         methods.add(RGB);
-        methods.add(YCBCR);
-        methods.add(HSV);
-        methods.add(detectors);
-        methods.add(noise);
-        methods.add(segmentation);
+
+        Method original = new Method();
+        original.setName("original");
         methods.add(original);
 
+        Method YCBCR = new Method();
+        YCBCR.setName("YCBCR");
+        YCBCR.setFunction(colorSpaces);
+        methods.add(YCBCR);
+
+        Method HSV = new Method();
+        HSV.setName("HSV");
+        HSV.setFunction(colorSpaces);
+        methods.add(HSV);
+
+        Method fDerivation = new Method();
+        fDerivation.setFunction(edgeDetectors);
+        fDerivation.setName("First Derivation");
+        methods.add(fDerivation);
+
+        Method sDerivation = new Method();
+        sDerivation.setFunction(edgeDetectors);
+        sDerivation.setName("Second Derivation");
+        methods.add(sDerivation);
+
+
+        Method noise = new Method();
+        noise.setFunction(denoiser);
+        noise.setName("Noise reducer");
+        methods.add(noise);
+
+        Method coloring = new Method();
+        coloring.setFunction(segment);
+        coloring.setName("Coloring");
+        methods.add(coloring);
+
+        Method thresholding = new Method();
+        thresholding.setFunction(segment);
+        thresholding.setName("Thresholding");
+        methods.add(thresholding);
+
+        Method bin = new Method();
+        bin.setFunction(morphology);
+        bin.setName("Binary");
+        methods.add(bin);
+
+        Method grayscale = new Method();
+        grayscale.setFunction(morphology);
+        grayscale.setName("Grayscale");
+        methods.add(grayscale);
+
         methodDAO.save(methods);
-        //test
 
-        methodRegister.register(original.getMethodId(), OriginalRGB.class);
-        methodRegister.register(RGB.getMethodId(), RGBChannel.class);
-        methodRegister.register(YCBCR.getMethodId(), YCBCRChannel.class);
-        methodRegister.register(HSV.getMethodId(), HSVChannel.class);
-        methodRegister.register(detectors.getMethodId(), EdgeDetector.class);
-        methodRegister.register(noise.getMethodId(), NoiseReducer.class);
-        methodRegister.register(segmentation.getMethodId(), Segmentation.class);
+        Operation originalOperation = new Operation();
+        originalOperation.setName("Original");
+        originalOperation.setMethod(original);
+        operations.add(originalOperation);
+
+        Operation redOperation = new Operation();
+        redOperation.setName("Red");
+        redOperation.setMethod(RGB);
+        operations.add(redOperation);
+
+        Operation greenOperation = new Operation();
+        greenOperation.setName("Green");
+        greenOperation.setMethod(RGB);
+        operations.add(greenOperation);
+
+        Operation blueOperation = new Operation();
+        blueOperation.setName("Blue");
+        blueOperation.setMethod(RGB);
+        operations.add(blueOperation);
+
+        Operation grayOperation = new Operation();
+        grayOperation.setName("Gray");
+        grayOperation.setMethod(RGB);
+        operations.add(grayOperation);
+
+        Operation yOperation = new Operation();
+        yOperation.setName("Y");
+        yOperation.setMethod(YCBCR);
+        operations.add(yOperation);
+
+        Operation cbOperation = new Operation();
+        cbOperation.setName("CB");
+        cbOperation.setMethod(YCBCR);
+        operations.add(cbOperation);
+
+        Operation crOperation = new Operation();
+        crOperation.setName("CR");
+        crOperation.setMethod(YCBCR);
+        operations.add(crOperation);
+
+        Operation hOperation = new Operation();
+        hOperation.setName("H");
+        hOperation.setMethod(HSV);
+        operations.add(hOperation);
+
+        Operation THRESH_BINARY = new Operation();
+        THRESH_BINARY.setName("THRESH_BINARY");
+        THRESH_BINARY.setMethod(thresholding);
+        operations.add(THRESH_BINARY);
+
+        Operation THRESH_BINARY_INV = new Operation();
+        THRESH_BINARY_INV.setName("THRESH_BINARY_INV");
+        THRESH_BINARY_INV.setMethod(thresholding);
+        operations.add(THRESH_BINARY_INV);
+
+        Operation THRESH_TRUNC = new Operation();
+        THRESH_TRUNC.setName("THRESH_TRUNC");
+        THRESH_TRUNC.setMethod(thresholding);
+        operations.add(THRESH_TRUNC);
+
+        Operation THRESH_TOZERO = new Operation();
+        THRESH_TOZERO.setName("THRESH_TOZERO");
+        THRESH_TOZERO.setMethod(thresholding);
+        operations.add(THRESH_TOZERO);
+
+        Operation average = new Operation();
+        average.setName("Average");
+        average.setMethod(noise);
+        operations.add(average);
+
+        Operation median = new Operation();
+        median.setName("Median");
+        median.setMethod(noise);
+        operations.add(median);
+
+        Operation rotateMask = new Operation();
+        rotateMask.setName("Rotating Mask");
+        rotateMask.setMethod(noise);
+        operations.add(rotateMask);
+
+        Operation sobel = new Operation();
+        sobel.setName("Sobell");
+        sobel.setMethod(fDerivation);
+        operations.add(sobel);
+
+        Operation laplace = new Operation();
+        laplace.setName("Laplacian");
+        laplace.setMethod(sDerivation);
+        operations.add(laplace);
+
+        Operation erode = new Operation();
+        erode.setName("Erode");
+        erode.setMethod(bin);
+        operations.add(erode);
+
+        Operation dilate = new Operation();
+        dilate.setName("Dilate");
+        dilate.setMethod(bin);
+        operations.add(dilate);
+
+        Operation open = new Operation();
+        open.setName("Open");
+        open.setMethod(bin);
+        operations.add(open);
+
+        Operation close = new Operation();
+        close.setName("Close");
+        close.setMethod(bin);
+        operations.add(close);
+
+        Operation topHat = new Operation();
+        topHat.setName("Tophat");
+        topHat.setMethod(grayscale);
+        operations.add(topHat);
+
+        Operation colorSeg = new Operation();
+        colorSeg.setName("Coloring");
+        colorSeg.setMethod(coloring);
+        operations.add(colorSeg);
 
 
-        //RGB
-        MethodAttributes rgbMethodAttributes = new MethodAttributes();
-        //YCBCR
-        MethodAttributes ycbcrMethodAttributes = new MethodAttributes();
-        //HSV
-        MethodAttributes hsvMethodAttributes = new MethodAttributes();
-        //BASIC
-        MethodAttributes originalMethodAttributes = new MethodAttributes();
-        //EDGEDETECTORS
-        MethodAttributes detectorsMethodAttributes = new MethodAttributes();
-        //NOSISEDETOCTOR
-        MethodAttributes noiseMethodAttributes = new MethodAttributes();
-        //SEGMENTATION
-        MethodAttributes thresholdMethodAttributes = new MethodAttributes();
-        MethodAttributes typeMethodAttributes = new MethodAttributes();
-        MethodAttributes segmentorMethodAttributes = new MethodAttributes();
+        operationDAO.save(operations);
 
-/*
-        //MORPHOLOGY
-        MethodAttributes erodeAttributesAtr1 = new MethodAttributes();
-        MethodAttributes dilateAttributesAtr1 = new MethodAttributes();
-        MethodAttributes openAttributesAtr1 = new MethodAttributes();
-        MethodAttributes closeAttributesAtr1 = new MethodAttributes();
-        MethodAttributes erodeAttributesAtr2 = new MethodAttributes();
-        MethodAttributes dilateAttributesAtr2 = new MethodAttributes();
-        MethodAttributes openAttributesAtr2 = new MethodAttributes();
-        MethodAttributes closeAttributesAtr2 = new MethodAttributes();*/
 
-        //inicializace
-        rgbMethodAttributes.setMethod(RGB);
-        ycbcrMethodAttributes.setMethod(YCBCR);
-        hsvMethodAttributes.setMethod(HSV);
-        originalMethodAttributes.setMethod(original);
-        detectorsMethodAttributes.setMethod(detectors);
-        noiseMethodAttributes.setMethod(noise);
-        //
-        thresholdMethodAttributes.setMethod(segmentation);
-        typeMethodAttributes.setMethod(segmentation);
-        segmentorMethodAttributes.setMethod(segmentation);
+        operationRegister.register(originalOperation.getOperationId(), OriginalRGB.class, ChannelsEnum.ORIGINAL.getChannelName());
+        operationRegister.registerOriginal(originalOperation.getOperationId());
+
+        operationRegister.register(redOperation.getOperationId(), RGBChannel.class, ChannelsEnum.RED.getChannelName());
+        operationRegister.register(greenOperation.getOperationId(), RGBChannel.class, ChannelsEnum.GREEN.getChannelName());
+        operationRegister.register(blueOperation.getOperationId(), RGBChannel.class, ChannelsEnum.BLUE.getChannelName());
+        operationRegister.register(grayOperation.getOperationId(), RGBChannel.class, ChannelsEnum.GRAY.getChannelName());
+
+        operationRegister.register(yOperation.getOperationId(), YCBCRChannel.class, ChannelsEnum.Y.getChannelName());
+        operationRegister.register(cbOperation.getOperationId(), YCBCRChannel.class, ChannelsEnum.CB.getChannelName());
+        operationRegister.register(crOperation.getOperationId(), YCBCRChannel.class, ChannelsEnum.CR.getChannelName());
+
+        operationRegister.register(hOperation.getOperationId(), HSVChannel.class, ChannelsEnum.H.getChannelName());
+
+        operationRegister.register(sobel.getOperationId(), EdgeDetector.class, EdgeDetectorEnum.SOBEL.getDetectorlName());
+        operationRegister.register(laplace.getOperationId(), EdgeDetector.class, EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+
+        operationRegister.register(average.getOperationId(), NoiseReducer.class, NoiseReducerEnum.SIMPLEAVERAGING.getReducerName());
+        operationRegister.register(median.getOperationId(), NoiseReducer.class, NoiseReducerEnum.MEDIAN.getReducerName());
+        operationRegister.register(rotateMask.getOperationId(), NoiseReducer.class, NoiseReducerEnum.ROTATINGMASK.getReducerName());
+
+        operationRegister.register(THRESH_BINARY.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_BINARY.getSegmentorName());
+        operationRegister.register(THRESH_BINARY_INV.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_BINARY_INV.getSegmentorName());
+        operationRegister.register(THRESH_TOZERO.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_TOZERO.getSegmentorName());
+        operationRegister.register(THRESH_TRUNC.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_TRUNC.getSegmentorName());
+        operationRegister.register(colorSeg.getOperationId(), Segmentation.class, SegmentorEnum.COLORING.getSegmentorName());
+
+        operationRegister.register(erode.getOperationId(), Morphology.class, MorphologyEnum.ERODE.getMorphologyName());
+        operationRegister.register(dilate.getOperationId(), Morphology.class, MorphologyEnum.DILATE.getMorphologyName());
+        operationRegister.register(open.getOperationId(), Morphology.class, MorphologyEnum.OPEN.getMorphologyName());
+        operationRegister.register(close.getOperationId(), Morphology.class, MorphologyEnum.CLOSE.getMorphologyName());
+        operationRegister.register(topHat.getOperationId(), Morphology.class, MorphologyEnum.TOPHAT.getMorphologyName());
 
 
         Attribute step = new Attribute("Krok");
@@ -177,187 +313,432 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(threshold);
         attributeDAO.save(attributes);
 
+        /*
+        OperationAttributes red = new OperationAttributes();
+        OperationAttributes green = new OperationAttributes();
+        OperationAttributes bleu = new OperationAttributes();
+        OperationAttributes gray = new OperationAttributes();
+        OperationAttributes y = new OperationAttributes();
+        OperationAttributes cb = new OperationAttributes();
+        OperationAttributes cr = new OperationAttributes();
+        OperationAttributes h = new OperationAttributes();
+        OperationAttributes color = new OperationAttributes();
+        OperationAttributes avr = new OperationAttributes();
+        OperationAttributes med = new OperationAttributes();
+        OperationAttributes rotMask = new OperationAttributes();
+        OperationAttributes sobelED = new OperationAttributes();
+        OperationAttributes laplacianED = new OperationAttributes();
+        */
 
-        originalMethodAttributes.setAttribute(inputImg);
-        originalMethodAttributes.setAttributeType(AttributeType.TEXT);
+        OperationAttributes trashA = new OperationAttributes();
+        trashA.setMinValue(0);
+        trashA.setMaxValue(255);
+        trashA.setOperation(THRESH_BINARY);
+        trashA.setAttribute(threshold);
+        trashA.setAttributeType(AttributeType.NUMBER);
+        trashA.setDefaultValues("125");
+        operationAttributes.add(trashA);
 
+        OperationAttributes trashB = new OperationAttributes();
+        trashB.setMinValue(0);
+        trashB.setMaxValue(255);
+        trashB.setOperation(THRESH_BINARY_INV);
+        trashB.setAttribute(threshold);
+        trashB.setAttributeType(AttributeType.NUMBER);
+        trashB.setDefaultValues("125");
+        operationAttributes.add(trashB);
+
+        OperationAttributes trashC = new OperationAttributes();
+        trashC.setMinValue(0);
+        trashC.setMaxValue(255);
+        trashC.setOperation(THRESH_TOZERO);
+        trashC.setAttribute(threshold);
+        trashC.setAttributeType(AttributeType.NUMBER);
+        trashC.setDefaultValues("125");
+        operationAttributes.add(trashC);
+
+        OperationAttributes trashD = new OperationAttributes();
+        trashD.setMinValue(0);
+        trashD.setMaxValue(255);
+        trashD.setOperation(THRESH_TRUNC);
+        trashD.setAttribute(threshold);
+        trashD.setAttributeType(AttributeType.NUMBER);
+        trashD.setDefaultValues("125");
+        operationAttributes.add(trashD);
+
+        OperationAttributes erodeM_A = new OperationAttributes();
+        erodeM_A.setMinValue(3);
+        erodeM_A.setMaxValue(5);
+        erodeM_A.setDefaultValues("3");
+        erodeM_A.setOperation(erode);
+        erodeM_A.setAttribute(size);
+        erodeM_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(erodeM_A);
+
+        OperationAttributes erodeM_B = new OperationAttributes();
         Map<String, String> shapes = new HashMap<>();
-        shapes.put("oval", "Oval");
-        shapes.put("circle", "Kruh");
-        shapes.put("square", "Čtverec");
+        shapes.put("ellipse", "Elipsa");
         shapes.put("rectangle", "Obdelník");
+        erodeM_B.setDefaultValues("rectangle");
+        erodeM_B.setOperation(erode);
+        erodeM_B.setAttribute(shape);
+        erodeM_B.setAttributeType(AttributeType.SELECT);
+        erodeM_B.setOptions(shapes);
+        operationAttributes.add(erodeM_B);
 
-        Map<String, String> RGBChannels = new HashMap<>();
-        RGBChannels.put(ChannelsEnum.RED.getChannelName(), ChannelsEnum.RED.getChannelName());
-        RGBChannels.put(ChannelsEnum.GREEN.getChannelName(), ChannelsEnum.GREEN.getChannelName());
-        RGBChannels.put(ChannelsEnum.BLUE.getChannelName(), ChannelsEnum.BLUE.getChannelName());
-        RGBChannels.put(ChannelsEnum.GRAY.getChannelName(), ChannelsEnum.GRAY.getChannelName());
-        rgbMethodAttributes.setAttribute(channel);
-        rgbMethodAttributes.setAttributeType(AttributeType.SELECT);
-        rgbMethodAttributes.setOptions(RGBChannels);
-        rgbMethodAttributes.setMinValue(0);
-        rgbMethodAttributes.setMaxValue(255);
+        OperationAttributes dilateM_A = new OperationAttributes();
+        dilateM_A.setMinValue(3);
+        dilateM_A.setMaxValue(5);
+        dilateM_A.setDefaultValues("3");
+        dilateM_A.setOperation(dilate);
+        dilateM_A.setAttribute(size);
+        dilateM_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(dilateM_A);
+
+        OperationAttributes dilateM_B = new OperationAttributes();
+        dilateM_B.setDefaultValues("rectangle");
+        dilateM_B.setOperation(dilate);
+        dilateM_B.setAttribute(shape);
+        dilateM_B.setAttributeType(AttributeType.SELECT);
+        dilateM_B.setOptions(shapes);
+        operationAttributes.add(dilateM_B);
+
+        OperationAttributes openM_A = new OperationAttributes();
+        openM_A.setMinValue(3);
+        openM_A.setMaxValue(5);
+        openM_A.setDefaultValues("3");
+        openM_A.setOperation(open);
+        openM_A.setAttribute(size);
+        openM_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(openM_A);
+
+        OperationAttributes openM_B = new OperationAttributes();
+        openM_B.setDefaultValues("rectangle");
+        openM_B.setOperation(open);
+        openM_B.setAttribute(shape);
+        openM_B.setAttributeType(AttributeType.SELECT);
+        openM_B.setOptions(shapes);
+        operationAttributes.add(openM_B);
+
+        OperationAttributes closeM_A = new OperationAttributes();
+        closeM_A.setMinValue(3);
+        closeM_A.setMaxValue(5);
+        closeM_A.setDefaultValues("3");
+        closeM_A.setOperation(close);
+        closeM_A.setAttribute(size);
+        closeM_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(closeM_A);
+
+        OperationAttributes closeM_B = new OperationAttributes();
+        closeM_B.setDefaultValues("rectangle");
+        closeM_B.setOperation(close);
+        closeM_B.setAttribute(shape);
+        closeM_B.setAttributeType(AttributeType.SELECT);
+        closeM_B.setOptions(shapes);
+        operationAttributes.add(closeM_B);
+
+        OperationAttributes topHatM_A = new OperationAttributes();
+        topHatM_A.setMinValue(3);
+        topHatM_A.setMaxValue(5);
+        topHatM_A.setDefaultValues("3");
+        topHatM_A.setOperation(topHat);
+        topHatM_A.setAttribute(size);
+        topHatM_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(topHatM_A);
+
+        OperationAttributes topHatM_B = new OperationAttributes();
+        topHatM_B.setDefaultValues("rectangle");
+        topHatM_B.setOperation(topHat);
+        topHatM_B.setAttribute(shape);
+        topHatM_B.setAttributeType(AttributeType.SELECT);
+        topHatM_B.setOptions(shapes);
+        operationAttributes.add(topHatM_B);
+        operationDAO.save(operationAttributes);
 
 
-        Map<String, String> YCBCRChannels = new HashMap<>();
-        YCBCRChannels.put(ChannelsEnum.Y.getChannelName(), ChannelsEnum.Y.getChannelName());
-        YCBCRChannels.put(ChannelsEnum.CB.getChannelName(), ChannelsEnum.CB.getChannelName());
-        YCBCRChannels.put(ChannelsEnum.CR.getChannelName(), ChannelsEnum.CR.getChannelName());
-        ycbcrMethodAttributes.setAttribute(channel);
-        ycbcrMethodAttributes.setAttributeType(AttributeType.SELECT);
-        ycbcrMethodAttributes.setOptions(YCBCRChannels);
-
-        Map<String, String> HSVChannels = new HashMap<>();
-        HSVChannels.put(ChannelsEnum.H.getChannelName(), ChannelsEnum.H.getChannelName());
-        hsvMethodAttributes.setAttribute(channel);
-        hsvMethodAttributes.setAttributeType(AttributeType.SELECT);
-        hsvMethodAttributes.setOptions(HSVChannels);
-
-        Map<String, String> detectorTypes = new HashMap<>();
-        detectorTypes.put(EdgeDetectorEnum.LAPLACIAN.getDetectorlName(), EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
-        detectorTypes.put(EdgeDetectorEnum.SOBEL.getDetectorlName(), EdgeDetectorEnum.SOBEL.getDetectorlName());
-        detectorsMethodAttributes.setAttribute(type);
-        detectorsMethodAttributes.setAttributeType(AttributeType.SELECT);
-        detectorsMethodAttributes.setOptions(detectorTypes);
-
-        Map<String, String> noiseReducerTypes = new HashMap<>();
-        noiseReducerTypes.put(NoiseReducerEnum.MEDIAN.getReducerName(), NoiseReducerEnum.MEDIAN.getReducerName());
-        noiseReducerTypes.put(NoiseReducerEnum.SIMPLEAVERAGING.getReducerName(), NoiseReducerEnum.SIMPLEAVERAGING.getReducerName());
-        noiseReducerTypes.put(NoiseReducerEnum.ROTATINGMASK.getReducerName(), NoiseReducerEnum.ROTATINGMASK.getReducerName());
-        noiseMethodAttributes.setAttribute(type);
-        noiseMethodAttributes.setAttributeType(AttributeType.SELECT);
-        noiseMethodAttributes.setOptions(noiseReducerTypes);
-
-        thresholdMethodAttributes.setAttribute(threshold);
-        thresholdMethodAttributes.setAttributeType(AttributeType.NUMBER);
-
-
-        Map<String, String> tresholdTypes = new HashMap<>();
-        tresholdTypes.put("" + Imgproc.THRESH_BINARY, "THRESH_BINARY");
-        tresholdTypes.put("" + Imgproc.THRESH_BINARY_INV, "THRESH_BINARY_INV");
-        tresholdTypes.put("" + Imgproc.THRESH_TRUNC, "THRESH_TRUNC");
-        tresholdTypes.put("" + Imgproc.THRESH_TOZERO, "THRESH_TOZERO");
-        typeMethodAttributes.setAttribute(type);
-        typeMethodAttributes.setAttributeType(AttributeType.SELECT);
-        typeMethodAttributes.setOptions(tresholdTypes);
-
-
-        Map<String, String> segmentorTypes = new HashMap<>();
-        segmentorTypes.put(SegmentorEnum.TRESHHOLDING.getSegmentorName(), SegmentorEnum.TRESHHOLDING.getSegmentorName());
-        segmentorTypes.put(SegmentorEnum.COLORING.getSegmentorName(), SegmentorEnum.COLORING.getSegmentorName());
-        segmentorMethodAttributes.setAttribute(segmentor);
-        segmentorMethodAttributes.setAttributeType(AttributeType.SELECT);
-        segmentorMethodAttributes.setOptions(segmentorTypes);
-
-
-        methodAttributes.add(rgbMethodAttributes);
-        methodAttributes.add(ycbcrMethodAttributes);
-        methodAttributes.add(hsvMethodAttributes);
-        methodAttributes.add(originalMethodAttributes);
-        methodAttributes.add(detectorsMethodAttributes);
-        methodAttributes.add(noiseMethodAttributes);
-        methodAttributes.add(thresholdMethodAttributes);
-        methodAttributes.add(typeMethodAttributes);
-        methodAttributes.add(segmentorMethodAttributes);
-        registerMethodAtributes(methodAttributes);
-        methodAttributesDAO.save(methodAttributes);
-
-        AllowStep allowStep_org = new AllowStep(ChannelsEnum.ORIGINAL.getChannelName());
-        allowStep_org.setMethod(original.getMethodId());
-        allowStep_org.setAllowStep(null);
+        AllowStep allowStep_org = new AllowStep();
+        allowStep_org.setOperation(originalOperation);
+        allowStep_org.setAllowoperationId(null);
         grayScale.add(allowStep_org);
 
-        AllowStep allowStep_R = new AllowStep(ChannelsEnum.RED.getChannelName());
-        allowStep_R.setMethod(RGB.getMethodId());
-        allowStep_R.setAllowStep(original.getMethodId());
+        AllowStep allowStep_R = new AllowStep();
+        allowStep_R.setOperation(redOperation);
+        allowStep_R.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_R);
 
-        AllowStep allowStep_G = new AllowStep(ChannelsEnum.GREEN.getChannelName());
-        allowStep_G.setMethod(RGB.getMethodId());
-        allowStep_G.setAllowStep(original.getMethodId());
+        AllowStep allowStep_G = new AllowStep();
+        allowStep_G.setOperation(greenOperation);
+        allowStep_G.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_G);
 
-        AllowStep allowStep_B = new AllowStep(ChannelsEnum.BLUE.getChannelName());
-        allowStep_B.setMethod(RGB.getMethodId());
-        allowStep_B.setAllowStep(original.getMethodId());
+        AllowStep allowStep_B = new AllowStep();
+        allowStep_B.setOperation(blueOperation);
+        allowStep_B.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_B);
 
-        AllowStep allowStep_GRAY = new AllowStep(ChannelsEnum.GRAY.getChannelName());
-        allowStep_GRAY.setMethod(RGB.getMethodId());
-        allowStep_GRAY.setAllowStep(original.getMethodId());
+        AllowStep allowStep_GRAY = new AllowStep();
+        allowStep_GRAY.setOperation(grayOperation);
+        allowStep_GRAY.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_GRAY);
 
-        AllowStep allowStep_Y = new AllowStep(ChannelsEnum.Y.getChannelName());
-        allowStep_Y.setMethod(YCBCR.getMethodId());
-        allowStep_Y.setAllowStep(original.getMethodId());
+        AllowStep allowStep_Y = new AllowStep();
+        allowStep_Y.setOperation(yOperation);
+        allowStep_Y.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_Y);
 
-        AllowStep allowStep_CB = new AllowStep(ChannelsEnum.CB.getChannelName());
-        allowStep_CB.setMethod(YCBCR.getMethodId());
-        allowStep_CB.setAllowStep(original.getMethodId());
+        AllowStep allowStep_CB = new AllowStep();
+        allowStep_CB.setOperation(cbOperation);
+        allowStep_CB.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_CB);
 
-        AllowStep allowStep_CR = new AllowStep(ChannelsEnum.CR.getChannelName());
-        allowStep_CR.setMethod(YCBCR.getMethodId());
-        allowStep_CR.setAllowStep(original.getMethodId());
+        AllowStep allowStep_CR = new AllowStep();
+        allowStep_CR.setOperation(crOperation);
+        allowStep_CR.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_CR);
 
-        AllowStep allowStep_H = new AllowStep(ChannelsEnum.H.getChannelName());
-        allowStep_H.setMethod(HSV.getMethodId());
-        allowStep_H.setAllowStep(original.getMethodId());
+        AllowStep allowStep_H = new AllowStep();
+        allowStep_H.setOperation(hOperation);
+        allowStep_H.setAllowoperationId(originalOperation.getOperationId());
         grayScale.add(allowStep_H);
 
-        ///////////////////////////////////
-        AllowStep allowStep_sobel_a = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
-        allowStep_sobel_a.setMethod(detectors.getMethodId());
-        allowStep_sobel_a.setAllowStep(RGB.getMethodId());
+        AllowStep allowStep_sobel_a = new AllowStep();
+        allowStep_sobel_a.setOperation(sobel);
+        allowStep_sobel_a.setAllowoperationId(grayOperation.getOperationId());
         grayScale.add(allowStep_sobel_a);
-        AllowStep allowStep_sobel_b = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
-        allowStep_sobel_b.setMethod(detectors.getMethodId());
-        allowStep_sobel_b.setAllowStep(YCBCR.getMethodId());
+
+        AllowStep allowStep_sobel_b = new AllowStep();
+        allowStep_sobel_b.setOperation(sobel);
+        allowStep_sobel_b.setAllowoperationId(redOperation.getOperationId());
         grayScale.add(allowStep_sobel_b);
-        AllowStep allowStep_sobel_c = new AllowStep(EdgeDetectorEnum.SOBEL.getDetectorlName());
-        allowStep_sobel_c.setMethod(detectors.getMethodId());
-        allowStep_sobel_c.setAllowStep(HSV.getMethodId());
+
+        AllowStep allowStep_sobel_c = new AllowStep();
+        allowStep_sobel_c.setOperation(sobel);
+        allowStep_sobel_c.setAllowoperationId(greenOperation.getOperationId());
         grayScale.add(allowStep_sobel_c);
+
+        AllowStep allowStep_sobel_d = new AllowStep();
+        allowStep_sobel_d.setOperation(sobel);
+        allowStep_sobel_d.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_sobel_d);
+
+        AllowStep allowStep_sobel_e = new AllowStep();
+        allowStep_sobel_e.setOperation(sobel);
+        allowStep_sobel_e.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_sobel_e);
+
+        AllowStep allowStep_sobel_f = new AllowStep();
+        allowStep_sobel_f.setOperation(sobel);
+        allowStep_sobel_f.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_sobel_f);
+
+        AllowStep allowStep_sobel_g = new AllowStep();
+        allowStep_sobel_g.setOperation(sobel);
+        allowStep_sobel_g.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_sobel_g);
         ////////////////////////////////////
-        AllowStep allowStep_laplace_a = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
-        allowStep_laplace_a.setMethod(detectors.getMethodId());
-        allowStep_laplace_a.setAllowStep(RGB.getMethodId());
+        AllowStep allowStep_laplace_a = new AllowStep();
+        allowStep_laplace_a.setOperation(laplace);
+        allowStep_laplace_a.setAllowoperationId(grayOperation.getOperationId());
         grayScale.add(allowStep_laplace_a);
-        AllowStep allowStep_laplace_b = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
-        allowStep_laplace_b.setMethod(detectors.getMethodId());
-        allowStep_laplace_b.setAllowStep(YCBCR.getMethodId());
+
+        AllowStep allowStep_laplace_b = new AllowStep();
+        allowStep_laplace_b.setOperation(laplace);
+        allowStep_laplace_b.setAllowoperationId(redOperation.getOperationId());
         grayScale.add(allowStep_laplace_b);
-        AllowStep allowStep_laplace_c = new AllowStep(EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
-        allowStep_laplace_c.setMethod(detectors.getMethodId());
-        allowStep_laplace_c.setAllowStep(HSV.getMethodId());
+
+        AllowStep allowStep_laplace_c = new AllowStep();
+        allowStep_laplace_c.setOperation(laplace);
+        allowStep_laplace_c.setAllowoperationId(greenOperation.getOperationId());
         grayScale.add(allowStep_laplace_c);
+
+        AllowStep allowStep_laplace_d = new AllowStep();
+        allowStep_laplace_d.setOperation(laplace);
+        allowStep_laplace_d.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_laplace_d);
+
+        AllowStep allowStep_laplace_e = new AllowStep();
+        allowStep_laplace_e.setOperation(laplace);
+        allowStep_laplace_e.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_laplace_e);
+
+        AllowStep allowStep_laplace_f = new AllowStep();
+        allowStep_laplace_f.setOperation(laplace);
+        allowStep_laplace_f.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_laplace_f);
+
+        AllowStep allowStep_laplace_g = new AllowStep();
+        allowStep_laplace_g.setOperation(laplace);
+        allowStep_laplace_g.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_laplace_g);
+
+
         ////////////////////////////////////
-        AllowStep allowStep_threshold_a = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
-        allowStep_threshold_a.setMethod(segmentation.getMethodId());
-        allowStep_threshold_a.setAllowStep(RGB.getMethodId());
-        grayScale.add(allowStep_threshold_a);
-        AllowStep allowStep_threshold_b = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
-        allowStep_threshold_b.setMethod(segmentation.getMethodId());
-        allowStep_threshold_b.setAllowStep(YCBCR.getMethodId());
+
+        AllowStep allowStep_threshold_b = new AllowStep();
+        allowStep_threshold_b.setOperation(THRESH_BINARY);
+        allowStep_threshold_b.setAllowoperationId(redOperation.getOperationId());
         grayScale.add(allowStep_threshold_b);
-        AllowStep allowStep_threshold_c = new AllowStep(SegmentorEnum.TRESHHOLDING.getSegmentorName());
-        allowStep_threshold_c.setMethod(segmentation.getMethodId());
-        allowStep_threshold_c.setAllowStep(HSV.getMethodId());
+
+        AllowStep allowStep_threshold_c = new AllowStep();
+        allowStep_threshold_c.setOperation(THRESH_BINARY);
+        allowStep_threshold_c.setAllowoperationId(greenOperation.getOperationId());
         grayScale.add(allowStep_threshold_c);
+
+        AllowStep allowStep_threshold_d = new AllowStep();
+        allowStep_threshold_d.setOperation(THRESH_BINARY);
+        allowStep_threshold_d.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_threshold_d);
+
+        AllowStep allowStep_threshold_e = new AllowStep();
+        allowStep_threshold_e.setOperation(THRESH_BINARY);
+        allowStep_threshold_e.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_threshold_e);
+
+        AllowStep allowStep_threshold_f = new AllowStep();
+        allowStep_threshold_f.setOperation(THRESH_BINARY);
+        allowStep_threshold_f.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_threshold_f);
+        AllowStep allowStep_threshold_a = new AllowStep();
+
+        allowStep_threshold_a.setOperation(THRESH_BINARY);
+        allowStep_threshold_a.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_threshold_a);
+
+        AllowStep allowStep_threshold_g = new AllowStep();
+        allowStep_threshold_g.setOperation(THRESH_BINARY);
+        allowStep_threshold_g.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(allowStep_threshold_g);
+
+        //
+        AllowStep allowStep_threshold_aa = new AllowStep();
+        allowStep_threshold_aa.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_aa.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_threshold_aa);
+
+        AllowStep allowStep_threshold_bb = new AllowStep();
+        allowStep_threshold_bb.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_bb.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(allowStep_threshold_bb);
+
+        AllowStep allowStep_threshold_cc = new AllowStep();
+        allowStep_threshold_cc.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_cc.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(allowStep_threshold_cc);
+
+        AllowStep allowStep_threshold_dd = new AllowStep();
+        allowStep_threshold_dd.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_dd.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_threshold_dd);
+
+        AllowStep allowStep_threshold_ee = new AllowStep();
+        allowStep_threshold_ee.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_ee.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ee);
+
+        AllowStep allowStep_threshold_ff = new AllowStep();
+        allowStep_threshold_ff.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_ff.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ff);
+
+        AllowStep allowStep_threshold_gg = new AllowStep();
+        allowStep_threshold_gg.setOperation(THRESH_TOZERO);
+        allowStep_threshold_gg.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(allowStep_threshold_gg);
+        //
+        AllowStep allowStep_threshold_aaa = new AllowStep();
+        allowStep_threshold_aaa.setOperation(THRESH_TOZERO);
+        allowStep_threshold_aaa.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(allowStep_threshold_aaa);
+
+        AllowStep allowStep_threshold_bbb = new AllowStep();
+        allowStep_threshold_bbb.setOperation(THRESH_TOZERO);
+        allowStep_threshold_bbb.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(allowStep_threshold_bbb);
+
+        AllowStep allowStep_threshold_ccc = new AllowStep();
+        allowStep_threshold_ccc.setOperation(THRESH_TOZERO);
+        allowStep_threshold_ccc.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ccc);
+
+        AllowStep allowStep_threshold_ddd = new AllowStep();
+        allowStep_threshold_ddd.setOperation(THRESH_TOZERO);
+        allowStep_threshold_ddd.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ddd);
+
+        AllowStep allowStep_threshold_eee = new AllowStep();
+        allowStep_threshold_eee.setOperation(THRESH_TOZERO);
+        allowStep_threshold_eee.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_threshold_eee);
+
+        AllowStep allowStep_threshold_fff = new AllowStep();
+        allowStep_threshold_fff.setOperation(THRESH_TOZERO);
+        allowStep_threshold_fff.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_threshold_fff);
+
+        AllowStep allowStep_threshold_ggg = new AllowStep();
+        allowStep_threshold_ggg.setOperation(THRESH_TOZERO);
+        allowStep_threshold_ggg.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ggg);
+////////////
+        AllowStep allowStep_threshold_aaaa = new AllowStep();
+        allowStep_threshold_aaaa.setOperation(THRESH_TRUNC);
+        allowStep_threshold_aaaa.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(allowStep_threshold_aaaa);
+
+        AllowStep allowStep_threshold_bbbb = new AllowStep();
+        allowStep_threshold_bbbb.setOperation(THRESH_TRUNC);
+        allowStep_threshold_bbbb.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(allowStep_threshold_bbbb);
+
+        AllowStep allowStep_threshold_cccc = new AllowStep();
+        allowStep_threshold_cccc.setOperation(THRESH_TRUNC);
+        allowStep_threshold_cccc.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(allowStep_threshold_cccc);
+
+        AllowStep allowStep_threshold_dddd = new AllowStep();
+        allowStep_threshold_dddd.setOperation(THRESH_TRUNC);
+        allowStep_threshold_dddd.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(allowStep_threshold_dddd);
+
+        AllowStep allowStep_threshold_eeee = new AllowStep();
+        allowStep_threshold_eeee.setOperation(THRESH_TRUNC);
+        allowStep_threshold_eeee.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(allowStep_threshold_eeee);
+
+        AllowStep allowStep_threshold_ffff = new AllowStep();
+        allowStep_threshold_ffff.setOperation(THRESH_TRUNC);
+        allowStep_threshold_ffff.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(allowStep_threshold_ffff);
+
+        AllowStep allowStep_threshold_gggg = new AllowStep();
+        allowStep_threshold_gggg.setOperation(THRESH_TRUNC);
+        allowStep_threshold_gggg.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(allowStep_threshold_gggg);
         //////////////////////////////////
-        AllowStep allowStep_coloring = new AllowStep(SegmentorEnum.COLORING.getSegmentorName());
-        allowStep_coloring.setMethod(segmentation.getMethodId());
-        allowStep_coloring.setAllowStep(segmentation.getMethodId());
-        allowStep_coloring.setSelfRelation(true);
-        allowStep_coloring.setSelfParam(SegmentorEnum.TRESHHOLDING.getSegmentorName());
-        grayScale.add(allowStep_coloring);
+        AllowStep allowStep_coloring_a = new AllowStep();
+        allowStep_coloring_a.setOperation(colorSeg);
+        allowStep_coloring_a.setAllowoperationId(THRESH_BINARY.getOperationId());
+        grayScale.add(allowStep_coloring_a);
+
+        AllowStep allowStep_coloring_b = new AllowStep();
+        allowStep_coloring_b.setOperation(colorSeg);
+        allowStep_coloring_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        grayScale.add(allowStep_coloring_b);
+
+        AllowStep allowStep_coloring_c = new AllowStep();
+        allowStep_coloring_c.setOperation(colorSeg);
+        allowStep_coloring_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        grayScale.add(allowStep_coloring_c);
+
+        AllowStep allowStep_coloring_d = new AllowStep();
+        allowStep_coloring_d.setOperation(colorSeg);
+        allowStep_coloring_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        grayScale.add(allowStep_coloring_d);
 
         allowStepDAO.save(grayScale);
     }
 
-
+/*
     private void registerMethodAtributes(Set<MethodAttributes> input) {
         for (MethodAttributes ma : input) {
             try {
@@ -370,7 +751,7 @@ public class DbProvisioner implements InitializingBean {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     public AttributeDAO getAttributeDAO() {
         return attributeDAO;
@@ -412,11 +793,5 @@ public class DbProvisioner implements InitializingBean {
         this.allowStepDAO = allowStepDAO;
     }
 
-    public MethodAttributesDAO getMethodAttributesDAO() {
-        return methodAttributesDAO;
-    }
 
-    public void setMethodAttributesDAO(MethodAttributesDAO methodAttributesDAO) {
-        this.methodAttributesDAO = methodAttributesDAO;
-    }
 }

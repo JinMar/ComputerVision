@@ -1,8 +1,10 @@
 package cz.tul.services;
 
 import cz.tul.controllers.transferObjects.ChainDTO;
-import cz.tul.controllers.transferObjects.MethodAttributeDTO;
+import cz.tul.entities.AllowStep;
+import cz.tul.entities.Operation;
 import cz.tul.repositories.AllowStepDAO;
+import cz.tul.repositories.OperationDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,27 +24,28 @@ public class ChainValidator {
 
     @Autowired
     private AllowStepDAO allowStepDAO;
+    @Autowired
+    private OperationDAO operationDAO;
 
     public boolean validateChain(List<ChainDTO> chainDtos) {
         String prew = null;
 
-        List<String> allowedMethod = null;
-        List<String> attr;
+        Operation operation = null;
+        List<String> allowedOp;
         boolean allowed = true;
         for (ChainDTO data : chainDtos) {
             if (prew == null) {
-                prew = data.getMethodId();
+                prew = operationDAO.getIdOperationByName("Original");
             } else {
-                attr = new ArrayList<>();
-                for (MethodAttributeDTO val : data.getAttributes()) {
-                    attr.add(val.getValue());
+                allowedOp = new ArrayList<>();
+                operation = operationDAO.getOperationById(data.getOperationId());
+                for (AllowStep as : operation.getAllowSteps()) {
+                    allowedOp.add(as.getAllowoperationId());
                 }
-                allowedMethod = allowStepDAO.getAllowedMethod(data.getMethodId(), attr);
-
-                if (!allowedMethod.contains(prew)) {
+                if (!allowedOp.contains(prew)) {
                     return !allowed;
                 }
-                prew = data.getMethodId();
+                prew = data.getOperationId();
             }
 
         }

@@ -42,23 +42,44 @@ public class JsonReceive {
         return msg;
     }
 
-    @RequestMapping(value = "/getMethods", method = RequestMethod.POST)
+    @RequestMapping(value = "/getFunctions", method = RequestMethod.POST)
     public
     @ResponseBody
-    List<MethodsDTO> getMethods() {
-        logger.info("getting methods");
-        List<MethodsDTO> result = contentProviderService.getAllMethod();
+    List<ListDataDTO> getFunctions() {
+        logger.info("Getting Functions");
+        List<ListDataDTO> result = contentProviderService.getAllFunctions();
         return result;
     }
 
+    @RequestMapping(value = "/getMethod", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    List<ListDataDTO> getMethod(@RequestBody final List<RequestData> requestData) {
+        String functionId = requestData.get(0).getObjectId();
+        logger.info("Getting method for id: " + functionId);
+        List<ListDataDTO> result = contentProviderService.getAllMethodByFunctionId(functionId);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/getOperation", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    List<ListDataDTO> getOperation(@RequestBody final List<RequestData> requestData) {
+        String methodId = requestData.get(0).getObjectId();
+        String functionId = requestData.get(0).getObjectId2();
+        logger.info("Getting operation for id: " + methodId);
+        List<ListDataDTO> result = contentProviderService.getOperationByMethodId(methodId);
+        return result;
+    }
 
     @RequestMapping(value = "/getAttributes", method = RequestMethod.POST)
     public
     @ResponseBody
     WrappedAtrDTO getAttributes(@RequestBody final List<RequestData> requestData) {
-        String idMethod = requestData.get(0).getIdMethod();
-        logger.info("getting atributes for method with id {}", idMethod);
-        List<AttributesDTO> result = contentProviderService.getAtributesByMethodId(idMethod);
+        String idOperation = requestData.get(0).getObjectId();
+        logger.info("getting atributes for operation with id {}", idOperation);
+        List<AttributesDTO> result = contentProviderService.getAttributesByOperationId(idOperation);
         WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(result, requestData.get(0).getPageAttributeId());
 
         return wrappedAtrDTO;

@@ -12,11 +12,13 @@ public class MethodFactory {
     private static final Logger logger = LoggerFactory.getLogger(MethodFactory.class);
 
 
-    public static IMethodWorker getMethod(String methodId) throws IllegalInputException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        MethodRegister methodRegister = MethodRegister.getInstance();
-        String className = methodRegister.getRelation(methodId).getName();
+    public static IMethodWorker getMethod(String operationId) throws IllegalInputException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+        OperationRegister operationRegister = OperationRegister.getInstance();
+        String className = operationRegister.getRelation(operationId).getName();
+        String classifier = operationRegister.getClassifier(operationId);
 
-
-        return (IMethodWorker) Class.forName(className).newInstance();
+        IMethodWorker result = (IMethodWorker) Class.forName(className).newInstance();
+        result.setClassifier(classifier);
+        return result;
     }
 }

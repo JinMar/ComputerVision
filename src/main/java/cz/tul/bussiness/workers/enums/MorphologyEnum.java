@@ -5,8 +5,8 @@ package cz.tul.bussiness.workers.enums;
  */
 public enum MorphologyEnum {
     ERODE("erode"),
-    DILATE("DILATACE"),
-    OPEN("OPEN"),
+    DILATE("dilate"),
+    OPEN("open"),
     CLOSE("close"),
     TOPHAT("tophhat");
     private String morphologyName;

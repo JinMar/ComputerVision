@@ -14,32 +14,16 @@ public class AllowStep implements Serializable, CustomEntity {
     @Column(name = "allowstep_id")
     private String allowStepId;
 
-    @Id
-    @Column(name = "param")
-    private String param;
+    @Column(name = "allowoperation_Id")
+    private String allowoperationId;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "OPERATION_ID")
+    private Operation operation;
 
-    @JoinColumn(name = "method_id")
-    private String method;
-
-    @Column(name = "allowstep")
-    private String allowStep;
-
-    @Column(name = "selfRelation")
-    private boolean selfRelation;
-
-    @Column(name = "selfParam")
-    private String selfParam;
 
     public AllowStep() {
         allowStepId = UUID.randomUUID().toString();
-        selfRelation = false;
-    }
-
-    public AllowStep(String param) {
-        allowStepId = UUID.randomUUID().toString();
-        selfRelation = false;
-        this.param = param;
 
     }
 
@@ -51,43 +35,19 @@ public class AllowStep implements Serializable, CustomEntity {
         this.allowStepId = allowStepId;
     }
 
-    public String getMethod() {
-        return method;
+    public String getAllowoperationId() {
+        return allowoperationId;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setAllowoperationId(String allowoperationId) {
+        this.allowoperationId = allowoperationId;
     }
 
-    public String getAllowStep() {
-        return allowStep;
+    public Operation getOperation() {
+        return operation;
     }
 
-    public void setAllowStep(String allowStep) {
-        this.allowStep = allowStep;
-    }
-
-    public String getParam() {
-        return param;
-    }
-
-    public void setParam(String param) {
-        this.param = param;
-    }
-
-    public boolean isSelfRelation() {
-        return selfRelation;
-    }
-
-    public void setSelfRelation(boolean selfRelation) {
-        this.selfRelation = selfRelation;
-    }
-
-    public String isSelfParam() {
-        return selfParam;
-    }
-
-    public void setSelfParam(String selfParam) {
-        this.selfParam = selfParam;
+    public void setOperation(Operation operation) {
+        this.operation = operation;
     }
 }

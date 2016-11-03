@@ -5,12 +5,12 @@ import java.io.Serializable;
 /**
  * Created by Marek on 02.10.2016.
  */
-public class MethodsDTO implements Serializable {
+public class ListDataDTO implements Serializable {
     private String name;
     private String idMethod;
 
 
-    public MethodsDTO() {
+    public ListDataDTO() {
     }
 
     public void setIdMethod(String idMethod) {

@@ -5,7 +5,11 @@ package cz.tul.bussiness.workers.enums;
  */
 public enum SegmentorEnum {
     TRESHHOLDING("treshholding"),
-    COLORING("coloring");
+    COLORING("coloring"),
+    THRESH_BINARY("THRESH_BINARY"),
+    THRESH_BINARY_INV("THRESH_BINARY_INV"),
+    THRESH_TOZERO("THRESH_TOZERO"),
+    THRESH_TRUNC("THRESH_TRUNC");
 
 
     private String segmentorName;

@@ -29,37 +29,59 @@ public class Segmentation extends Worker {
     public void work() {
 
         int methodType = -1;
+
+        if (classifier.equals(SegmentorEnum.THRESH_BINARY.getSegmentorName())) {
+            methodType = 1;
+        }
+        if (classifier.equals(SegmentorEnum.THRESH_BINARY_INV.getSegmentorName())) {
+            methodType = 2;
+        }
+        if (classifier.equals(SegmentorEnum.THRESH_TOZERO.getSegmentorName())) {
+            methodType = 3;
+        }
+        if (classifier.equals(SegmentorEnum.THRESH_TRUNC.getSegmentorName())) {
+            methodType = 4;
+        }
+
+        if (classifier.equals(SegmentorEnum.COLORING.getSegmentorName())) {
+            methodType = 5;
+        }
         for (PartAttributeValue att : getAttributes()) {
-            if (att.getValue().equals(SegmentorEnum.TRESHHOLDING.getSegmentorName())) {
-                methodType = 1;
-            }
-            if (att.getValue().equals(SegmentorEnum.COLORING.getSegmentorName())) {
-                methodType = 2;
-            }
-            if (att.getMethodAttributes().getAttribute().getName().equals("Práh")) {
+            if (att.getOperationAttributes().getAttribute().getName().equals("Práh")) {
                 System.out.println(att.getValue());
                 threshold = Integer.parseInt(att.getValue());
             }
-            if (att.getMethodAttributes().getAttribute().getName().equals("Typ")) {
-                typ = Integer.parseInt(att.getValue());
 
-            }
         }
         switch (methodType) {
             case 1:
-                logger.info("threshold: " + threshold + " type: " + typ);
-                thresholding();
+                logger.info("threshold: " + threshold + " type: " + classifier);
+                thresholding(Imgproc.THRESH_BINARY);
                 break;
             case 2:
+                logger.info("threshold: " + threshold + " type: " + classifier);
+                thresholding(Imgproc.THRESH_BINARY_INV);
+                break;
+            case 3:
+                logger.info("threshold: " + threshold + " type: " + classifier);
+                thresholding(Imgproc.THRESH_TOZERO);
+                break;
+            case 4:
+                logger.info("threshold: " + threshold + " type: " + classifier);
+                thresholding(Imgproc.THRESH_TRUNC);
+                break;
+            case 5:
                 logger.info("ColoringMethod:");
                 coloringMethod();
                 break;
+            default:
+                //todo vyhodit exception
         }
 
     }
 
 
-    private void thresholding() {
+    private void thresholding(int type) {
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         channels.add(Mat.zeros(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC1));
@@ -69,7 +91,7 @@ public class Segmentation extends Worker {
         result = new Mat(BGR.rows(), BGR.cols(), CvType.CV_8UC1);
         BGR.put(0, 0, sourceData);
         Core.split(BGR, channels);
-        Imgproc.threshold(channels.get(0), result, threshold, 255, typ);
+        Imgproc.threshold(channels.get(0), result, threshold, 255, type);
         save();
     }
 

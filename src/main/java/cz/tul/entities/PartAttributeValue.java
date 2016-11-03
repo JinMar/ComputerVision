@@ -21,9 +21,11 @@ public class PartAttributeValue implements Serializable, CustomEntity {
     @JoinColumn(name = "PART_ID")
     private Part part;
 
+
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "METHODATTRIBUTE_ID")
-    private MethodAttributes methodAttributes;
+    @JoinColumn(name = "OPERATIONATTRIBUTES_ID")
+    private OperationAttributes operationAttributes;
+
 
     public PartAttributeValue() {
         partAttributeValueId = UUID.randomUUID().toString();
@@ -43,12 +45,17 @@ public class PartAttributeValue implements Serializable, CustomEntity {
         this.part = part;
     }
 
-    public void setMethodAttributes(MethodAttributes methodAttributes) {
-        this.methodAttributes = methodAttributes;
+    public void setOperationAttributes(OperationAttributes operationAttributes) {
+        this.operationAttributes = operationAttributes;
     }
+
 
     //GETTERS
 
+
+    public OperationAttributes getOperationAttributes() {
+        return operationAttributes;
+    }
 
     public String getPartAttributeValueId() {
         return partAttributeValueId;
@@ -62,7 +69,5 @@ public class PartAttributeValue implements Serializable, CustomEntity {
         return part;
     }
 
-    public MethodAttributes getMethodAttributes() {
-        return methodAttributes;
-    }
+
 }

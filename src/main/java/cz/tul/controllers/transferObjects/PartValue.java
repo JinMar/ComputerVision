@@ -12,6 +12,7 @@ public class PartValue extends DataHolder {
     private String value;
     private double min;
     private double max;
+    private String operationAttributesId;
 
     public double getMin() {
         return min;
@@ -37,5 +38,11 @@ public class PartValue extends DataHolder {
         this.value = value;
     }
 
+    public String getOperationAttributesId() {
+        return operationAttributesId;
+    }
 
+    public void setOperationAttributesId(String operationAttributesId) {
+        this.operationAttributesId = operationAttributesId;
+    }
 }

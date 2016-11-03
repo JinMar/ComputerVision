@@ -23,4 +23,6 @@ public interface IMethodWorker {
     void setImgData(BufferedImage imgData);
 
     void saveImg();
+
+    void setClassifier(String classifier);
 }

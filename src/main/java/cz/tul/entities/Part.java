@@ -24,8 +24,8 @@ public class Part implements Serializable, CustomEntity {
     private Chain chain;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "METHOD_ID")
-    private Method method;
+    @JoinColumn(name = "OPERATION_ID")
+    private Operation operation;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "part")
     private Set<PartAttributeValue> partAttributeValues = new HashSet<>();
@@ -35,6 +35,12 @@ public class Part implements Serializable, CustomEntity {
 
     @Column(name = "STATE")
     private String state;
+
+    @Column(name = "functionId")
+    private String functionId;
+
+    @Column(name = "methodId")
+    private String methodId;
 
     public Part() {
         partId = UUID.randomUUID().toString();
@@ -62,12 +68,20 @@ public class Part implements Serializable, CustomEntity {
         this.state = state;
     }
 
-    public void setMethod(Method method) {
-        this.method = method;
+    public void setOperation(Operation operation) {
+        this.operation = operation;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setFunctionId(String functionId) {
+        this.functionId = functionId;
+    }
+
+    public void setMethodId(String methodId) {
+        this.methodId = methodId;
     }
     //GETTERS
 
@@ -96,7 +110,15 @@ public class Part implements Serializable, CustomEntity {
         return state;
     }
 
-    public Method getMethod() {
-        return method;
+    public Operation getOperation() {
+        return operation;
+    }
+
+    public String getFunctionId() {
+        return functionId;
+    }
+
+    public String getMethodId() {
+        return methodId;
     }
 }

@@ -12,20 +12,9 @@ import java.util.List;
 @Repository
 public class MethodDAO extends BasicRepositoryAbstract {
 
-    public List<Method> getAllMethods() {
-        Query query = getQuery("from Method m order by m.name");
-        return (List<Method>) query.list();
-    }
-
-
-    public Method getMethodById(String id) {
-        Query query = getQuery("from Method m where m.methodId='" + id + "'");
-        query.setMaxResults(1);
-        if (query.list().size() > 0) {
-            return (Method) query.list().get(0);
-        } else {
-            return null;
-        }
-
+    public List<Method> getMethodsById(String functionId) {
+        Query query = getQuery("from Method m where m.function.functionId= :id order by m.name");
+        query.setParameter("id", functionId);
+        return query.list();
     }
 }

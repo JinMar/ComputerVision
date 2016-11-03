@@ -1,6 +1,7 @@
 package cz.tul.repositories;
 
 import cz.tul.entities.Chain;
+import cz.tul.entities.Part;
 import cz.tul.entities.StateEnum;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -32,32 +33,14 @@ public class ChainDAO extends BasicRepositoryAbstract {
     @Transactional
     public StateEnum isChainState(String key) {
         int count = -1;
-        String hql = " FROM Part p where p.partId = :part and p.state != :state1 ";
+        String hql = " FROM Part p where p.chain.chainId = :part and p.state != :state1 ";
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
         query.setParameter("state1", StateEnum.COMPLETE.getState());
         query.setParameter("part", key);
-        count = query.list().size();
+        List<Part> result = query.list();
+        count = result.size();
         if (count == 0) {
             return StateEnum.COMPLETE;
-        }
-
-        String hql2 = "FROM Part p where p.partId = :part and p.state = :state1 ";
-        Query query2 = getSessionFactory().getCurrentSession().createQuery(hql2);
-        query2.setParameter("state1", StateEnum.PROCESSING.getState());
-        query2.setParameter("part", key);
-        count = query.list().size();
-        if (count > 0) {
-            return StateEnum.PROCESSING;
-        }
-
-
-        String hql3 = " FROM Part p where p.partId = :part and p.state = :state1 ";
-        Query query3 = getSessionFactory().getCurrentSession().createQuery(hql3);
-        query3.setParameter("state1", StateEnum.ACTIVE.getState());
-        query3.setParameter("part", key);
-        count = query.list().size();
-        if (count > 0) {
-            return StateEnum.ACTIVE;
         }
 
         return StateEnum.ERROR;

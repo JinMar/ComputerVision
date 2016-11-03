@@ -3,7 +3,6 @@ package cz.tul.bussiness.workers;
 import cz.tul.bussiness.workers.enums.NoiseReducerEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import cz.tul.bussiness.workers.helper.Dispersion;
-import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -31,18 +30,16 @@ public class NoiseReducer extends Worker {
         BGR.put(0, 0, sourceData);
         Core.split(BGR, channels);
         newChannels = new ArrayList<>();
-        for (PartAttributeValue att : getAttributes()) {
-            if (att.getValue().equals(NoiseReducerEnum.SIMPLEAVERAGING.getReducerName())) {
-                simpleAveraging();
-            }
-            if (att.getValue().equals(NoiseReducerEnum.MEDIAN.getReducerName())) {
-                median();
-            }
-            if (att.getValue().equals(NoiseReducerEnum.ROTATINGMASK.getReducerName())) {
-                rotatingMask();
-            }
 
 
+        if (classifier.equals(NoiseReducerEnum.SIMPLEAVERAGING.getReducerName())) {
+            simpleAveraging();
+        }
+        if (classifier.equals(NoiseReducerEnum.MEDIAN.getReducerName())) {
+            median();
+        }
+        if (classifier.equals(NoiseReducerEnum.ROTATINGMASK.getReducerName())) {
+            rotatingMask();
         }
 
     }

@@ -2,7 +2,6 @@ package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.workers.enums.ChannelsEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
-import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -24,19 +23,19 @@ public class RGBChannel extends Worker {
     @Override
     public void work() throws SelectionLayerException {
         int layer = -1;
-        for (PartAttributeValue att : getAttributes()) {
-            if (att.getValue().equals(ChannelsEnum.RED.getChannelName())) {
-                layer = 2;
-            }
-            if (att.getValue().equals(ChannelsEnum.GREEN.getChannelName())) {
-                layer = 1;
-            }
-            if (att.getValue().equals(ChannelsEnum.BLUE.getChannelName())) {
-                layer = 0;
-            }
-            if (att.getValue().equals(ChannelsEnum.GRAY.getChannelName())) {
-                layer = 3;
-            }
+
+        if (classifier.equals(ChannelsEnum.RED.getChannelName())) {
+            layer = 2;
+        }
+        if (classifier.equals(ChannelsEnum.GREEN.getChannelName())) {
+            layer = 1;
+        }
+        if (classifier.equals(ChannelsEnum.BLUE.getChannelName())) {
+            layer = 0;
+        }
+        if (classifier.equals(ChannelsEnum.GRAY.getChannelName())) {
+            layer = 3;
+
 
         }
         if (layer < 0) {

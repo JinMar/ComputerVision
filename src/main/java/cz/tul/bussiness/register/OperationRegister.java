@@ -13,20 +13,23 @@ import java.util.Map;
 /**
  * Created by Bc. Marek Jindrák on 13.10.2016.
  */
-public class MethodRegister implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(MethodRegister.class);
-    private static MethodRegister INSTANCE;
+public class OperationRegister implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(OperationRegister.class);
+    private static OperationRegister INSTANCE;
     private static Map<String, Class<? extends IMethodWorker>> relation;
+    private static Map<String, String> classifier;
     private static String realContextPath;
+    private static String original;
 
-    private MethodRegister() {
+    private OperationRegister() {
     }
 
 
-    public static MethodRegister getInstance() {
+    public static OperationRegister getInstance() {
         if (INSTANCE == null) {
             relation = new HashMap<>();
-            INSTANCE = new MethodRegister();
+            classifier = new HashMap<>();
+            INSTANCE = new OperationRegister();
 
         }
         return INSTANCE;
@@ -38,8 +41,8 @@ public class MethodRegister implements Serializable {
      * @param key   - identifikator metody (PK entity Method)
      * @param input - modul, ktery bude vykonavat zpracovani dat
      */
-    public void register(String key, Class<? extends IMethodWorker> input) throws IllegalInputException {
-        if (key == null || input == null) {
+    public void register(String key, Class<? extends IMethodWorker> input, String operationClassifier) throws IllegalInputException {
+        if (key == null || input == null || operationClassifier == null) {
             throw new IllegalInputException("One of input parameters is null");
         } else if (key.length() == 0) {
             throw new IllegalInputException("Length of key is 0 !!! Its not supported");
@@ -47,6 +50,7 @@ public class MethodRegister implements Serializable {
             throw new IllegalInputException("The key %s was already used", key);
         } else {
             relation.put(key, input);
+            classifier.put(key, operationClassifier);
         }
 
     }
@@ -82,4 +86,24 @@ public class MethodRegister implements Serializable {
         return realContextPath;
 
     }
+
+    public String getClassifier(String key) throws IllegalInputException {
+        if (!classifier.containsKey(key)) {
+            throw new IllegalInputException("Register does not contains this key %s", key);
+        }
+        return classifier.get(key);
+    }
+
+    public void registerOriginal(String original) {
+        OperationRegister.original = original;
+    }
+
+    public String getOriginal() throws IllegalInputException {
+        if (original == null) {
+            throw new IllegalInputException("Id of original image worker is not registred");
+        }
+        return original;
+
+    }
+
 }

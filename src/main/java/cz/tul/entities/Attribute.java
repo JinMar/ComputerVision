@@ -20,7 +20,7 @@ public class Attribute implements Serializable, CustomEntity {
     private String name;
 
     @OneToMany(mappedBy = "attribute")
-    private Set<MethodAttributes> methodAttributes = new HashSet<MethodAttributes>();
+    private Set<OperationAttributes> operationAttributes = new HashSet<>();
 
     public Attribute() {
         attributeId = UUID.randomUUID().toString();
@@ -34,6 +34,11 @@ public class Attribute implements Serializable, CustomEntity {
 
     //SETTERS
 
+
+    public void setOperationAttributes(Set<OperationAttributes> operationAttributes) {
+        this.operationAttributes = operationAttributes;
+    }
+
     public void setAttributeId(String attributeId) {
         this.attributeId = attributeId;
     }
@@ -42,12 +47,13 @@ public class Attribute implements Serializable, CustomEntity {
         this.name = name;
     }
 
-    public void setMethodAttributes(Set<MethodAttributes> methodAttributes) {
-        this.methodAttributes = methodAttributes;
-    }
 
     //GETTERS
 
+
+    public Set<OperationAttributes> getOperationAttributes() {
+        return operationAttributes;
+    }
 
     public String getAttributeId() {
         return attributeId;
@@ -57,7 +63,5 @@ public class Attribute implements Serializable, CustomEntity {
         return name;
     }
 
-    public Set<MethodAttributes> getMethodAttributes() {
-        return methodAttributes;
-    }
+
 }

@@ -19,11 +19,13 @@ public class Method implements Serializable, CustomEntity {
     @Column(name = "NAME")
     private String name;
 
-    @OneToMany(mappedBy = "method")
-    private Set<MethodAttributes> methodAttributes = new HashSet<MethodAttributes>();
 
     @OneToMany(mappedBy = "method")
-    private Set<MethodAttributes> methodPart = new HashSet<MethodAttributes>();
+    private Set<Operation> operations = new HashSet<Operation>();
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "FUNCTION_ID")
+    private Function function;
 
 
     public Method() {
@@ -40,16 +42,24 @@ public class Method implements Serializable, CustomEntity {
         this.name = name;
     }
 
-    public void setMethodAttributes(Set<MethodAttributes> methodAttributes) {
-        this.methodAttributes = methodAttributes;
+
+    public void setFunction(Function function) {
+        this.function = function;
     }
 
-    public void setMethodPart(Set<MethodAttributes> methodPart) {
-        this.methodPart = methodPart;
+    public void setOperations(Set<Operation> operations) {
+        this.operations = operations;
     }
-
     //GETTERS
 
+
+    public Set<Operation> getOperations() {
+        return operations;
+    }
+
+    public Function getFunction() {
+        return function;
+    }
 
     public String getMethodId() {
         return methodId;
@@ -59,11 +69,4 @@ public class Method implements Serializable, CustomEntity {
         return name;
     }
 
-    public Set<MethodAttributes> getMethodAttributes() {
-        return methodAttributes;
-    }
-
-    public Set<MethodAttributes> getMethodPart() {
-        return methodPart;
-    }
 }

@@ -8,7 +8,8 @@ import java.io.Serializable;
 public class RequestData implements Serializable {
 
     private String pageAttributeId;
-    private String idMethod;
+    private String objectId;
+    private String objectId2;
 
     public RequestData() {
     }
@@ -19,13 +20,23 @@ public class RequestData implements Serializable {
 
     public void setPageAttributeId(String pageAttributeId) {
         this.pageAttributeId = pageAttributeId;
+
     }
 
-    public String getIdMethod() {
-        return idMethod;
+    public String getObjectId() {
+        return objectId;
     }
 
-    public void setIdMethod(String idMethod) {
-        this.idMethod = idMethod;
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public String getObjectId2() {
+        return objectId2;
+    }
+
+    public void setObjectId2(String objectId2) {
+        this.objectId2 = objectId2;
     }
 }
+

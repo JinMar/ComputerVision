@@ -17,7 +17,7 @@ $(document).ready(function () {
     };
 
     var itemIMG;
-    window.onload = getMethods();
+    window.onload = getFunctions();
     function encodeImageFileAsURL(cb) {
         return function () {
             var file = this.files[0];
@@ -43,15 +43,34 @@ $(document).ready(function () {
         $("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
             "<img class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
             "<div class='methodName'>" +
-            "<table cellspacing='0'>" +
-            " <tr>" +
+            "<table id ='tab-" + count + "'cellspacing='0'>" +
+            " <tr id='tblRow-1' >" +
             "<td width='90%'>" +
-            "<select  id='method-" + count + "' name='comp'>" +
-            " <option disabled selected value> -- selection -- </option>" +
+            "<select class='function' id='fce-" + count + "' name='comp'>" +
+            " <option disabled selected value> -- Function -- </option>" +
             "</select>" +
             "</td>" +
             "<td width='10%'>" +
             "    <button onclick='removeFCE(" + count + ")' class='close'>" + '&times' +
+            "</td>" +
+            "</tr>" +
+            " <tr id='tblRow-2' >" +
+            "<td width='90%'>" +
+            "<select class='metoda' id='method-" + count + "' name='comp'>" +
+            " <option disabled selected value> -- Method -- </option>" +
+            "</select>" +
+            "</td>" +
+            "<td width='10%'>" +
+            "</td>" +
+            "</tr>" +
+            " <tr id='tblRow-3' >" +
+            "<td width='90%'>" +
+            "<select class='operation' id='op-" + count + "' name='comp'>" +
+            " <option disabled selected value> -- Operation -- </option>" +
+            "</select>" +
+            "</td>" +
+            "<td width='10%'>" +
+
             "</td>" +
             "</tr>" +
             "</table>" +
@@ -68,21 +87,98 @@ $(document).ready(function () {
 
 
         $.each(allmethod, function (key, value) {
-            $('#method-' + count)
+            $('#fce-' + count)
                 .append($("<option></option>")
                     .attr("value", value.idMethod)
                     .text(value.name));
         });
 
-        $('select').on('change', function () {
+        $('.function').on('change', function () {
             var dataToSend = [];
             var item = {
                 "pageAttributeId": this.id,
-                "idMethod": this.value
+                "objectId": $("#" + this.id).val()
             };
-            var temp = this.id.split("-");
 
+            var temp = this.id.split("-");
             var currentPositionElement = temp[1];
+
+            $('#method-' + currentPositionElement).empty().append('<option disabled selected value> -- Method -- </option>"');
+            $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
+            $(".tabRow-" + currentPositionElement).remove();
+            dataToSend.push(item);
+            $.ajax({
+                url: "/rest/getMethod",
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                dataType: 'json',
+                contentType: 'application/json',
+                mimeType: 'application/json',
+                success: function (data) {
+                    $.each(data, function (key, value) {
+                        $('#method-' + currentPositionElement)
+                            .append($("<option></option>")
+                                .attr("value", value.idMethod)
+                                .text(value.name));
+                    });
+
+                },
+                error: function (data, status, er) {
+                    alert("error: " + data + " status: " + status + " er:" + er);
+                }
+            });
+
+        });
+        $('.metoda').on('change', function () {
+
+            var temp = this.id.split("-");
+            var currentPositionElement = temp[1];
+            $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
+            $(".tabRow-" + currentPositionElement).remove();
+            var dataToSend = [];
+            var item = {
+                "pageAttributeId": this.id,
+                "objectId": $("#" + this.id).val(),
+
+            };
+
+
+            dataToSend.push(item);
+            $.ajax({
+                url: "/rest/getOperation",
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                dataType: 'json',
+                contentType: 'application/json',
+                mimeType: 'application/json',
+                success: function (data) {
+                    $.each(data, function (key, value) {
+                        $('#op-' + currentPositionElement)
+                            .append($("<option></option>")
+                                .attr("value", value.idMethod)
+                                .text(value.name));
+                    });
+
+                },
+                error: function (data, status, er) {
+                    alert("error: " + data + " status: " + status + " er:" + er);
+                }
+            });
+
+        });
+        $('.operation').on('change', function () {
+
+            var temp = this.id.split("-");
+            var currentPositionElement = temp[1];
+
+            var dataToSend = [];
+            var item = {
+                "pageAttributeId": this.id,
+                "objectId": $("#" + this.id).val(),
+
+            };
+
+
             dataToSend.push(item);
             $.ajax({
                 url: "/rest/getAttributes",
@@ -92,43 +188,52 @@ $(document).ready(function () {
                 contentType: 'application/json',
                 mimeType: 'application/json',
                 success: function (data) {
+                    $(".tabRow-" + currentPositionElement).remove();
+                    console.log(JSON.stringify(data));
+                    for (var key in data.attributesDTOs) {
+                        var recieveData = data.attributesDTOs[key];
+                        if (recieveData.name.length != 0) {
+                            if (recieveData.attributeType.toLowerCase() == "select".toLowerCase()) {
 
-                    if (data.pageAttributeId == item.pageAttributeId) {
-                        $(".tabRow-" + currentPositionElement).remove();
-                        for (var key in data.attributesDTOs) {
-                            var recieveData = data.attributesDTOs[key];
-                            if (recieveData.name.length != 0) {
-                                if (recieveData.attributeType.toLowerCase() == "select".toLowerCase()) {
+                                $("#tbl-" + currentPositionElement).append(
+                                    $(
+                                        "<tr class='tabRow-" + key + "'>" +
+                                        "<td>" + recieveData.name + "</td>" +
+                                        "<td><select class='sel' id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
+                                        " <option disabled selected value> -- selection -- </option>" +
+                                        "</select></tr>"));
+                                for (var keyOption in recieveData.options) {
 
-                                    $("#tbl-" + currentPositionElement).append(
-                                        $(
-                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
-                                            "<td>" + recieveData.name + "</td>" +
-                                            "<td><select class='sel' id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
-                                            " <option disabled selected value> -- selection -- </option>" +
-                                            "</select></tr>"));
-
-                                    for (var keyOption in recieveData.options) {
-
+                                    if (keyOption == recieveData.defaultValues) {
+                                        $('#param-' + key + "-" + currentPositionElement)
+                                            .append($("<option selected></option>")
+                                                .attr("value", keyOption)
+                                                .text(recieveData.options[keyOption]));
+                                    } else {
                                         $('#param-' + key + "-" + currentPositionElement)
                                             .append($("<option></option>")
                                                 .attr("value", keyOption)
                                                 .text(recieveData.options[keyOption]));
-
                                     }
-                                }
-                                else {
 
-                                    $("#tbl-" + currentPositionElement)
-                                        .append($(
-                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
-                                            "<td>" + recieveData.name + "</td>" +
-                                            "<td><input  id='param-" + key + "-" + currentPositionElement + "' type='" + recieveData.attributeType.toLowerCase() + "'  value='61'></td>" +
-                                            "</tr>"
-                                        ));
-                                }
 
+                                }
                             }
+                            else {
+
+                                $("#tbl-" + currentPositionElement)
+                                    .append($(
+                                        "<tr class='tabRow-" + key + "'>" +
+                                        "<td>" + recieveData.name + "</td>" +
+                                        "<td><input  id='param-" + key + "-" + currentPositionElement + "' type='" +
+                                        recieveData.attributeType.toLowerCase() + "'  value='" + recieveData.defaultValues + "'" +
+                                        "min='" + recieveData.minValue + "' max='" + recieveData.maxValue + "'></td>" +
+                                        "</tr>"
+                                    ));
+                            }
+                            $('#param-' + key + "-" + currentPositionElement).attr("data-key");
+                            $('#param-' + key + "-" + currentPositionElement).data("key", recieveData.operationAttributesId);
+                            console.log($("#param-" + key + "-" + currentPositionElement).data('key'))
                         }
                     }
 
@@ -138,8 +243,8 @@ $(document).ready(function () {
                 }
             });
 
-        })
-        ;
+        });
+
     })
     ;
 
@@ -151,54 +256,34 @@ $(document).ready(function () {
         //alert("count loop: " + countLoop);
         $('#sortable li').each(function () {
             var number = this.id.split("-")[1];
-
-            var dataToSend = [];
-            var item = {
-                "pageAttributeId": "data",
-                "idMethod": $("#method-" + number).val()
-            };
-            var finalItem = [];
-            dataToSend.push(item);
             var inputData = [];
-            var inputDataItem = {
-                "value": "",
-                "methodAttributeId": ""
-            };
 
-            $.ajax({
-                url: "/rest/getAttributes",
-                type: 'POST',
-                data: JSON.stringify(dataToSend),
-                dataType: 'json',
-                contentType: 'application/json',
-                mimeType: 'application/json',
-                success: function (data) {
-                    for (var key in data.attributesDTOs) {
-                        var recieveData = data.attributesDTOs[key];
-                        inputDataItem = {
-                            "value": $("#param-" + key + "-" + number).val(),
-                            "methodAttributeId": recieveData.methodAttributesId
-                        };
-                        inputData.push(inputDataItem);
-                    }
-                    finalItem = {
-                        "position": index,
-                        "methodId": $("#method-" + number).val(),
-                        "attributes": inputData
-                    };
-                    arraz1.push(finalItem);
-                    index = index + 1;
-                    currentLoop = currentLoop + 1;
-                    if (currentLoop == countLoop) {
-                        sendAjax(arraz1);
-                        arraz1 = [];
-                        index = 1
-                    }
-                },
-                error: function (data, status, er) {
-                    alert("error: " + data + " status: " + status + " er:" + er);
-                }
-            });
+            var table = document.getElementById('tbl-' + number);
+
+            var rowLength = table.rows.length;
+            for (var i = 0; i < rowLength; i += 1) {
+                var inputDataItem = {
+                    "value": $("#param-" + i + "-" + number).val(),
+                    "operationAttributeId": $("#param-" + i + "-" + number).data('key')
+                };
+                inputData.push(inputDataItem)
+            }
+            console.log("$(op- + number).val(): " + $("#op-" + number).val());
+            var finalItem = {
+                "position": index,
+                "operationId": $("#op-" + number).val(),
+                "methodId": $("#method-" + number).val(),
+                "functionId": $("#fce-" + number).val(),
+                "attributes": inputData
+            };
+            arraz1.push(finalItem);
+            index = index + 1;
+            currentLoop = currentLoop + 1;
+            if (currentLoop == countLoop) {
+                sendAjax(arraz1);
+                arraz1 = [];
+                index = 1
+            }
 
 
         });
@@ -207,7 +292,7 @@ $(document).ready(function () {
     });
     function sendAjax(dataToSend) {
         // alert(JSON.stringify(dataToSend));
-        console.log("data to send:   " + JSON.stringify(dataToSend));
+
         $("#wait").css("display", "block");
         $.ajax({
             url: "/rest/createChain",
@@ -218,7 +303,7 @@ $(document).ready(function () {
             mimeType: 'application/json',
             success: function (data) {
                 testData = data;
-                console.log(data);
+
                 if (data.state) {
 
                     $(".message").append("<div class='alert alert-success'>" +
@@ -264,11 +349,11 @@ $(document).ready(function () {
             success: function (data) {
 
                 if (data.ready == true) {
-                    console.log("je to: " + data.ready);
-                    console.log(JSON.stringify(data));
+
                     $("#wait").css("display", "none");
-                    reDraw(data);
                     clearInterval(interval);
+                    reDraw(data);
+
 
                 } else {
                     setTimeout(loadChain, 5000);
@@ -287,7 +372,7 @@ $(document).ready(function () {
             var number = this.id.split("-")[1];
             removeFCE(number)
         });
-        count = 1;
+        count = 0;
 
         for (var key in data.parts) {
             var recieveData = data.parts[key];
@@ -296,15 +381,34 @@ $(document).ready(function () {
             $("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
                 "<img src='" + recieveData.url + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
                 "<div class='methodName'>" +
-                "<table cellspacing='0'>" +
-                " <tr>" +
+                "<table id ='tab-" + count + "'cellspacing='0'>" +
+                " <tr id='tblRow-1' >" +
                 "<td width='90%'>" +
-                "<select class='sel' id='method-" + count + "' name='comp'>" +
-
+                "<select class='function' id='fce-" + count + "' name='comp'>" +
+                " <option disabled selected value> -- Function -- </option>" +
                 "</select>" +
                 "</td>" +
                 "<td width='10%'>" +
                 "    <button onclick='removeFCE(" + count + ")' class='close'>" + '&times' +
+                "</td>" +
+                "</tr>" +
+                " <tr id='tblRow-2' >" +
+                "<td width='90%'>" +
+                "<select class='metoda' id='method-" + count + "' name='comp'>" +
+                " <option disabled selected value> -- Method -- </option>" +
+                "</select>" +
+                "</td>" +
+                "<td width='10%'>" +
+                "</td>" +
+                "</tr>" +
+                " <tr id='tblRow-3' >" +
+                "<td width='90%'>" +
+                "<select class='operation' id='op-" + count + "' name='comp'>" +
+                " <option disabled selected value> -- Operation -- </option>" +
+                "</select>" +
+                "</td>" +
+                "<td width='10%'>" +
+
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -312,6 +416,19 @@ $(document).ready(function () {
                 "<table id='tbl-" + count + "' cellspacing='0' width='100%' ></table>" +
                 "</li>").appendTo("#sortable");
             $.each(allmethod, function (key, value) {
+                if (value.idMethod == recieveData.functionId) {
+                    $('#fce-' + count)
+                        .append($("<option selected></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                } else {
+                    $('#fce-' + count)
+                        .append($("<option></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                }
+            });
+            $.each(recieveData.methods, function (key, value) {
                 if (value.idMethod == recieveData.methodId) {
                     $('#method-' + count)
                         .append($("<option selected></option>")
@@ -319,6 +436,19 @@ $(document).ready(function () {
                             .text(value.name));
                 } else {
                     $('#method-' + count)
+                        .append($("<option></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                }
+            });
+            $.each(recieveData.operations, function (key, value) {
+                if (value.idMethod == recieveData.operationId) {
+                    $('#op-' + count)
+                        .append($("<option selected></option>")
+                            .attr("value", value.idMethod)
+                            .text(value.name));
+                } else {
+                    $('#op-' + count)
                         .append($("<option></option>")
                             .attr("value", value.idMethod)
                             .text(value.name));
@@ -350,6 +480,7 @@ $(document).ready(function () {
 
 
                     }
+
                 }
                 else {
                     $("#tbl-" + count)
@@ -360,18 +491,100 @@ $(document).ready(function () {
                             "</tr>"
                         ));
                 }
+                $('#param-' + key + "-" + count).attr("data-key");
+                $('#param-' + key + "-" + count).data("key", stored.operationAttributesId);
+
+                console.log($("#param-" + key + "-" + count).data('key'));
 
             }
         }
-        $('.sel').on('change', function () {
+
+        $('.function').on('change', function () {
             var dataToSend = [];
             var item = {
                 "pageAttributeId": this.id,
-                "idMethod": this.value
+                "objectId": $("#" + this.id).val()
             };
+
             var temp = this.id.split("-");
-            alert("t");
             var currentPositionElement = temp[1];
+
+            $('#method-' + currentPositionElement).empty().append('<option disabled selected value> -- Method -- </option>"');
+            $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
+            $(".tabRow-" + currentPositionElement).remove();
+            dataToSend.push(item);
+            $.ajax({
+                url: "/rest/getMethod",
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                dataType: 'json',
+                contentType: 'application/json',
+                mimeType: 'application/json',
+                success: function (data) {
+                    $.each(data, function (key, value) {
+                        $('#method-' + currentPositionElement)
+                            .append($("<option></option>")
+                                .attr("value", value.idMethod)
+                                .text(value.name));
+                    });
+
+                },
+                error: function (data, status, er) {
+                    alert("error: " + data + " status: " + status + " er:" + er);
+                }
+            });
+
+        });
+        $('.metoda').on('change', function () {
+
+            var temp = this.id.split("-");
+            var currentPositionElement = temp[1];
+            $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
+            $(".tabRow-" + currentPositionElement).remove();
+            var dataToSend = [];
+            var item = {
+                "pageAttributeId": this.id,
+                "objectId": $("#" + this.id).val(),
+
+            };
+
+
+            dataToSend.push(item);
+            $.ajax({
+                url: "/rest/getOperation",
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                dataType: 'json',
+                contentType: 'application/json',
+                mimeType: 'application/json',
+                success: function (data) {
+                    $.each(data, function (key, value) {
+                        $('#op-' + currentPositionElement)
+                            .append($("<option></option>")
+                                .attr("value", value.idMethod)
+                                .text(value.name));
+                    });
+
+                },
+                error: function (data, status, er) {
+                    alert("error: " + data + " status: " + status + " er:" + er);
+                }
+            });
+
+        });
+        $('.operation').on('change', function () {
+
+            var temp = this.id.split("-");
+            var currentPositionElement = temp[1];
+
+            var dataToSend = [];
+            var item = {
+                "pageAttributeId": this.id,
+                "objectId": $("#" + this.id).val(),
+
+            };
+
+
             dataToSend.push(item);
             $.ajax({
                 url: "/rest/getAttributes",
@@ -381,43 +594,52 @@ $(document).ready(function () {
                 contentType: 'application/json',
                 mimeType: 'application/json',
                 success: function (data) {
+                    $(".tabRow-" + currentPositionElement).remove();
+                    console.log(JSON.stringify(data));
+                    for (var key in data.attributesDTOs) {
+                        var recieveData = data.attributesDTOs[key];
+                        if (recieveData.name.length != 0) {
+                            if (recieveData.attributeType.toLowerCase() == "select".toLowerCase()) {
 
-                    if (data.pageAttributeId == item.pageAttributeId) {
-                        $(".tabRow-" + currentPositionElement).remove();
-                        for (var key in data.attributesDTOs) {
-                            var recieveData = data.attributesDTOs[key];
-                            if (recieveData.name.length != 0) {
-                                if (recieveData.attributeType.toLowerCase() == "select".toLowerCase()) {
+                                $("#tbl-" + currentPositionElement).append(
+                                    $(
+                                        "<tr class='tabRow-" + key + "'>" +
+                                        "<td>" + recieveData.name + "</td>" +
+                                        "<td><select class='sel' id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
+                                        " <option disabled selected value> -- selection -- </option>" +
+                                        "</select></tr>"));
+                                for (var keyOption in recieveData.options) {
 
-                                    $("#tbl-" + currentPositionElement).append(
-                                        $(
-                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
-                                            "<td>" + recieveData.name + "</td>" +
-                                            "<td><select  id='param-" + key + "-" + currentPositionElement + "' name='comp'>" +
-                                            " <option disabled selected value> -- selection -- </option>" +
-                                            "</select></tr>"));
-
-                                    for (var keyOption in recieveData.options) {
-
+                                    if (keyOption == recieveData.defaultValues) {
+                                        $('#param-' + key + "-" + currentPositionElement)
+                                            .append($("<option selected></option>")
+                                                .attr("value", keyOption)
+                                                .text(recieveData.options[keyOption]));
+                                    } else {
                                         $('#param-' + key + "-" + currentPositionElement)
                                             .append($("<option></option>")
                                                 .attr("value", keyOption)
                                                 .text(recieveData.options[keyOption]));
-
                                     }
-                                }
-                                else {
 
-                                    $("#tbl-" + currentPositionElement)
-                                        .append($(
-                                            "<tr class='tabRow-" + currentPositionElement + "'>" +
-                                            "<td>" + recieveData.name + "</td>" +
-                                            "<td><input  id='param-" + key + "-" + currentPositionElement + "' type='" + recieveData.attributeType.toLowerCase() + "'  value='61'></td>" +
-                                            "</tr>"
-                                        ));
-                                }
 
+                                }
                             }
+                            else {
+
+                                $("#tbl-" + currentPositionElement)
+                                    .append($(
+                                        "<tr class='tabRow-" + key + "'>" +
+                                        "<td>" + recieveData.name + "</td>" +
+                                        "<td><input  id='param-" + key + "-" + currentPositionElement + "' type='" +
+                                        recieveData.attributeType.toLowerCase() + "'  value='" + recieveData.defaultValues + "'" +
+                                        "min='" + recieveData.minValue + "' max='" + recieveData.maxValue + "'></td>" +
+                                        "</tr>"
+                                    ));
+                            }
+                            $('#param-' + key + "-" + currentPositionElement).attr("data-key");
+                            $('#param-' + key + "-" + currentPositionElement).data("key", recieveData.operationAttributesId);
+                            console.log($("#param-" + key + "-" + currentPositionElement).data('key'))
                         }
                     }
 
@@ -427,8 +649,7 @@ $(document).ready(function () {
                 }
             });
 
-        })
-        ;
+        });
         function removeFCE(par) {
 
             $("#attachment-" + par).remove();
@@ -441,62 +662,27 @@ $(document).ready(function () {
 
 
     $('#inputFileToLoad').change(encodeImageFileAsURL(function (base64Img) {
-        var initialIMG = "original";
-        var initialMethod;
-        var initialMethodAtr;
+
+
         var inputData = [];
         var inputDataItem;
-        for (var key in allmethod) {
 
-            if (allmethod[key].name.toLowerCase() == initialIMG) {
-                initialMethod = allmethod[key].idMethod;
-                //alert(allmethod[key].name);
-            }
-        }
-        var dataToSend = [];
-
-        var item = {
-            "pageAttributeId": "inputImg",
-            "idMethod": initialMethod
+        inputDataItem = {
+            "value": base64Img,
+            "methodAttributeId": ""
         };
-        dataToSend.push(item);
-
-        $.ajax({
-            url: "/rest/getAttributes",
-            type: 'POST',
-            data: JSON.stringify(dataToSend),
-            dataType: 'json',
-            contentType: 'application/json',
-            mimeType: 'application/json',
-            success: function (data) {
-                for (var key in data.attributesDTOs) {
-                    var recieveData = data.attributesDTOs[key];
-                    initialMethodAtr = recieveData.methodAttributesId;
-                }
-                inputDataItem = {
-                    "value": base64Img,
-                    "methodAttributeId": initialMethodAtr
-                };
-                inputData.push(inputDataItem);
-                firstItem = {
-                    "position": 0,
-                    "methodId": initialMethod,
-                    "attributes": inputData
-                };
-
-                //alert(JSON.stringify(firstItem));
-            },
-            error: function (data, status, er) {
-                alert("error: " + data + " status: " + status + " er:" + er);
-            }
-        });
-
+        inputData.push(inputDataItem);
+        firstItem = {
+            "position": 0,
+            "methodId": "",
+            "attributes": inputData
+        };
 
     }));
 
-    function getMethods() {
+    function getFunctions() {
         $.ajax({
-            url: "/rest/getMethods",
+            url: "/rest/getFunctions",
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',

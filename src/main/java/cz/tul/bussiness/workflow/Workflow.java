@@ -81,9 +81,11 @@ public class Workflow {
                 break;
             case PROCESSING:
                 logger.error("Some steps have been not processed ---> part in state " + StateEnum.PROCESSING.getState());
+                break;
             case ERROR:
                 chain.setState(StateEnum.ERROR.getState());
                 logger.error("Error occurred");
+                break;
             case COMPLETE:
                 logger.info("Chain with id: " + chain.getChainId() + " is completed");
                 chain.setState(StateEnum.COMPLETE.getState());
