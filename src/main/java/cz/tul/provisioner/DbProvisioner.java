@@ -735,23 +735,279 @@ public class DbProvisioner implements InitializingBean {
         allowStep_coloring_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
         grayScale.add(allowStep_coloring_d);
 
+        AllowStep allowStep_coloring_e = new AllowStep();
+        allowStep_coloring_e.setOperation(colorSeg);
+        allowStep_coloring_e.setAllowoperationId(erode.getOperationId());
+        grayScale.add(allowStep_coloring_e);
+
+        AllowStep allowStep_coloring_f = new AllowStep();
+        allowStep_coloring_f.setOperation(colorSeg);
+        allowStep_coloring_f.setAllowoperationId(dilate.getOperationId());
+        grayScale.add(allowStep_coloring_f);
+
+        AllowStep allowStep_coloring_g = new AllowStep();
+        allowStep_coloring_g.setOperation(colorSeg);
+        allowStep_coloring_g.setAllowoperationId(open.getOperationId());
+        grayScale.add(allowStep_coloring_g);
+
+        AllowStep allowStep_coloring_h = new AllowStep();
+        allowStep_coloring_h.setOperation(colorSeg);
+        allowStep_coloring_h.setAllowoperationId(close.getOperationId());
+        grayScale.add(allowStep_coloring_h);
+
+        //DENOISER avg
+        AllowStep noiseReduceAVG_a = new AllowStep();
+        noiseReduceAVG_a.setOperation(average);
+        noiseReduceAVG_a.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_a);
+
+        AllowStep noiseReduceAVG_b = new AllowStep();
+        noiseReduceAVG_b.setOperation(average);
+        noiseReduceAVG_b.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_b);
+
+        AllowStep noiseReduceAVG_c = new AllowStep();
+        noiseReduceAVG_c.setOperation(average);
+        noiseReduceAVG_c.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_c);
+
+        AllowStep noiseReduceAVG_d = new AllowStep();
+        noiseReduceAVG_d.setOperation(average);
+        noiseReduceAVG_d.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_d);
+
+        AllowStep noiseReduceAVG_e = new AllowStep();
+        noiseReduceAVG_e.setOperation(average);
+        noiseReduceAVG_e.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_e);
+
+        AllowStep noiseReduceAVG_f = new AllowStep();
+        noiseReduceAVG_f.setOperation(average);
+        noiseReduceAVG_f.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_f);
+
+        AllowStep noiseReduceAVG_g = new AllowStep();
+        noiseReduceAVG_g.setOperation(average);
+        noiseReduceAVG_g.setAllowoperationId(originalOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_g);
+
+        AllowStep noiseReduceAVG_h = new AllowStep();
+        noiseReduceAVG_h.setOperation(average);
+        noiseReduceAVG_h.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(noiseReduceAVG_h);
+
+        //noise reducer median
+
+        AllowStep noiseReduceMedian_a = new AllowStep();
+        noiseReduceMedian_a.setOperation(median);
+        noiseReduceMedian_a.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_a);
+
+        AllowStep noiseReduceMedian_b = new AllowStep();
+        noiseReduceMedian_b.setOperation(median);
+        noiseReduceMedian_b.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_b);
+
+        AllowStep noiseReduceMedian_c = new AllowStep();
+        noiseReduceMedian_c.setOperation(median);
+        noiseReduceMedian_c.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_c);
+
+        AllowStep noiseReduceMedian_d = new AllowStep();
+        noiseReduceMedian_d.setOperation(median);
+        noiseReduceMedian_d.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_d);
+
+        AllowStep noiseReduceMedian_e = new AllowStep();
+        noiseReduceMedian_e.setOperation(median);
+        noiseReduceMedian_e.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_e);
+
+        AllowStep noiseReduceMedian_f = new AllowStep();
+        noiseReduceMedian_f.setOperation(median);
+        noiseReduceMedian_f.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_f);
+
+        AllowStep noiseReduceMedian_g = new AllowStep();
+        noiseReduceMedian_g.setOperation(median);
+        noiseReduceMedian_g.setAllowoperationId(originalOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_g);
+
+        AllowStep noiseReduceMedian_h = new AllowStep();
+        noiseReduceMedian_h.setOperation(median);
+        noiseReduceMedian_h.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(noiseReduceMedian_h);
+
+        //rotating mask reducer median
+
+        AllowStep noiseReduceRotMask_a = new AllowStep();
+        noiseReduceRotMask_a.setOperation(median);
+        noiseReduceRotMask_a.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_a);
+
+        AllowStep noiseReduceRotMask_b = new AllowStep();
+        noiseReduceRotMask_b.setOperation(median);
+        noiseReduceRotMask_b.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_b);
+
+        AllowStep noiseReduceRotMask_c = new AllowStep();
+        noiseReduceRotMask_c.setOperation(median);
+        noiseReduceRotMask_c.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_c);
+
+        AllowStep noiseReduceRotMask_d = new AllowStep();
+        noiseReduceRotMask_d.setOperation(median);
+        noiseReduceRotMask_d.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_d);
+
+        AllowStep noiseReduceRotMask_e = new AllowStep();
+        noiseReduceRotMask_e.setOperation(median);
+        noiseReduceRotMask_e.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_e);
+
+        AllowStep noiseReduceRotMask_f = new AllowStep();
+        noiseReduceRotMask_f.setOperation(median);
+        noiseReduceRotMask_f.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_f);
+
+        AllowStep noiseReduceRotMask_g = new AllowStep();
+        noiseReduceRotMask_g.setOperation(median);
+        noiseReduceRotMask_g.setAllowoperationId(originalOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_g);
+
+        AllowStep noiseReduceRotMask_h = new AllowStep();
+        noiseReduceRotMask_h.setOperation(median);
+        noiseReduceRotMask_h.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_h);
+
+        //tophat
+
+        AllowStep morphologyTophat_a = new AllowStep();
+        morphologyTophat_a.setOperation(topHat);
+        morphologyTophat_a.setAllowoperationId(redOperation.getOperationId());
+        grayScale.add(morphologyTophat_a);
+
+        AllowStep morphologyTophat_b = new AllowStep();
+        morphologyTophat_b.setOperation(topHat);
+        morphologyTophat_b.setAllowoperationId(greenOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_b);
+
+        AllowStep morphologyTophat_c = new AllowStep();
+        morphologyTophat_c.setOperation(topHat);
+        morphologyTophat_c.setAllowoperationId(blueOperation.getOperationId());
+        grayScale.add(noiseReduceRotMask_c);
+
+        AllowStep morphologyTophat_d = new AllowStep();
+        morphologyTophat_d.setOperation(topHat);
+        morphologyTophat_d.setAllowoperationId(yOperation.getOperationId());
+        grayScale.add(morphologyTophat_d);
+
+        AllowStep morphologyTophat_e = new AllowStep();
+        morphologyTophat_e.setOperation(topHat);
+        morphologyTophat_e.setAllowoperationId(cbOperation.getOperationId());
+        grayScale.add(morphologyTophat_e);
+
+        AllowStep morphologyTophat_f = new AllowStep();
+        morphologyTophat_f.setOperation(topHat);
+        morphologyTophat_f.setAllowoperationId(crOperation.getOperationId());
+        grayScale.add(morphologyTophat_f);
+
+        AllowStep morphologyTophat_g = new AllowStep();
+        morphologyTophat_g.setOperation(topHat);
+        morphologyTophat_g.setAllowoperationId(originalOperation.getOperationId());
+        grayScale.add(morphologyTophat_g);
+
+        AllowStep morphologyTophat_h = new AllowStep();
+        morphologyTophat_h.setOperation(topHat);
+        morphologyTophat_h.setAllowoperationId(grayOperation.getOperationId());
+        grayScale.add(morphologyTophat_h);
+
+        //binary
+
+        AllowStep morphologyErode_a = new AllowStep();
+        morphologyErode_a.setOperation(erode);
+        morphologyErode_a.setAllowoperationId(THRESH_BINARY.getOperationId());
+        grayScale.add(morphologyErode_a);
+
+        AllowStep morphologyErode_b = new AllowStep();
+        morphologyErode_b.setOperation(erode);
+        morphologyErode_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        grayScale.add(morphologyErode_a);
+
+        AllowStep morphologyErode_c = new AllowStep();
+        morphologyErode_c.setOperation(erode);
+        morphologyErode_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        grayScale.add(morphologyErode_c);
+
+        AllowStep morphologyErode_d = new AllowStep();
+        morphologyErode_d.setOperation(erode);
+        morphologyErode_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        grayScale.add(morphologyErode_d);
+
+        AllowStep morphologyDilate_a = new AllowStep();
+        morphologyDilate_a.setOperation(dilate);
+        morphologyDilate_a.setAllowoperationId(THRESH_BINARY.getOperationId());
+        grayScale.add(morphologyDilate_a);
+
+        AllowStep morphologyDilate_b = new AllowStep();
+        morphologyDilate_b.setOperation(dilate);
+        morphologyDilate_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        grayScale.add(morphologyDilate_b);
+
+        AllowStep morphologyDilate_c = new AllowStep();
+        morphologyDilate_c.setOperation(dilate);
+        morphologyDilate_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        grayScale.add(morphologyDilate_c);
+
+        AllowStep morphologyDilate_d = new AllowStep();
+        morphologyDilate_d.setOperation(dilate);
+        morphologyDilate_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        grayScale.add(morphologyDilate_d);
+
+        AllowStep morphologyOpen_a = new AllowStep();
+        morphologyOpen_a.setOperation(open);
+        morphologyOpen_a.setAllowoperationId(THRESH_BINARY.getOperationId());
+        grayScale.add(morphologyOpen_a);
+
+        AllowStep morphologyOpen_b = new AllowStep();
+        morphologyOpen_b.setOperation(open);
+        morphologyOpen_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        grayScale.add(morphologyOpen_b);
+
+        AllowStep morphologyOpen_c = new AllowStep();
+        morphologyOpen_c.setOperation(open);
+        morphologyOpen_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        grayScale.add(morphologyOpen_c);
+
+        AllowStep morphologyOpen_d = new AllowStep();
+        morphologyOpen_d.setOperation(open);
+        morphologyOpen_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        grayScale.add(morphologyOpen_d);
+
+        AllowStep morphologyClose_a = new AllowStep();
+        morphologyClose_a.setOperation(close);
+        morphologyClose_a.setAllowoperationId(THRESH_BINARY.getOperationId());
+        grayScale.add(morphologyClose_a);
+
+        AllowStep morphologyClose_b = new AllowStep();
+        morphologyClose_b.setOperation(close);
+        morphologyClose_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        grayScale.add(morphologyClose_b);
+
+        AllowStep morphologyClose_c = new AllowStep();
+        morphologyClose_c.setOperation(close);
+        morphologyClose_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        grayScale.add(morphologyClose_c);
+
+        AllowStep morphologyClose_d = new AllowStep();
+        morphologyClose_d.setOperation(close);
+        morphologyClose_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        grayScale.add(morphologyClose_d);
+
+
         allowStepDAO.save(grayScale);
     }
 
-/*
-    private void registerMethodAtributes(Set<MethodAttributes> input) {
-        for (MethodAttributes ma : input) {
-            try {
-                DataHolder dh = new DataHolder();
-                dh.setName(ma.getAttribute().getName());
-                dh.setOptions(ma.getOptions());
-                dh.setType(ma.getAttributeType());
-                methodAttributeRegister.register(ma.getMethodAttributesId(), dh);
-            } catch (IllegalInputException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     public AttributeDAO getAttributeDAO() {
         return attributeDAO;

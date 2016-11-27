@@ -19,11 +19,11 @@ import java.util.Random;
 /**
  * Created by Bc. Marek Jindrák on 19.10.2016.
  */
-public class Segmentation extends Worker {
+public class Segmentation extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(Segmentation.class);
     private int threshold;
     private int typ;
-    Mat result;
+    private Mat result;
 
     @Override
     public void work() {
@@ -48,9 +48,9 @@ public class Segmentation extends Worker {
         }
         for (PartAttributeValue att : getAttributes()) {
             if (att.getOperationAttributes().getAttribute().getName().equals("Práh")) {
-                System.out.println(att.getValue());
                 threshold = Integer.parseInt(att.getValue());
             }
+
 
         }
         switch (methodType) {

@@ -99,6 +99,7 @@ public class JsonReceive {
             result.setReady(true);
         } else {
             result.setMessage("Chain is not ready !!!");
+            result.setParts(contentProviderService.getCompletedParts(chainId));
             result.setReady(false);
         }
 

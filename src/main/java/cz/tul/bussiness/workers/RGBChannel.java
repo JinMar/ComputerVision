@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by Bc. Marek Jindrák on 16.10.2016.
  */
-public class RGBChannel extends Worker {
+public class RGBChannel extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(RGBChannel.class);
 
     @Override

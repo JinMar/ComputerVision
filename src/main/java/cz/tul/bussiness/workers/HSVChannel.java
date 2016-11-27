@@ -13,7 +13,7 @@ import java.awt.image.DataBufferByte;
 /**
  * Created by Bc. Marek Jindrák on 17.10.2016.
  */
-public class HSVChannel extends Worker {
+public class HSVChannel extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(HSVChannel.class);
 
     @Override

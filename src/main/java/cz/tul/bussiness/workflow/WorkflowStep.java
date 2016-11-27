@@ -49,6 +49,8 @@ public class WorkflowStep {
             methodWorker.setImgData(sourceImage);
             methodWorker.work();
             part.setUrl("/img/" + part.getPartId() + ".jpg");
+            part.setHistogramUrl("/img/histogram-" + part.getPartId() + ".jpg");
+            part.setMagnitudeUrl("/img/magnitude-" + part.getPartId() + ".jpg");
             partDAO.update(part);
         } catch (NullPointerException np) {
             part.setState("ERROR");

@@ -14,11 +14,12 @@ public class PartData {
     List<ListDataDTO> operations;
     List<ListDataDTO> methods;
     private String URL;
+    private String hURL;
+    private String mURL;
     private String methodId;
     private String functionId;
     private String operationId;
     private int position;
-
 
 
     public void setURL(String URL) {
@@ -86,5 +87,19 @@ public class PartData {
         return position;
     }
 
+    public String gethURL() {
+        return hURL;
+    }
 
+    public void sethURL(String hURL) {
+        this.hURL = hURL;
+    }
+
+    public String getmURL() {
+        return mURL;
+    }
+
+    public void setmURL(String mURL) {
+        this.mURL = mURL;
+    }
 }

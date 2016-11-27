@@ -108,6 +108,9 @@ body {
     float: left
 }
 
+.previewOrig {
+    float: left
+}
 select {
     height: 30px;
     line-height: 30px;

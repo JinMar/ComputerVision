@@ -17,7 +17,8 @@
     <link href="${bootstrap}" rel="stylesheet">
     <spring:url value="/css/navbar-fixed-top.css" var="bootstrapTop"/>
     <link href="${bootstrapTop}" rel="stylesheet">
-
+    <spring:url value="/css/lightbox.css" var="ligbox"/>
+    <link href="${ligbox}" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <spring:url value="/js/bootstrap.min.js" var="bootstrapJs"/>
     <script src="${bootstrapJs}"></script>
@@ -29,9 +30,11 @@
     <spring:url value="/js/jquery.js" var="coreJs"/>
     <spring:url value="/js/jquery-ui.js" var="coreJSUI"/>
     <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
+    <spring:url value="/js/lightbox.js" var="lightbox"/>
     <script src="${coreJs}"></script>
     <script src="${coreJSUI}"></script>
     <script src="${attributeSetup}"></script>
+    <script src="${lightbox}"></script>
 
 
 </head>
@@ -92,7 +95,7 @@
 
 
         <div id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
-            <img src="/img/test.png" class="img-thumbnail preview" alt="Cinque Terre" width="152">
+            <img src="/img/test.png" class="img-thumbnail previewOrig" alt="Cinque Terre" width="152">
             <div class="methodName">
                 <p>ZÁKALDNÍ OBRÁZEK</p>
             </div>

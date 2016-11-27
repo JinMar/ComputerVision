@@ -19,6 +19,12 @@ public class Part implements Serializable, CustomEntity {
     @Column(name = "URL")
     private String url;
 
+    @Column(name = "HISTOGRAM_URL")
+    private String histogramUrl;
+
+    @Column(name = "MAGNITUDE_URL")
+    private String magnitudeUrl;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "CHAIN_ID")
     private Chain chain;
@@ -47,6 +53,15 @@ public class Part implements Serializable, CustomEntity {
     }
 
     //SETTERS
+
+
+    public void setHistogramUrl(String histogramUrl) {
+        this.histogramUrl = histogramUrl;
+    }
+
+    public void setMagnitudeUrl(String magnitudeUrl) {
+        this.magnitudeUrl = magnitudeUrl;
+    }
 
     public void setPartId(String partId) {
         this.partId = partId;
@@ -85,6 +100,14 @@ public class Part implements Serializable, CustomEntity {
     }
     //GETTERS
 
+
+    public String getHistogramUrl() {
+        return histogramUrl;
+    }
+
+    public String getMagnitudeUrl() {
+        return magnitudeUrl;
+    }
 
     public String getUrl() {
         return url;

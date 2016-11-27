@@ -235,6 +235,8 @@ public class ContentProviderService {
                 PartData partData = new PartData();
                 partData.setPosition(part.getPosition());
                 partData.setURL(part.getUrl());
+                partData.setmURL(part.getMagnitudeUrl());
+                partData.sethURL(part.getHistogramUrl());
                 partData.setOperationId(part.getOperation().getOperationId());
                 partData.setMethodId(part.getMethodId());
                 partData.setFunctionId(part.getFunctionId());

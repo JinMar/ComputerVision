@@ -26,7 +26,7 @@ $(document).ready(function () {
                 cb(reader.result);
             };
             reader.onload = function (e) {
-                $('.preview')
+                $('.previewOrig')
                     .attr('src', e.target.result);
                 itemIMG = e.target.result;
             };
@@ -35,8 +35,8 @@ $(document).ready(function () {
     }
 
     ////////////////////////////
-    $("#sortable").sortable();
-    $("#sortable").disableSelection();
+    //$("#sortable").sortable();
+    //$("#sortable").disableSelection();
     $(".adding").click(function () {
 
         count = count + 1;
@@ -78,10 +78,10 @@ $(document).ready(function () {
             "<table id='tbl-" + count + "' cellspacing='0' width='100%' ></table>" +
             "</li>").appendTo("#sortable");
         if (itemIMG == null) {
-            $('.preview')
+            $('#img-' + count)
                 .attr('src', '/img/test.png');
         } else {
-            $('.preview')
+            $('#img-' + count)
                 .attr('src', itemIMG)
         }
 
@@ -105,7 +105,7 @@ $(document).ready(function () {
 
             $('#method-' + currentPositionElement).empty().append('<option disabled selected value> -- Method -- </option>"');
             $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
-            $(".tabRow-" + currentPositionElement).remove();
+            $("#tbl-" + currentPositionElement).empty();
             dataToSend.push(item);
             $.ajax({
                 url: "/rest/getMethod",
@@ -134,7 +134,7 @@ $(document).ready(function () {
             var temp = this.id.split("-");
             var currentPositionElement = temp[1];
             $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
-            $(".tabRow-" + currentPositionElement).remove();
+            $("#tbl-" + currentPositionElement).empty();
             var dataToSend = [];
             var item = {
                 "pageAttributeId": this.id,
@@ -177,7 +177,7 @@ $(document).ready(function () {
                 "objectId": $("#" + this.id).val(),
 
             };
-
+            $("#tbl-" + currentPositionElement).empty();
 
             dataToSend.push(item);
             $.ajax({
@@ -249,7 +249,8 @@ $(document).ready(function () {
     ;
 
     $(".send").click(function () {
-
+        $(".alert").remove();
+        $('.preview').attr('src', '/img/wait.gif');
         arraz1.push(firstItem);
         var countLoop = $('#sortable li').size();
         var currentLoop = 0;
@@ -337,6 +338,7 @@ $(document).ready(function () {
 
         dataToSend.push(newItem);
 
+
         console.log(JSON.stringify(dataToSend));
         $.ajax({
             url: "/rest/isChainReady",
@@ -356,13 +358,15 @@ $(document).ready(function () {
 
 
                 } else {
-                    setTimeout(loadChain, 5000);
+                    reDraw(data);
+                    setTimeout(loadChain, 2000);
                 }
 
                 //  ;
             },
             error: function (data, status, er) {
                 alert("error: " + data + " status: " + status + " er:" + er);
+                clearInterval(interval);
             }
         });
     }
@@ -376,12 +380,27 @@ $(document).ready(function () {
 
         for (var key in data.parts) {
             var recieveData = data.parts[key];
-
+            var tempURL = "";
             count += 1;
+
+            if (recieveData.url == null) {
+                tempURL = '/img/wait.gif';
+            } else {
+                tempURL = recieveData.url;
+            }
+
             $("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
-                "<img src='" + recieveData.url + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
+                "<a href='" + tempURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
+                "<img src='" + tempURL + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/></a>" +
                 "<div class='methodName'>" +
                 "<table id ='tab-" + count + "'cellspacing='0'>" +
+                " <tr id='tblRow-0' >" +
+                "<td width='50%'>" +
+                "<a href='" + recieveData.mURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
+                "<img src='" + '/img/mag.jpg' + "' class='img-thumbnail additional-info'  id='img-" + count + "' alt='Cinque Terre' width='50'/></a>" +
+                "<a href='" + recieveData.hURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
+                "<img src='" + '/img/frek.jpg' + "' class='img-thumbnail additional-info'  id='img-" + count + "' alt='Cinque Terre' width='50'/></a>" +
+                "</td>" +
                 " <tr id='tblRow-1' >" +
                 "<td width='90%'>" +
                 "<select class='function' id='fce-" + count + "' name='comp'>" +
@@ -511,7 +530,7 @@ $(document).ready(function () {
 
             $('#method-' + currentPositionElement).empty().append('<option disabled selected value> -- Method -- </option>"');
             $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
-            $(".tabRow-" + currentPositionElement).remove();
+            $("#tbl-" + currentPositionElement).empty();
             dataToSend.push(item);
             $.ajax({
                 url: "/rest/getMethod",
@@ -540,7 +559,7 @@ $(document).ready(function () {
             var temp = this.id.split("-");
             var currentPositionElement = temp[1];
             $('#op-' + currentPositionElement).empty().append('<option disabled selected value> -- Operation -- </option>"');
-            $(".tabRow-" + currentPositionElement).remove();
+            $("#tbl-" + currentPositionElement).empty();
             var dataToSend = [];
             var item = {
                 "pageAttributeId": this.id,
@@ -584,7 +603,7 @@ $(document).ready(function () {
 
             };
 
-
+            $("#tbl-" + currentPositionElement).empty();
             dataToSend.push(item);
             $.ajax({
                 url: "/rest/getAttributes",

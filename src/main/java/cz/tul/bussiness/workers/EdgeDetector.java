@@ -21,7 +21,7 @@ import static org.opencv.core.Core.convertScaleAbs;
 /**
  * Created by Bc. Marek Jindrák on 17.10.2016.
  */
-public class EdgeDetector extends Worker {
+public class EdgeDetector extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(EdgeDetector.class);
     private Mat channelFinal;
 

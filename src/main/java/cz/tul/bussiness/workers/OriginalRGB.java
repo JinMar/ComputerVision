@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by Bc. Marek Jindrák on 16.10.2016.
  */
-public class OriginalRGB extends Worker {
+public class OriginalRGB extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(OriginalRGB.class);
 
 
