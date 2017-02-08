@@ -16,13 +16,13 @@ public class OperationAttributesDAO extends BasicRepositoryAbstract {
     private static final Logger logger = LoggerFactory.getLogger(OperationAttributesDAO.class);
 
     public List<OperationAttributes> getAttributesById(String idOperation) {
-        Query query = getQuery("from OperationAttributes oa where oa.operation.operationId= :id");
+        Query query = getQuery("from OperationAttributes oa where oa.operation.operationId= :id order by oa.operation.name desc");
         query.setParameter("id", idOperation);
         return query.list();
     }
 
     public OperationAttributes getAttributById(String idOperation) {
-        Query query = getQuery("from OperationAttributes oa where oa.operationAttributesId= :id");
+        Query query = getQuery("from OperationAttributes oa where oa.operationAttributesId= :id order by oa.operation.name desc");
         query.setParameter("id", idOperation);
         OperationAttributes result = (OperationAttributes) query.uniqueResult();
         return result;

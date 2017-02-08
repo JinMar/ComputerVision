@@ -56,7 +56,7 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.registerContextPath(test);
 
         Set<Method> methods = new HashSet<>();
-        Set<AllowStep> grayScale = new HashSet<>();
+        Set<AllowStep> allowSteps = new HashSet<>();
         Set<Operation> operations = new HashSet<>();
         Set<Attribute> attributes = new HashSet<>();
         Set<Function> functions = new HashSet<>();
@@ -77,6 +77,11 @@ public class DbProvisioner implements InitializingBean {
         Function segment = new Function();
         segment.setName("Segmentor");
         functions.add(segment);
+
+        Function geometricTransformation = new Function();
+        geometricTransformation.setName("Geom. Transformations");
+        functions.add(geometricTransformation);
+
         functionDAO.save(functions);
 
         // RGB funkce
@@ -134,6 +139,11 @@ public class DbProvisioner implements InitializingBean {
         grayscale.setFunction(morphology);
         grayscale.setName("Grayscale");
         methods.add(grayscale);
+
+        Method gTransformation = new Method();
+        gTransformation.setFunction(geometricTransformation);
+        gTransformation.setName("Geom. Transformations");
+        methods.add(gTransformation);
 
         methodDAO.save(methods);
 
@@ -257,6 +267,26 @@ public class DbProvisioner implements InitializingBean {
         colorSeg.setMethod(coloring);
         operations.add(colorSeg);
 
+        Operation resizing = new Operation();
+        resizing.setName("Resizing");
+        resizing.setMethod(gTransformation);
+        operations.add(resizing);
+
+        Operation rotating = new Operation();
+        rotating.setName("Rotating");
+        rotating.setMethod(gTransformation);
+        operations.add(rotating);
+
+        Operation HTC = new Operation();
+        HTC.setName("Hough circles");
+        HTC.setMethod(gTransformation);
+        operations.add(HTC);
+
+        Operation HTL = new Operation();
+        HTL.setName("Hough lines");
+        HTL.setMethod(gTransformation);
+        operations.add(HTL);
+
 
         operationDAO.save(operations);
 
@@ -288,12 +318,16 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(THRESH_TRUNC.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_TRUNC.getSegmentorName());
         operationRegister.register(colorSeg.getOperationId(), Segmentation.class, SegmentorEnum.COLORING.getSegmentorName());
 
-        operationRegister.register(erode.getOperationId(), Morphology.class, MorphologyEnum.ERODE.getMorphologyName());
-        operationRegister.register(dilate.getOperationId(), Morphology.class, MorphologyEnum.DILATE.getMorphologyName());
-        operationRegister.register(open.getOperationId(), Morphology.class, MorphologyEnum.OPEN.getMorphologyName());
-        operationRegister.register(close.getOperationId(), Morphology.class, MorphologyEnum.CLOSE.getMorphologyName());
-        operationRegister.register(topHat.getOperationId(), Morphology.class, MorphologyEnum.TOPHAT.getMorphologyName());
+        operationRegister.register(erode.getOperationId(), MorfologyTransformations.class, MorphologyEnum.ERODE.getMorphologyName());
+        operationRegister.register(dilate.getOperationId(), MorfologyTransformations.class, MorphologyEnum.DILATE.getMorphologyName());
+        operationRegister.register(open.getOperationId(), MorfologyTransformations.class, MorphologyEnum.OPEN.getMorphologyName());
+        operationRegister.register(close.getOperationId(), MorfologyTransformations.class, MorphologyEnum.CLOSE.getMorphologyName());
+        operationRegister.register(topHat.getOperationId(), MorfologyTransformations.class, MorphologyEnum.TOPHAT.getMorphologyName());
 
+        operationRegister.register(resizing.getOperationId(), GeometricTransformations.class, GeometricTransformationEnum.RESIZE.getGgometricTransformationName());
+        operationRegister.register(rotating.getOperationId(), GeometricTransformations.class, GeometricTransformationEnum.ROTATE.getGgometricTransformationName());
+        operationRegister.register(HTC.getOperationId(), GeometricTransformations.class, HoughTransformationEnum.CIRCLE.getGgometricTransformationName());
+        operationRegister.register(HTL.getOperationId(), GeometricTransformations.class, HoughTransformationEnum.LINE.getGgometricTransformationName());
 
         Attribute step = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
@@ -303,6 +337,13 @@ public class DbProvisioner implements InitializingBean {
         Attribute segmentor = new Attribute("Segmentor");
         Attribute type = new Attribute("Typ");
         Attribute threshold = new Attribute("Práh");
+        Attribute angle = new Attribute("Úhel");
+        Attribute interpolation = new Attribute("Interpolace");
+        Attribute mask = new Attribute("Maska");
+        Attribute use = new Attribute("Použít tvar");
+        Attribute method = new Attribute("Metoda");
+        Attribute dp = new Attribute("DP");
+        Attribute minDist = new Attribute("Min vzdálenost");
 
         attributes.add(type);
         attributes.add(channel);
@@ -311,6 +352,12 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(size);
         attributes.add(inputImg);
         attributes.add(threshold);
+        attributes.add(angle);
+        attributes.add(use);
+        attributes.add(mask);
+        attributes.add(method);
+        attributes.add(dp);
+        attributes.add(minDist);
         attributeDAO.save(attributes);
 
         /*
@@ -365,6 +412,10 @@ public class DbProvisioner implements InitializingBean {
         trashD.setAttributeType(AttributeType.NUMBER);
         trashD.setDefaultValues("125");
         operationAttributes.add(trashD);
+////////////////
+        Map<String, String> useOperationValues = new HashMap<>();
+        useOperationValues.put("default", "Výchozí");
+        useOperationValues.put("custom", "Vlastní");
 
         OperationAttributes erodeM_A = new OperationAttributes();
         erodeM_A.setMinValue(3);
@@ -379,6 +430,7 @@ public class DbProvisioner implements InitializingBean {
         Map<String, String> shapes = new HashMap<>();
         shapes.put("ellipse", "Elipsa");
         shapes.put("rectangle", "Obdelník");
+        shapes.put("custom", "Vlastní");
         erodeM_B.setDefaultValues("rectangle");
         erodeM_B.setOperation(erode);
         erodeM_B.setAttribute(shape);
@@ -386,6 +438,14 @@ public class DbProvisioner implements InitializingBean {
         erodeM_B.setOptions(shapes);
         operationAttributes.add(erodeM_B);
 
+        OperationAttributes erodeM_C = new OperationAttributes();
+        erodeM_C.setOperation(erode);
+        erodeM_C.setAttribute(mask);
+        erodeM_C.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(erodeM_C);
+
+
+////
         OperationAttributes dilateM_A = new OperationAttributes();
         dilateM_A.setMinValue(3);
         dilateM_A.setMaxValue(5);
@@ -403,6 +463,14 @@ public class DbProvisioner implements InitializingBean {
         dilateM_B.setOptions(shapes);
         operationAttributes.add(dilateM_B);
 
+        OperationAttributes dilateM_C = new OperationAttributes();
+        dilateM_C.setOperation(dilate);
+        dilateM_C.setAttribute(mask);
+        dilateM_C.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(dilateM_C);
+
+
+////
         OperationAttributes openM_A = new OperationAttributes();
         openM_A.setMinValue(3);
         openM_A.setMaxValue(5);
@@ -420,6 +488,14 @@ public class DbProvisioner implements InitializingBean {
         openM_B.setOptions(shapes);
         operationAttributes.add(openM_B);
 
+        OperationAttributes openM_C = new OperationAttributes();
+        openM_C.setOperation(open);
+        openM_C.setAttribute(mask);
+        openM_C.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(openM_C);
+
+
+////
         OperationAttributes closeM_A = new OperationAttributes();
         closeM_A.setMinValue(3);
         closeM_A.setMaxValue(5);
@@ -437,6 +513,14 @@ public class DbProvisioner implements InitializingBean {
         closeM_B.setOptions(shapes);
         operationAttributes.add(closeM_B);
 
+        OperationAttributes closeM_C = new OperationAttributes();
+        closeM_C.setOperation(close);
+        closeM_C.setAttribute(mask);
+        closeM_C.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(closeM_C);
+
+
+////
         OperationAttributes topHatM_A = new OperationAttributes();
         topHatM_A.setMinValue(3);
         topHatM_A.setMaxValue(5);
@@ -453,123 +537,245 @@ public class DbProvisioner implements InitializingBean {
         topHatM_B.setAttributeType(AttributeType.SELECT);
         topHatM_B.setOptions(shapes);
         operationAttributes.add(topHatM_B);
+
+        OperationAttributes topHatM_C = new OperationAttributes();
+        topHatM_C.setOperation(topHat);
+        topHatM_C.setAttribute(mask);
+        topHatM_C.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(topHatM_C);
+
+
+/////
+        OperationAttributes resizeOp = new OperationAttributes();
+        resizeOp.setDefaultValues("100");
+        resizeOp.setMinValue(1);
+        resizeOp.setMaxValue(1000);
+        resizeOp.setOperation(resizing);
+        resizeOp.setAttribute(size);
+        resizeOp.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(resizeOp);
+
+        /*OperationAttributes rotateOp = new OperationAttributes();
+        rotateOp.setDefaultValues("100");
+        rotateOp.setMinValue(1);
+        rotateOp.setMaxValue(1000);
+        rotateOp.setOperation(rotating);
+        rotateOp.setAttribute(size);
+        rotateOp.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(rotateOp);*/
+
+        OperationAttributes rotateOp_A = new OperationAttributes();
+        rotateOp_A.setDefaultValues("0");
+        rotateOp_A.setMinValue(-360);
+        rotateOp_A.setMaxValue(360);
+        rotateOp_A.setOperation(rotating);
+        rotateOp_A.setAttribute(angle);
+        rotateOp_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(rotateOp_A);
+
+
+        OperationAttributes HTC_A = new OperationAttributes();
+        HTC_A.setDefaultValues("15");
+        HTC_A.setMinValue(0);
+        HTC_A.setMaxValue(1000);
+        HTC_A.setOperation(HTC);
+        HTC_A.setAttribute(minDist);
+        HTC_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(HTC_A);
+
+        OperationAttributes HTC_B = new OperationAttributes();
+        Map<String, String> HTCmethods = new HashMap<>();
+        //HTCmethods.put("HOUGH_STANDARD", "STANDARD ");
+        // HTCmethods.put("HOUGH_PROBABILISTIC", "PROBABILISTIC ");
+        //HTCmethods.put("HOUGH_MULTI_SCALE", "MULTI SCALE ");
+        HTCmethods.put("HOUGH_GRADIENT", "GRADIENT ");
+
+        HTC_B.setDefaultValues("GRADIENT");
+
+        HTC_B.setOperation(HTC);
+        HTC_B.setAttribute(method);
+        HTC_B.setAttributeType(AttributeType.SELECT);
+        HTC_B.setOptions(HTCmethods);
+        operationAttributes.add(HTC_B);
+
+        OperationAttributes HTC_C = new OperationAttributes();
+        HTC_C.setDefaultValues("0.1");
+        HTC_C.setMinValue(0);
+        HTC_C.setMaxValue(100);
+        HTC_C.setOperation(HTC);
+        HTC_C.setAttribute(dp);
+        HTC_C.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(HTC_C);
+
+        OperationAttributes HTL_A = new OperationAttributes();
+        HTL_A.setDefaultValues("15");
+        HTL_A.setMinValue(0);
+        HTL_A.setMaxValue(1000);
+        HTL_A.setOperation(HTL);
+        HTL_A.setAttribute(minDist);
+        HTL_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(HTL_A);
+
+        OperationAttributes HTL_B = new OperationAttributes();
+        Map<String, String> HTLmethods = new HashMap<>();
+        //HTCmethods.put("HOUGH_STANDARD", "STANDARD ");
+        // HTCmethods.put("HOUGH_PROBABILISTIC", "PROBABILISTIC ");
+        //HTCmethods.put("HOUGH_MULTI_SCALE", "MULTI SCALE ");
+        HTLmethods.put("HOUGH_GRADIENT", "GRADIENT ");
+
+        HTL_B.setDefaultValues("GRADIENT");
+
+        HTL_B.setOperation(HTL);
+        HTL_B.setAttribute(method);
+        HTL_B.setAttributeType(AttributeType.SELECT);
+        HTL_B.setOptions(HTLmethods);
+        operationAttributes.add(HTL_B);
+
+        OperationAttributes HTL_C = new OperationAttributes();
+        HTL_C.setDefaultValues("0.1");
+        HTL_C.setMinValue(0);
+        HTL_C.setMaxValue(100);
+        HTL_C.setOperation(HTL);
+        HTL_C.setAttribute(dp);
+        HTL_C.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(HTL_C);
+
+
+        OperationAttributes rotateOp_B = new OperationAttributes();
+        Map<String, String> interpolations = new HashMap<>();
+        interpolations.put("INTER_AREA", "INTER_AREA");
+        interpolations.put("INTER_BITS", "INTER_BITS");
+        interpolations.put("INTER_BITS2", "INTER_BITS2");
+        interpolations.put("INTER_CUBIC", "INTER_CUBIC");
+        interpolations.put("INTER_LANCZOS4", "INTER_LANCZOS4");
+        interpolations.put("INTER_LINEAR", "INTER_LINEAR");
+        interpolations.put("INTER_MAX", "INTER_MAX");
+        interpolations.put("INTER_NEAREST", "INTER_NEAREST");
+        rotateOp_B.setDefaultValues("INTER_NEAREST");
+        rotateOp_B.setMinValue(-360);
+        rotateOp_B.setMaxValue(360);
+        rotateOp_B.setOperation(rotating);
+        rotateOp_B.setAttribute(interpolation);
+        rotateOp_B.setAttributeType(AttributeType.SELECT);
+        rotateOp_B.setOptions(interpolations);
+        operationAttributes.add(rotateOp_B);
         operationDAO.save(operationAttributes);
 
 
         AllowStep allowStep_org = new AllowStep();
         allowStep_org.setOperation(originalOperation);
         allowStep_org.setAllowoperationId(null);
-        grayScale.add(allowStep_org);
+        allowSteps.add(allowStep_org);
 
         AllowStep allowStep_R = new AllowStep();
         allowStep_R.setOperation(redOperation);
         allowStep_R.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_R);
+        allowSteps.add(allowStep_R);
 
         AllowStep allowStep_G = new AllowStep();
         allowStep_G.setOperation(greenOperation);
         allowStep_G.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_G);
+        allowSteps.add(allowStep_G);
 
         AllowStep allowStep_B = new AllowStep();
         allowStep_B.setOperation(blueOperation);
         allowStep_B.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_B);
+        allowSteps.add(allowStep_B);
 
         AllowStep allowStep_GRAY = new AllowStep();
         allowStep_GRAY.setOperation(grayOperation);
         allowStep_GRAY.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_GRAY);
+        allowSteps.add(allowStep_GRAY);
 
         AllowStep allowStep_Y = new AllowStep();
         allowStep_Y.setOperation(yOperation);
         allowStep_Y.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_Y);
+        allowSteps.add(allowStep_Y);
 
         AllowStep allowStep_CB = new AllowStep();
         allowStep_CB.setOperation(cbOperation);
         allowStep_CB.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_CB);
+        allowSteps.add(allowStep_CB);
 
         AllowStep allowStep_CR = new AllowStep();
         allowStep_CR.setOperation(crOperation);
         allowStep_CR.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_CR);
+        allowSteps.add(allowStep_CR);
 
         AllowStep allowStep_H = new AllowStep();
         allowStep_H.setOperation(hOperation);
         allowStep_H.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(allowStep_H);
+        allowSteps.add(allowStep_H);
 
         AllowStep allowStep_sobel_a = new AllowStep();
         allowStep_sobel_a.setOperation(sobel);
         allowStep_sobel_a.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_sobel_a);
+        allowSteps.add(allowStep_sobel_a);
 
         AllowStep allowStep_sobel_b = new AllowStep();
         allowStep_sobel_b.setOperation(sobel);
         allowStep_sobel_b.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_sobel_b);
+        allowSteps.add(allowStep_sobel_b);
 
         AllowStep allowStep_sobel_c = new AllowStep();
         allowStep_sobel_c.setOperation(sobel);
         allowStep_sobel_c.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_sobel_c);
+        allowSteps.add(allowStep_sobel_c);
 
         AllowStep allowStep_sobel_d = new AllowStep();
         allowStep_sobel_d.setOperation(sobel);
         allowStep_sobel_d.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_sobel_d);
+        allowSteps.add(allowStep_sobel_d);
 
         AllowStep allowStep_sobel_e = new AllowStep();
         allowStep_sobel_e.setOperation(sobel);
         allowStep_sobel_e.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_sobel_e);
+        allowSteps.add(allowStep_sobel_e);
 
         AllowStep allowStep_sobel_f = new AllowStep();
         allowStep_sobel_f.setOperation(sobel);
         allowStep_sobel_f.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_sobel_f);
+        allowSteps.add(allowStep_sobel_f);
 
         AllowStep allowStep_sobel_g = new AllowStep();
         allowStep_sobel_g.setOperation(sobel);
         allowStep_sobel_g.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_sobel_g);
+        allowSteps.add(allowStep_sobel_g);
         ////////////////////////////////////
         AllowStep allowStep_laplace_a = new AllowStep();
         allowStep_laplace_a.setOperation(laplace);
         allowStep_laplace_a.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_laplace_a);
+        allowSteps.add(allowStep_laplace_a);
 
         AllowStep allowStep_laplace_b = new AllowStep();
         allowStep_laplace_b.setOperation(laplace);
         allowStep_laplace_b.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_laplace_b);
+        allowSteps.add(allowStep_laplace_b);
 
         AllowStep allowStep_laplace_c = new AllowStep();
         allowStep_laplace_c.setOperation(laplace);
         allowStep_laplace_c.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_laplace_c);
+        allowSteps.add(allowStep_laplace_c);
 
         AllowStep allowStep_laplace_d = new AllowStep();
         allowStep_laplace_d.setOperation(laplace);
         allowStep_laplace_d.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_laplace_d);
+        allowSteps.add(allowStep_laplace_d);
 
         AllowStep allowStep_laplace_e = new AllowStep();
         allowStep_laplace_e.setOperation(laplace);
         allowStep_laplace_e.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_laplace_e);
+        allowSteps.add(allowStep_laplace_e);
 
         AllowStep allowStep_laplace_f = new AllowStep();
         allowStep_laplace_f.setOperation(laplace);
         allowStep_laplace_f.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_laplace_f);
+        allowSteps.add(allowStep_laplace_f);
 
         AllowStep allowStep_laplace_g = new AllowStep();
         allowStep_laplace_g.setOperation(laplace);
         allowStep_laplace_g.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_laplace_g);
+        allowSteps.add(allowStep_laplace_g);
 
 
         ////////////////////////////////////
@@ -577,435 +783,455 @@ public class DbProvisioner implements InitializingBean {
         AllowStep allowStep_threshold_b = new AllowStep();
         allowStep_threshold_b.setOperation(THRESH_BINARY);
         allowStep_threshold_b.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_threshold_b);
+        allowSteps.add(allowStep_threshold_b);
 
         AllowStep allowStep_threshold_c = new AllowStep();
         allowStep_threshold_c.setOperation(THRESH_BINARY);
         allowStep_threshold_c.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_threshold_c);
+        allowSteps.add(allowStep_threshold_c);
 
         AllowStep allowStep_threshold_d = new AllowStep();
         allowStep_threshold_d.setOperation(THRESH_BINARY);
         allowStep_threshold_d.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_threshold_d);
+        allowSteps.add(allowStep_threshold_d);
 
         AllowStep allowStep_threshold_e = new AllowStep();
         allowStep_threshold_e.setOperation(THRESH_BINARY);
         allowStep_threshold_e.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_threshold_e);
+        allowSteps.add(allowStep_threshold_e);
 
         AllowStep allowStep_threshold_f = new AllowStep();
         allowStep_threshold_f.setOperation(THRESH_BINARY);
         allowStep_threshold_f.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_threshold_f);
+        allowSteps.add(allowStep_threshold_f);
         AllowStep allowStep_threshold_a = new AllowStep();
 
         allowStep_threshold_a.setOperation(THRESH_BINARY);
         allowStep_threshold_a.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_threshold_a);
+        allowSteps.add(allowStep_threshold_a);
 
         AllowStep allowStep_threshold_g = new AllowStep();
         allowStep_threshold_g.setOperation(THRESH_BINARY);
         allowStep_threshold_g.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_threshold_g);
+        allowSteps.add(allowStep_threshold_g);
 
         //
         AllowStep allowStep_threshold_aa = new AllowStep();
         allowStep_threshold_aa.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_aa.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_threshold_aa);
+        allowSteps.add(allowStep_threshold_aa);
 
         AllowStep allowStep_threshold_bb = new AllowStep();
         allowStep_threshold_bb.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_bb.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_threshold_bb);
+        allowSteps.add(allowStep_threshold_bb);
 
         AllowStep allowStep_threshold_cc = new AllowStep();
         allowStep_threshold_cc.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_cc.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_threshold_cc);
+        allowSteps.add(allowStep_threshold_cc);
 
         AllowStep allowStep_threshold_dd = new AllowStep();
         allowStep_threshold_dd.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_dd.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_threshold_dd);
+        allowSteps.add(allowStep_threshold_dd);
 
         AllowStep allowStep_threshold_ee = new AllowStep();
         allowStep_threshold_ee.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_ee.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ee);
+        allowSteps.add(allowStep_threshold_ee);
 
         AllowStep allowStep_threshold_ff = new AllowStep();
         allowStep_threshold_ff.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_ff.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ff);
+        allowSteps.add(allowStep_threshold_ff);
 
         AllowStep allowStep_threshold_gg = new AllowStep();
         allowStep_threshold_gg.setOperation(THRESH_TOZERO);
         allowStep_threshold_gg.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_threshold_gg);
+        allowSteps.add(allowStep_threshold_gg);
         //
         AllowStep allowStep_threshold_aaa = new AllowStep();
         allowStep_threshold_aaa.setOperation(THRESH_TOZERO);
         allowStep_threshold_aaa.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_threshold_aaa);
+        allowSteps.add(allowStep_threshold_aaa);
 
         AllowStep allowStep_threshold_bbb = new AllowStep();
         allowStep_threshold_bbb.setOperation(THRESH_TOZERO);
         allowStep_threshold_bbb.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_threshold_bbb);
+        allowSteps.add(allowStep_threshold_bbb);
 
         AllowStep allowStep_threshold_ccc = new AllowStep();
         allowStep_threshold_ccc.setOperation(THRESH_TOZERO);
         allowStep_threshold_ccc.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ccc);
+        allowSteps.add(allowStep_threshold_ccc);
 
         AllowStep allowStep_threshold_ddd = new AllowStep();
         allowStep_threshold_ddd.setOperation(THRESH_TOZERO);
         allowStep_threshold_ddd.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ddd);
+        allowSteps.add(allowStep_threshold_ddd);
 
         AllowStep allowStep_threshold_eee = new AllowStep();
         allowStep_threshold_eee.setOperation(THRESH_TOZERO);
         allowStep_threshold_eee.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_threshold_eee);
+        allowSteps.add(allowStep_threshold_eee);
 
         AllowStep allowStep_threshold_fff = new AllowStep();
         allowStep_threshold_fff.setOperation(THRESH_TOZERO);
         allowStep_threshold_fff.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_threshold_fff);
+        allowSteps.add(allowStep_threshold_fff);
 
         AllowStep allowStep_threshold_ggg = new AllowStep();
         allowStep_threshold_ggg.setOperation(THRESH_TOZERO);
         allowStep_threshold_ggg.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ggg);
+        allowSteps.add(allowStep_threshold_ggg);
 ////////////
         AllowStep allowStep_threshold_aaaa = new AllowStep();
         allowStep_threshold_aaaa.setOperation(THRESH_TRUNC);
         allowStep_threshold_aaaa.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(allowStep_threshold_aaaa);
+        allowSteps.add(allowStep_threshold_aaaa);
 
         AllowStep allowStep_threshold_bbbb = new AllowStep();
         allowStep_threshold_bbbb.setOperation(THRESH_TRUNC);
         allowStep_threshold_bbbb.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(allowStep_threshold_bbbb);
+        allowSteps.add(allowStep_threshold_bbbb);
 
         AllowStep allowStep_threshold_cccc = new AllowStep();
         allowStep_threshold_cccc.setOperation(THRESH_TRUNC);
         allowStep_threshold_cccc.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(allowStep_threshold_cccc);
+        allowSteps.add(allowStep_threshold_cccc);
 
         AllowStep allowStep_threshold_dddd = new AllowStep();
         allowStep_threshold_dddd.setOperation(THRESH_TRUNC);
         allowStep_threshold_dddd.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(allowStep_threshold_dddd);
+        allowSteps.add(allowStep_threshold_dddd);
 
         AllowStep allowStep_threshold_eeee = new AllowStep();
         allowStep_threshold_eeee.setOperation(THRESH_TRUNC);
         allowStep_threshold_eeee.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(allowStep_threshold_eeee);
+        allowSteps.add(allowStep_threshold_eeee);
 
         AllowStep allowStep_threshold_ffff = new AllowStep();
         allowStep_threshold_ffff.setOperation(THRESH_TRUNC);
         allowStep_threshold_ffff.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(allowStep_threshold_ffff);
+        allowSteps.add(allowStep_threshold_ffff);
 
         AllowStep allowStep_threshold_gggg = new AllowStep();
         allowStep_threshold_gggg.setOperation(THRESH_TRUNC);
         allowStep_threshold_gggg.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(allowStep_threshold_gggg);
+        allowSteps.add(allowStep_threshold_gggg);
         //////////////////////////////////
         AllowStep allowStep_coloring_a = new AllowStep();
         allowStep_coloring_a.setOperation(colorSeg);
         allowStep_coloring_a.setAllowoperationId(THRESH_BINARY.getOperationId());
-        grayScale.add(allowStep_coloring_a);
+        allowSteps.add(allowStep_coloring_a);
 
         AllowStep allowStep_coloring_b = new AllowStep();
         allowStep_coloring_b.setOperation(colorSeg);
         allowStep_coloring_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        grayScale.add(allowStep_coloring_b);
+        allowSteps.add(allowStep_coloring_b);
 
         AllowStep allowStep_coloring_c = new AllowStep();
         allowStep_coloring_c.setOperation(colorSeg);
         allowStep_coloring_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
-        grayScale.add(allowStep_coloring_c);
+        allowSteps.add(allowStep_coloring_c);
 
         AllowStep allowStep_coloring_d = new AllowStep();
         allowStep_coloring_d.setOperation(colorSeg);
         allowStep_coloring_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
-        grayScale.add(allowStep_coloring_d);
+        allowSteps.add(allowStep_coloring_d);
 
         AllowStep allowStep_coloring_e = new AllowStep();
         allowStep_coloring_e.setOperation(colorSeg);
         allowStep_coloring_e.setAllowoperationId(erode.getOperationId());
-        grayScale.add(allowStep_coloring_e);
+        allowSteps.add(allowStep_coloring_e);
 
         AllowStep allowStep_coloring_f = new AllowStep();
         allowStep_coloring_f.setOperation(colorSeg);
         allowStep_coloring_f.setAllowoperationId(dilate.getOperationId());
-        grayScale.add(allowStep_coloring_f);
+        allowSteps.add(allowStep_coloring_f);
 
         AllowStep allowStep_coloring_g = new AllowStep();
         allowStep_coloring_g.setOperation(colorSeg);
         allowStep_coloring_g.setAllowoperationId(open.getOperationId());
-        grayScale.add(allowStep_coloring_g);
+        allowSteps.add(allowStep_coloring_g);
 
         AllowStep allowStep_coloring_h = new AllowStep();
         allowStep_coloring_h.setOperation(colorSeg);
         allowStep_coloring_h.setAllowoperationId(close.getOperationId());
-        grayScale.add(allowStep_coloring_h);
+        allowSteps.add(allowStep_coloring_h);
 
         //DENOISER avg
         AllowStep noiseReduceAVG_a = new AllowStep();
         noiseReduceAVG_a.setOperation(average);
         noiseReduceAVG_a.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_a);
+        allowSteps.add(noiseReduceAVG_a);
 
         AllowStep noiseReduceAVG_b = new AllowStep();
         noiseReduceAVG_b.setOperation(average);
         noiseReduceAVG_b.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_b);
+        allowSteps.add(noiseReduceAVG_b);
 
         AllowStep noiseReduceAVG_c = new AllowStep();
         noiseReduceAVG_c.setOperation(average);
         noiseReduceAVG_c.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_c);
+        allowSteps.add(noiseReduceAVG_c);
 
         AllowStep noiseReduceAVG_d = new AllowStep();
         noiseReduceAVG_d.setOperation(average);
         noiseReduceAVG_d.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_d);
+        allowSteps.add(noiseReduceAVG_d);
 
         AllowStep noiseReduceAVG_e = new AllowStep();
         noiseReduceAVG_e.setOperation(average);
         noiseReduceAVG_e.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_e);
+        allowSteps.add(noiseReduceAVG_e);
 
         AllowStep noiseReduceAVG_f = new AllowStep();
         noiseReduceAVG_f.setOperation(average);
         noiseReduceAVG_f.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_f);
+        allowSteps.add(noiseReduceAVG_f);
 
         AllowStep noiseReduceAVG_g = new AllowStep();
         noiseReduceAVG_g.setOperation(average);
         noiseReduceAVG_g.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_g);
+        allowSteps.add(noiseReduceAVG_g);
 
         AllowStep noiseReduceAVG_h = new AllowStep();
         noiseReduceAVG_h.setOperation(average);
         noiseReduceAVG_h.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(noiseReduceAVG_h);
+        allowSteps.add(noiseReduceAVG_h);
 
         //noise reducer median
 
         AllowStep noiseReduceMedian_a = new AllowStep();
         noiseReduceMedian_a.setOperation(median);
         noiseReduceMedian_a.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_a);
+        allowSteps.add(noiseReduceMedian_a);
 
         AllowStep noiseReduceMedian_b = new AllowStep();
         noiseReduceMedian_b.setOperation(median);
         noiseReduceMedian_b.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_b);
+        allowSteps.add(noiseReduceMedian_b);
 
         AllowStep noiseReduceMedian_c = new AllowStep();
         noiseReduceMedian_c.setOperation(median);
         noiseReduceMedian_c.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_c);
+        allowSteps.add(noiseReduceMedian_c);
 
         AllowStep noiseReduceMedian_d = new AllowStep();
         noiseReduceMedian_d.setOperation(median);
         noiseReduceMedian_d.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_d);
+        allowSteps.add(noiseReduceMedian_d);
 
         AllowStep noiseReduceMedian_e = new AllowStep();
         noiseReduceMedian_e.setOperation(median);
         noiseReduceMedian_e.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_e);
+        allowSteps.add(noiseReduceMedian_e);
 
         AllowStep noiseReduceMedian_f = new AllowStep();
         noiseReduceMedian_f.setOperation(median);
         noiseReduceMedian_f.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_f);
+        allowSteps.add(noiseReduceMedian_f);
 
         AllowStep noiseReduceMedian_g = new AllowStep();
         noiseReduceMedian_g.setOperation(median);
         noiseReduceMedian_g.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_g);
+        allowSteps.add(noiseReduceMedian_g);
 
         AllowStep noiseReduceMedian_h = new AllowStep();
         noiseReduceMedian_h.setOperation(median);
         noiseReduceMedian_h.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(noiseReduceMedian_h);
+        allowSteps.add(noiseReduceMedian_h);
 
         //rotating mask reducer median
 
         AllowStep noiseReduceRotMask_a = new AllowStep();
         noiseReduceRotMask_a.setOperation(median);
         noiseReduceRotMask_a.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_a);
+        allowSteps.add(noiseReduceRotMask_a);
 
         AllowStep noiseReduceRotMask_b = new AllowStep();
         noiseReduceRotMask_b.setOperation(median);
         noiseReduceRotMask_b.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_b);
+        allowSteps.add(noiseReduceRotMask_b);
 
         AllowStep noiseReduceRotMask_c = new AllowStep();
         noiseReduceRotMask_c.setOperation(median);
         noiseReduceRotMask_c.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_c);
+        allowSteps.add(noiseReduceRotMask_c);
 
         AllowStep noiseReduceRotMask_d = new AllowStep();
         noiseReduceRotMask_d.setOperation(median);
         noiseReduceRotMask_d.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_d);
+        allowSteps.add(noiseReduceRotMask_d);
 
         AllowStep noiseReduceRotMask_e = new AllowStep();
         noiseReduceRotMask_e.setOperation(median);
         noiseReduceRotMask_e.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_e);
+        allowSteps.add(noiseReduceRotMask_e);
 
         AllowStep noiseReduceRotMask_f = new AllowStep();
         noiseReduceRotMask_f.setOperation(median);
         noiseReduceRotMask_f.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_f);
+        allowSteps.add(noiseReduceRotMask_f);
 
         AllowStep noiseReduceRotMask_g = new AllowStep();
         noiseReduceRotMask_g.setOperation(median);
         noiseReduceRotMask_g.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_g);
+        allowSteps.add(noiseReduceRotMask_g);
 
         AllowStep noiseReduceRotMask_h = new AllowStep();
         noiseReduceRotMask_h.setOperation(median);
         noiseReduceRotMask_h.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_h);
+        allowSteps.add(noiseReduceRotMask_h);
 
         //tophat
 
         AllowStep morphologyTophat_a = new AllowStep();
         morphologyTophat_a.setOperation(topHat);
         morphologyTophat_a.setAllowoperationId(redOperation.getOperationId());
-        grayScale.add(morphologyTophat_a);
+        allowSteps.add(morphologyTophat_a);
 
         AllowStep morphologyTophat_b = new AllowStep();
         morphologyTophat_b.setOperation(topHat);
         morphologyTophat_b.setAllowoperationId(greenOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_b);
+        allowSteps.add(noiseReduceRotMask_b);
 
         AllowStep morphologyTophat_c = new AllowStep();
         morphologyTophat_c.setOperation(topHat);
         morphologyTophat_c.setAllowoperationId(blueOperation.getOperationId());
-        grayScale.add(noiseReduceRotMask_c);
+        allowSteps.add(noiseReduceRotMask_c);
 
         AllowStep morphologyTophat_d = new AllowStep();
         morphologyTophat_d.setOperation(topHat);
         morphologyTophat_d.setAllowoperationId(yOperation.getOperationId());
-        grayScale.add(morphologyTophat_d);
+        allowSteps.add(morphologyTophat_d);
 
         AllowStep morphologyTophat_e = new AllowStep();
         morphologyTophat_e.setOperation(topHat);
         morphologyTophat_e.setAllowoperationId(cbOperation.getOperationId());
-        grayScale.add(morphologyTophat_e);
+        allowSteps.add(morphologyTophat_e);
 
         AllowStep morphologyTophat_f = new AllowStep();
         morphologyTophat_f.setOperation(topHat);
         morphologyTophat_f.setAllowoperationId(crOperation.getOperationId());
-        grayScale.add(morphologyTophat_f);
+        allowSteps.add(morphologyTophat_f);
 
         AllowStep morphologyTophat_g = new AllowStep();
         morphologyTophat_g.setOperation(topHat);
         morphologyTophat_g.setAllowoperationId(originalOperation.getOperationId());
-        grayScale.add(morphologyTophat_g);
+        allowSteps.add(morphologyTophat_g);
 
         AllowStep morphologyTophat_h = new AllowStep();
         morphologyTophat_h.setOperation(topHat);
         morphologyTophat_h.setAllowoperationId(grayOperation.getOperationId());
-        grayScale.add(morphologyTophat_h);
+        allowSteps.add(morphologyTophat_h);
 
         //binary
 
         AllowStep morphologyErode_a = new AllowStep();
         morphologyErode_a.setOperation(erode);
         morphologyErode_a.setAllowoperationId(THRESH_BINARY.getOperationId());
-        grayScale.add(morphologyErode_a);
+        allowSteps.add(morphologyErode_a);
 
         AllowStep morphologyErode_b = new AllowStep();
         morphologyErode_b.setOperation(erode);
         morphologyErode_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        grayScale.add(morphologyErode_a);
+        allowSteps.add(morphologyErode_a);
 
         AllowStep morphologyErode_c = new AllowStep();
         morphologyErode_c.setOperation(erode);
         morphologyErode_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
-        grayScale.add(morphologyErode_c);
+        allowSteps.add(morphologyErode_c);
 
         AllowStep morphologyErode_d = new AllowStep();
         morphologyErode_d.setOperation(erode);
         morphologyErode_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
-        grayScale.add(morphologyErode_d);
+        allowSteps.add(morphologyErode_d);
 
         AllowStep morphologyDilate_a = new AllowStep();
         morphologyDilate_a.setOperation(dilate);
         morphologyDilate_a.setAllowoperationId(THRESH_BINARY.getOperationId());
-        grayScale.add(morphologyDilate_a);
+        allowSteps.add(morphologyDilate_a);
 
         AllowStep morphologyDilate_b = new AllowStep();
         morphologyDilate_b.setOperation(dilate);
         morphologyDilate_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        grayScale.add(morphologyDilate_b);
+        allowSteps.add(morphologyDilate_b);
 
         AllowStep morphologyDilate_c = new AllowStep();
         morphologyDilate_c.setOperation(dilate);
         morphologyDilate_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
-        grayScale.add(morphologyDilate_c);
+        allowSteps.add(morphologyDilate_c);
 
         AllowStep morphologyDilate_d = new AllowStep();
         morphologyDilate_d.setOperation(dilate);
         morphologyDilate_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
-        grayScale.add(morphologyDilate_d);
+        allowSteps.add(morphologyDilate_d);
 
         AllowStep morphologyOpen_a = new AllowStep();
         morphologyOpen_a.setOperation(open);
         morphologyOpen_a.setAllowoperationId(THRESH_BINARY.getOperationId());
-        grayScale.add(morphologyOpen_a);
+        allowSteps.add(morphologyOpen_a);
 
         AllowStep morphologyOpen_b = new AllowStep();
         morphologyOpen_b.setOperation(open);
         morphologyOpen_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        grayScale.add(morphologyOpen_b);
+        allowSteps.add(morphologyOpen_b);
 
         AllowStep morphologyOpen_c = new AllowStep();
         morphologyOpen_c.setOperation(open);
         morphologyOpen_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
-        grayScale.add(morphologyOpen_c);
+        allowSteps.add(morphologyOpen_c);
 
         AllowStep morphologyOpen_d = new AllowStep();
         morphologyOpen_d.setOperation(open);
         morphologyOpen_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
-        grayScale.add(morphologyOpen_d);
+        allowSteps.add(morphologyOpen_d);
 
         AllowStep morphologyClose_a = new AllowStep();
         morphologyClose_a.setOperation(close);
         morphologyClose_a.setAllowoperationId(THRESH_BINARY.getOperationId());
-        grayScale.add(morphologyClose_a);
+        allowSteps.add(morphologyClose_a);
 
         AllowStep morphologyClose_b = new AllowStep();
         morphologyClose_b.setOperation(close);
         morphologyClose_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        grayScale.add(morphologyClose_b);
+        allowSteps.add(morphologyClose_b);
 
         AllowStep morphologyClose_c = new AllowStep();
         morphologyClose_c.setOperation(close);
         morphologyClose_c.setAllowoperationId(THRESH_TOZERO.getOperationId());
-        grayScale.add(morphologyClose_c);
+        allowSteps.add(morphologyClose_c);
 
         AllowStep morphologyClose_d = new AllowStep();
         morphologyClose_d.setOperation(close);
         morphologyClose_d.setAllowoperationId(THRESH_TRUNC.getOperationId());
-        grayScale.add(morphologyClose_d);
+        allowSteps.add(morphologyClose_d);
 
 
-        allowStepDAO.save(grayScale);
+        AllowStep allowResize = new AllowStep();
+        allowResize.setOperation(resizing);
+        allowResize.setAllowoperationId(originalOperation.getOperationId());
+        allowSteps.add(allowResize);
+
+        AllowStep allowRotate = new AllowStep();
+        allowRotate.setOperation(rotating);
+        allowRotate.setAllowoperationId(originalOperation.getOperationId());
+        allowSteps.add(allowRotate);
+
+        AllowStep allowHTC = new AllowStep();
+        allowHTC.setOperation(HTC);
+        allowHTC.setAllowoperationId(redOperation.getOperationId());
+        allowSteps.add(allowHTC);
+
+        AllowStep allowHTL = new AllowStep();
+        allowHTL.setOperation(HTL);
+        allowHTL.setAllowoperationId(redOperation.getOperationId());
+        allowSteps.add(allowHTL);
+
+        allowStepDAO.save(allowSteps);
     }
 
 

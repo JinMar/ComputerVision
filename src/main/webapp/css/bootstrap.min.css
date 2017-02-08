@@ -1349,7 +1349,7 @@ body {
     font-size: 14px;
     line-height: 1.42857143;
     color: #333;
-    background-color: #fff
+    background-color: #ececec;
 }
 
 button, input, select, textarea {
@@ -5374,7 +5374,7 @@ a.badge:focus, a.badge:hover {
 
 @media screen and (min-width: 768px) {
     .jumbotron {
-        padding-top: 48px;
+        padding-top: 16px;
         padding-bottom: 48px
     }
 

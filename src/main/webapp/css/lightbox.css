@@ -1,6 +1,5 @@
 /* Preload images */
 body:after {
-    content: url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/close.png) url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/loading.gif) url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/prev.png) url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/next.png);
     display: none;
 }
 
@@ -78,7 +77,7 @@ body.lb-disable-scrolling {
     width: 32px;
     height: 32px;
     margin: 0 auto;
-    background: url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/loading.gif) no-repeat;
+
 }
 
 .lb-nav {
@@ -109,7 +108,7 @@ body.lb-disable-scrolling {
     width: 34%;
     left: 0;
     float: left;
-    background: url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/prev.png) left 48% no-repeat;
+
     filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
     opacity: 0;
     -webkit-transition: opacity 0.6s;
@@ -127,7 +126,7 @@ body.lb-disable-scrolling {
     width: 64%;
     right: 0;
     float: right;
-    background: url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/next.png) right 48% no-repeat;
+
     filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
     opacity: 0;
     -webkit-transition: opacity 0.6s;
@@ -195,7 +194,7 @@ body.lb-disable-scrolling {
     float: right;
     width: 30px;
     height: 30px;
-    background: url(../../../../../Users/Marek/Downloads/lightbox2-master/lightbox2-master/src/images/close.png) top right no-repeat;
+
     text-align: right;
     outline: none;
     filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);

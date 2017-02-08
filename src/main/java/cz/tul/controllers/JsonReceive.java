@@ -3,6 +3,8 @@ package cz.tul.controllers;
 import cz.tul.controllers.transferObjects.*;
 import cz.tul.services.ChainValidator;
 import cz.tul.services.ContentProviderService;
+import cz.tul.services.exceptions.ImageNotFoundException;
+import cz.tul.utilities.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,20 @@ public class JsonReceive {
     @ResponseBody
     Message receiveChain(@RequestBody final List<ChainDTO> chainDtos) {
         Message msg = new Message();
-        if (chainValidator.validateChain(chainDtos)) {
-            msg.setChainId(contentProviderService.createWholeChain(chainDtos));
-            msg.setState(true);
-            msg.setMessage("Byl vytvořen požadavek na zpracování  vložených dat");
-        } else {
+        boolean isChainValid = false;
+        try {
+            isChainValid = chainValidator.validateChain(chainDtos);
+            if (isChainValid) {
+                msg.setChainId(contentProviderService.createWholeChain(chainDtos));
+                msg.setState(true);
+                msg.setMessage("Byl vytvořen požadavek na zpracování  vložených dat");
+            } else {
+                msg.setState(false);
+                msg.setMessage("Data nemohou byt zpracována z důvodu nekompaktibilních kroků");
+            }
+        } catch (ImageNotFoundException e) {
             msg.setState(false);
-            msg.setMessage("Data nemohou byt zpracována z důvodu nekompaktibilních kroků");
+            msg.setMessage(e.getMessage());
         }
         return msg;
     }
@@ -80,7 +89,7 @@ public class JsonReceive {
         String idOperation = requestData.get(0).getObjectId();
         logger.info("getting atributes for operation with id {}", idOperation);
         List<AttributesDTO> result = contentProviderService.getAttributesByOperationId(idOperation);
-        WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(result, requestData.get(0).getPageAttributeId());
+        WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(Utility.getSortAttributesDTO(result), requestData.get(0).getPageAttributeId());
 
         return wrappedAtrDTO;
     }

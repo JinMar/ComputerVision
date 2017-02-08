@@ -1,5 +1,6 @@
 package cz.tul.bussiness.workflow;
 
+import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.bussiness.register.MethodFactory;
 import cz.tul.bussiness.register.exceptions.IllegalInputException;
 import cz.tul.bussiness.workers.IMethodWorker;
@@ -62,6 +63,8 @@ public class WorkflowStep {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (MinimalArgumentsException e) {
             e.printStackTrace();
         }
 

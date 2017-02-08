@@ -11,10 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Bc. Marek Jindrák on 19.10.2016.
@@ -72,12 +69,141 @@ public class Segmentation extends AMethodWorker {
                 break;
             case 5:
                 logger.info("ColoringMethod:");
-                coloringMethod();
+                try {
+                    coloringMethod();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             default:
                 //todo vyhodit exception
         }
 
+    }
+
+    private void coloringMethod() throws Exception {
+        double[] values = new double[1];
+        sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
+        BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
+        BGR.put(0, 0, sourceData);
+        Core.split(BGR, channels);
+        int x = channels.get(0).rows(), y = channels.get(0).cols();
+        Map<Double, Set<Double>> neighbours = new HashMap<>();
+        List<Double> tempList = new ArrayList<>();
+        Set<Double> usedNeighbours = new HashSet<>();
+        Set<Double> newNeighbours = new HashSet<>();
+        List<Set<Double>> finalColors = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> RGBColors = new ArrayList<>();
+        ArrayList<Integer> color;
+        double current_color = 2;
+
+        double[][] prepearedData;
+        if (channels.get(0) != null) {
+            prepearedData = prepareData(channels.get(0));
+        } else {
+            throw new Exception();
+        }
+
+        for (int i = 1; i < x; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                if (prepearedData[i][j] == 1) {
+
+                    if (prepearedData[i - 1][j - 1] == 0 && prepearedData[i - 1][j] == 0 && prepearedData[i - 1][j + 1] == 0 && prepearedData[i][j - 1] == 0) {
+                        current_color++;
+                        Set<Double> newSet = new HashSet<>();
+                        newSet.add(current_color);
+                        neighbours.put(current_color, newSet);
+                        prepearedData[i][j] = current_color;
+
+                    } else {
+                        tempList.clear();
+                        tempList.add(prepearedData[i - 1][j - 1]);
+                        tempList.add(prepearedData[i - 1][j]);
+                        tempList.add(prepearedData[i - 1][j + 1]);
+                        tempList.add(prepearedData[i][j - 1]);
+
+                        Collections.sort(tempList);
+                        if (tempList.get(2) > 0 && tempList.get(3) > 0) {
+                            double test = tempList.get(2);
+                            Set<Double> tets = neighbours.get(tempList.get(2));
+                            tets.add(tempList.get(3));
+                            neighbours.get(tempList.get(3)).add(tempList.get(2));
+                        }
+
+                        prepearedData[i][j] = tempList.get(3);
+                    }
+                }
+            }
+
+        }
+        for (int i = 3; i < neighbours.size(); i++) {
+            if (!usedNeighbours.contains((double) i)) {
+                newNeighbours = findNeighbours(i, neighbours, new HashSet<>());
+                finalColors.add(newNeighbours);
+                usedNeighbours.addAll(newNeighbours);
+            }
+        }
+
+        RGBColors = generateColors(finalColors.size());
+
+        for (int i = 1; i < x; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                if (prepearedData[i][j] > 0) {
+
+                    color = findFinalColor(prepearedData[i][j], finalColors, RGBColors);
+                    channels.get(0).put(i, j, color.get(0));
+                    channels.get(1).put(i, j, color.get(1));
+                    channels.get(2).put(i, j, color.get(2));
+                }
+
+            }
+        }
+        saveColoredImg();
+    }
+
+    private ArrayList<Integer> findFinalColor(double value, List<Set<Double>> finalColors, ArrayList<ArrayList<Integer>> colors) {
+        for (int i = 0; i < finalColors.size(); i++) {
+            if (finalColors.get(i).contains(value)) {
+                return colors.get(i);
+            }
+        }
+        System.out.println("Barva pro : " + value + "nebyla nalezena");
+        return colors.get(0);
+    }
+
+    private Set<Double> findNeighbours(double currentColor, Map<Double, Set<Double>> neig, Set<Double> neighboursFinal) {
+        List<Double> currNeig = new ArrayList<>(neig.get(currentColor));
+
+        for (int i = 0; i < currNeig.size(); i++) {
+            if (!neighboursFinal.contains(currNeig.get(i))) {
+                neighboursFinal.add(currNeig.get(i));
+                neighboursFinal = findNeighbours(currNeig.get(i), neig, neighboursFinal);
+            }
+        }
+
+        return neighboursFinal;
+    }
+
+
+    private double[][] prepareData(Mat mat) {
+        double[][] result = new double[mat.rows()][mat.cols()];
+        for (int i = 0; i < mat.rows(); i++) {
+            for (int j = 0; j < mat.cols() - 1; j++) {
+                if (mat.get(i, j)[0] == 255) {
+                    result[i][j] = 1;
+                } else {
+                    result[i][j] = 0;
+                }
+                /*
+                osetreni okrajů obrazu
+                 */
+                if (i == 0 || i == mat.rows() - 1 || j == 0 || j == mat.cols() - 1) {
+                    result[i][j] = 0;
+                }
+            }
+        }
+        return result;
     }
 
 
@@ -95,336 +221,6 @@ public class Segmentation extends AMethodWorker {
         save();
     }
 
-    private void coloringMethod() {
-        int temp, temp1, temp2, temp3, temp4;
-        double[] values = new double[1];
-        sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
-        BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
-        BGR.put(0, 0, sourceData);
-        Core.split(BGR, channels);
-
-        Mat colored = Mat.zeros(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC1);
-        Mat result = new Mat(BGR.rows(), BGR.cols(), CvType.CV_8UC1);
-        Imgproc.threshold(channels.get(0), result, 80, 255, typ);
-
-
-        int color = 1;
-        prepareData(result);
-        HashMap<Integer, ArrayList<Integer>> map = new HashMap();
-        ArrayList<Integer> colors = new ArrayList<>();
-        boolean isInList, isInList2, isInlist3;
-        for (int i = 1; i < result.rows(); i++) {
-            for (int j = 1; j < result.cols() - 1; j++) {
-
-                temp = (int) result.get(i, j)[0];
-
-                if (temp > 0) {
-
-                    temp1 = (int) result.get(i, j - 1)[0];
-                    temp2 = (int) result.get(i - 1, j + 1)[0];
-                    temp3 = (int) result.get(i - 1, j)[0];
-                    temp4 = (int) result.get(i - 1, j - 1)[0];
-
-                    if (temp1 == temp2 && temp2 == temp3 && temp3 == temp4 && temp4 == 0) {
-                        color++;
-
-                        map.put(color, new ArrayList<>(color));
-                        values[0] = color;
-                        colored.put(i, j, values);
-                        continue;
-                    }
-                    if (temp4 > 0) {
-                        values[0] = colored.get(i - 1, j - 1)[0];
-                        colored.put(i, j, values);
-                        continue;
-                    }
-                    if (temp3 > 0) {
-                        values[0] = colored.get(i - 1, j)[0];
-                        colored.put(i, j, values);
-                        continue;
-                    }
-                    if (temp2 > 0) {
-                        values[0] = (int) colored.get(i - 1, j + 1)[0];
-                        colored.put(i, j, values);
-                        continue;
-                    }
-                    if (temp1 > 0) {
-                        values[0] = colored.get(i, j - 1)[0];
-                        colored.put(i, j, values);
-
-                    }
-                }
-            }
-        }
-        System.out.println("Počrt barev " + color);
-
-        for (int i = 1; i < colored.rows(); i++) {
-            for (int j = 1; j < colored.cols() - 1; j++) {
-
-                temp = (int) colored.get(i, j)[0];
-
-                if (temp > 0) {
-
-                    temp1 = (int) colored.get(i, j - 1)[0];
-                    temp2 = (int) colored.get(i - 1, j + 1)[0];
-                    temp3 = (int) colored.get(i - 1, j)[0];
-                    temp4 = (int) colored.get(i - 1, j - 1)[0];
-
-                    if (map.get(temp).isEmpty()) {
-                        map.get(temp).add(temp);
-
-                    } else {
-                        isInlist3 = false;
-                        for (int k = 0; k < map.get(temp).size(); k++) {
-                            if (map.get(temp).get(k) == temp) {
-                                isInlist3 = true;
-                                break;
-                            }
-                        }
-                        if (!isInlist3) {
-
-                            map.get(temp).add(temp);
-
-                        }
-                    }
-
-                    if (temp4 > 0) {
-                        isInList = false;
-                        isInList2 = false;
-                        for (int k = 0; k < map.get(temp).size(); k++) {
-                            if (map.get(temp).get(k) == temp4) {
-                                isInList = true;
-                                break;
-                            }
-                        }
-                        if (!isInList) {
-                            if (temp != temp4) {
-                                map.get(temp).add(temp4);
-                            }
-                        }
-                        for (int k = 0; k < map.get(temp4).size(); k++) {
-                            if (map.get(temp4).get(k) == temp) {
-                                isInList2 = true;
-                                break;
-                            }
-                        }
-                        if (!isInList2) {
-                            map.get(temp4).add(temp);
-                        }
-                    }
-                    if (temp3 > 0) {
-                        isInList = false;
-                        isInList2 = false;
-                        for (int k = 0; k < map.get(temp).size(); k++) {
-                            if (map.get(temp).get(k) == temp3) {
-                                isInList = true;
-                                break;
-                            }
-                        }
-                        if (!isInList) {
-                            if (temp != temp3) {
-                                map.get(temp).add(temp3);
-
-                            }
-                        }
-                        for (int k = 0; k < map.get(temp3).size(); k++) {
-                            if (map.get(temp3).get(k) == temp) {
-                                isInList2 = true;
-                                break;
-                            }
-                        }
-                        if (!isInList2) {
-
-                            map.get(temp3).add(temp);
-
-                        }
-
-                    }
-
-                    if (temp2 > 0) {
-                        isInList2 = false;
-                        isInList = false;
-
-                        for (int k = 0; k < map.get(temp).size(); k++) {
-                            if (map.get(temp).get(k) == temp2) {
-                                isInList = true;
-                                break;
-                            }
-                        }
-                        if (!isInList) {
-                            if (temp != temp2) {
-                                map.get(temp).add(temp2);
-
-                            }
-                        }
-                        for (int k = 0; k < map.get(temp2).size(); k++) {
-                            if (map.get(temp2).get(k) == temp) {
-                                isInList2 = true;
-                                break;
-                            }
-                        }
-                        if (!isInList2) {
-
-                            map.get(temp2).add(temp);
-
-                        }
-
-                    }
-                    if (temp1 > 0) {
-                        isInList2 = false;
-                        isInList = false;
-
-                        for (int k = 0; k < map.get(temp).size(); k++) {
-                            if (map.get(temp).get(k) == temp1) {
-                                isInList = true;
-                                break;
-                            }
-                        }
-                        if (!isInList) {
-                            if (temp != temp1) {
-                                map.get(temp).add(temp1);
-
-                            }
-                        }
-                        for (int k = 0; k < map.get(temp1).size(); k++) {
-                            if (map.get(temp1).get(k) == temp) {
-                                isInList2 = true;
-                                break;
-                            }
-                        }
-                        if (!isInList2) {
-
-                            map.get(temp1).add(temp);
-
-                        }
-
-                    }
-                }
-            }
-        }
-
-        map = coloring(map, colors);
-        reColoring(map, colored);
-        saveColoredImg();
-
-    }
-
-
-    private Mat prepareData(Mat threshold) {
-        double[] values = new double[1];
-        values[0] = 0;
-        for (int i = 0; i < threshold.cols(); i++) {
-            for (int j = 0; j < threshold.rows(); j++) {
-                if (i == 0) {
-                    threshold.put(i, j, values);
-                }
-                if (j == 0) {
-                    threshold.put(i, j, values);
-                }
-                if (j == threshold.rows() - 1) {
-                    threshold.put(i, j, values);
-                }
-            }
-        }
-        return threshold;
-    }
-
-    private HashMap<Integer, ArrayList<Integer>> coloring(HashMap<Integer, ArrayList<Integer>> list, ArrayList<Integer> colors) {
-        boolean isInList;
-        int color = 0;
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        HashMap<Integer, ArrayList<Integer>> ColorList = new HashMap();
-        if (list.isEmpty()) {
-            System.out.println("List is empty maybe throw someting else");
-        } else {
-            System.out.println("Počet " + list.size());
-            for (int i = 2; i < list.size(); i++) {
-                isInList = false;
-                for (int k = 0; k < colors.size(); k++) {
-                    if (colors.get(k) == i) {
-                        isInList = true;
-                        break;
-                    }
-                }
-                if (!isInList) {
-                    result = neighbor(i, list, colors, new ArrayList<>());
-                    color++;
-                    colors = result.get(1);
-                    ColorList.put(color, result.get(0));
-                }
-            }
-        }
-
-        return ColorList;
-    }
-
-    private ArrayList<ArrayList<Integer>> neighbor(int color, HashMap<Integer, ArrayList<Integer>> list, ArrayList<Integer> colors, ArrayList<Integer> neighbors) {
-        boolean isInList;
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < list.get(color).size(); i++) {
-            isInList = false;
-
-            for (int k = 0; k < colors.size(); k++) {
-                int tmp = list.get(color).get(i);
-                if (colors.get(k) == tmp) {
-                    isInList = true;
-                    break;
-                }
-            }
-            if (!isInList) {
-                neighbors.add(list.get(color).get(i));
-                colors.add(list.get(color).get(i));
-                neighbor(list.get(color).get(i), list, colors, neighbors);
-            }
-        }
-        result.add(neighbors);
-        result.add(colors);
-        return result;
-    }
-
-    private void reColoring(HashMap<Integer, ArrayList<Integer>> map, Mat colored) {
-        int temp;
-        int color = 1;
-        boolean end;
-        double[] values = new double[1];
-        ArrayList<ArrayList<Integer>> ListOfFinalColors = generateColors(map.size());
-        for (int i = 1; i < colored.rows(); i++) {
-            for (int j = 1; j < colored.cols() - 1; j++) {
-                temp = (int) colored.get(i, j)[0];
-
-                if (temp > 0) {
-                    end = false;
-
-                    for (int h = 0; h < map.size(); h++) {
-                        for (int k = 0; k < map.get(h + 1).size(); k++) {
-                            if (temp == map.get(h + 1).get(k)) {
-
-                                for (int key : map.keySet()) {
-                                    if (map.get(key).equals(map.get(h + 1))) {
-
-                                        color = key;
-                                    }
-                                }
-
-                                values[0] = ListOfFinalColors.get(color).get(0);
-                                channels.get(0).put(i, j, values);
-                                values[0] = ListOfFinalColors.get(color).get(1);
-                                channels.get(1).put(i, j, values);
-                                values[0] = ListOfFinalColors.get(color).get(2);
-                                channels.get(2).put(i, j, values);
-                                end = true;
-                                break;
-                            }
-                            if (end) {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    }
 
     private ArrayList<ArrayList<Integer>> generateColors(int count) {
         ArrayList<ArrayList<Integer>> ListOfFinalColors = new ArrayList<>();

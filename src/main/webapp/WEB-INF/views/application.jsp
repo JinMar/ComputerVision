@@ -28,7 +28,7 @@
 
 
     <spring:url value="/js/jquery.js" var="coreJs"/>
-    <spring:url value="/js/jquery-ui.js" var="coreJSUI"/>
+
     <spring:url value="/js/attributeSetup.js" var="attributeSetup"/>
     <spring:url value="/js/lightbox.js" var="lightbox"/>
     <script src="${coreJs}"></script>
@@ -75,8 +75,6 @@
     </div>
 </nav>
 
-
-<!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
 
@@ -90,37 +88,28 @@
         <div class="message">
         </div>
         <h2>Vítejte na stránkách diplomové práce</h2>
-        <input class="adding" style="font-family:Helvetica" type="submit" value="Pøidat ">
-        <input class="send" style="font-family:Helvetica" type="submit" value="Odeslat ">
 
 
-        <div id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
-            <img src="/img/test.png" class="img-thumbnail previewOrig" alt="Cinque Terre" width="152">
-            <div class="methodName">
-                <p>ZÁKALDNÍ OBRÁZEK</p>
-            </div>
-            <form class="input-group" id="img2b64">
-                <input id="inputFileToLoad" type="file"/>
-            </form>
-        </div>
-
-        <div id="wait"
-             style="display:none;border:1px solid #5e5e5e;position:absolute;
-             top:50%;left:50%;padding:2px;background: #7d7d7d">
-            <img src=${waitingBar} width="234" height="130"/><br>Loading..
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-12">
+        <ul id="sortable" class="col-xs-12 col-sm-12 col-md-12">
+            <li id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
+                <img src="/img/test.png" class="img-thumbnail previewOrig" alt="Cinque Terre" width="152">
+                <div class="methodName">
+                    <p>ZÁKALDNÍ OBRÁZEK</p>
+                </div>
+                <form class="input-group" id="img2b64">
+                    <input id="inputFileToLoad" type="file"/>
+                </form>
+            </li>
+            <li class="add">
+                <input class="adding methodItem" style="font-family:Helvetica" type="button" value="+">
+            </li>
             <!-- Here will be new methods -->
-            <div class="contentBody">
-                <ul id="sortable"></ul>
-            </div>
 
-        </div>
+        </ul>
     </div>
 
 </div>
-<div class="clr"></div>
+<div class="clr"><img class="hide" id="hiddenImg"></div>
 <footer class="footer">
 
     <p>&copy; Semestrální projekt 2016. All rights reserved. Design by Marek Jindrák.</p>

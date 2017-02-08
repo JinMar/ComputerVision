@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Marek on 02.10.2016.
@@ -97,7 +98,8 @@ public class ContentProviderService {
     }
 
     public List<AttributesDTO> getAttributesByOperationId(String idOperation) {
-        return getWrappedMethodAttributes(operationAttributesDAO.getAttributesById(idOperation));
+        List<AttributesDTO> result = getWrappedMethodAttributes(operationAttributesDAO.getAttributesById(idOperation));
+        return result;
     }
 
     /**
@@ -157,6 +159,9 @@ public class ContentProviderService {
                         break;
                     case TEXT:
                         tmp.setAttributeType(AttributeType.TEXT);
+                        break;
+                    case IMAGE:
+                        tmp.setAttributeType(AttributeType.IMAGE);
                         break;
                     default:
                         //// TODO: 09.10.2016 vyvolat vyjímku nějakou
@@ -243,7 +248,8 @@ public class ContentProviderService {
                 partData.setMethods(getAllMethodByFunctionId(part.getFunctionId()));
                 partData.setOperations(getOperationByMethodId(part.getMethodId()));
                 List<PartValue> partValueList = new ArrayList<>();
-                List<PartAttributeValue> list = Utility.getSortPartAttributeValue(part.getPartAttributeValues());
+                Set<PartAttributeValue> partSet = part.getPartAttributeValues();
+                List<PartAttributeValue> list = Utility.getSortPartAttributeValue(partSet);
 
                 for (PartAttributeValue pv : list) {
                     PartValue partValue = new PartValue();
@@ -261,6 +267,7 @@ public class ContentProviderService {
 
                 }
                 partData.setPartValueList(partValueList);
+
                 result.add(partData);
             }
 

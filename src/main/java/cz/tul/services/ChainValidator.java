@@ -5,6 +5,7 @@ import cz.tul.entities.AllowStep;
 import cz.tul.entities.Operation;
 import cz.tul.repositories.AllowStepDAO;
 import cz.tul.repositories.OperationDAO;
+import cz.tul.services.exceptions.ImageNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class ChainValidator {
     @Autowired
     private OperationDAO operationDAO;
 
-    public boolean validateChain(List<ChainDTO> chainDtos) {
+    public boolean validateChain(List<ChainDTO> chainDtos) throws ImageNotFoundException {
         String prew = null;
 
         Operation operation = null;
@@ -36,6 +37,9 @@ public class ChainValidator {
         for (ChainDTO data : chainDtos) {
             if (prew == null) {
                 prew = operationDAO.getIdOperationByName("Original");
+                if (data.getAttributes().size() == 0) {
+                    throw new ImageNotFoundException("Chain can not be created because input data not contains image date");
+                }
             } else {
                 allowedOp = new ArrayList<>();
                 operation = operationDAO.getOperationById(data.getOperationId());

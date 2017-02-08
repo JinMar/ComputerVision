@@ -6,7 +6,8 @@ package cz.tul.entities;
 public enum AttributeType {
     NUMBER("number"),
     SELECT("select"),
-    TEXT("text");
+    TEXT("text"),
+    IMAGE("image");
 
     private String attributeType;
 

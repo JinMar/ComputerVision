@@ -1,5 +1,6 @@
 package cz.tul.utilities;
 
+import cz.tul.controllers.transferObjects.AttributesDTO;
 import cz.tul.entities.Part;
 import cz.tul.entities.PartAttributeValue;
 import cz.tul.entities.StateEnum;
@@ -42,13 +43,32 @@ public class Utility {
         return result;
     }
 
+    public static List<AttributesDTO> getSortAttributesDTO(List<AttributesDTO> input) {
+        List<AttributesDTO> result = new ArrayList(input);
+
+        Collections.sort(result, new Comparator<AttributesDTO>() {
+            @Override
+            public int compare(AttributesDTO p1, AttributesDTO p2) {
+
+                return p2.getName().compareTo(p1.getName());
+
+
+            }
+        });
+        return result;
+    }
+
+
+    public static byte[] getImageByte(String base64) {
+        return javax.xml.bind.DatatypeConverter.parseBase64Binary(base64);
+    }
 
     public static List<PartAttributeValue> getSortPartAttributeValue(Set<PartAttributeValue> atributes) {
         List<PartAttributeValue> result = new ArrayList(atributes);
 
         Collections.sort(result, new Comparator<PartAttributeValue>() {
             public int compare(PartAttributeValue o1, PartAttributeValue o2) {
-                return o1.getOperationAttributes().getAttribute().getName().compareTo(o2.getOperationAttributes().getAttribute().getName());
+                return o2.getOperationAttributes().getAttribute().getName().compareTo(o1.getOperationAttributes().getAttribute().getName());
             }
         });
         return result;

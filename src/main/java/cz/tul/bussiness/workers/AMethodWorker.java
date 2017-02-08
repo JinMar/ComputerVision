@@ -1,6 +1,8 @@
 package cz.tul.bussiness.workers;
 
+import cz.tul.bussiness.jobs.IJob;
 import cz.tul.bussiness.register.OperationRegister;
+import cz.tul.bussiness.workers.helper.ColorBarHelper;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -24,12 +26,21 @@ public abstract class AMethodWorker implements IMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(AMethodWorker.class);
     protected Set<PartAttributeValue> attributes;
     protected String imgName;
+    protected IJob job;
     protected BufferedImage imgData;
     protected String classifier;
     protected byte[] sourceData;
     protected Mat BGR;
     protected List<Mat> channels = new ArrayList<>();
+    private IJob work;
 
+    public IJob getWork() {
+        return work;
+    }
+
+    public void setWork(IJob work) {
+        this.work = work;
+    }
 
     public byte[] getSourceData() {
         return sourceData;
@@ -88,6 +99,7 @@ public abstract class AMethodWorker implements IMethodWorker {
             if (!channels.isEmpty()) {
                 createhist();
                 transformImage();
+                createColorScaleImage(800, 600);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,7 +135,7 @@ public abstract class AMethodWorker implements IMethodWorker {
         Core.MinMaxLocResult max = Core.minMaxLoc(histogram);
 
 
-        BufferedImage img = new BufferedImage(800, 600, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage img = new BufferedImage(800, 550, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D img2D = img.createGraphics();
         Font font = new Font("TimesRoman", Font.BOLD, 20);
         img2D.setFont(font);
@@ -143,7 +155,9 @@ public abstract class AMethodWorker implements IMethodWorker {
             img2D.fillRect(16 + (3) * i, 450, 3, 50);
 
         }
-
+        img2D.setPaint(Color.BLACK);
+        img2D.drawString("0", 15, 520);
+        img2D.drawString("255", 750, 520);
 
         logger.info("Output" + getRealPath() + "\\img\\histogram-" + getImgName() + ".jpg");
         try {
@@ -199,6 +213,8 @@ public abstract class AMethodWorker implements IMethodWorker {
         // init
         List<Mat> newPlanes = new ArrayList<>();
         Mat mag = new Mat();
+        int addWidth = 60;
+        int minRow = 150;
         // split the comples image in two planes
         Core.split(complexImage, newPlanes);
         // compute the magnitude
@@ -217,10 +233,84 @@ public abstract class AMethodWorker implements IMethodWorker {
 
         // you can also write on disk the resulting image...
         Imgproc.applyColorMap(mag, mag, Imgproc.COLORMAP_JET);
-        Imgcodecs.imwrite(getRealPath() + "\\img\\magnitude-" + getImgName() + ".jpg", mag);
+
+        List<Mat> withColorMap = new ArrayList<>();
+        List<Mat> splited = new ArrayList<>();
+        Core.split(mag, splited);
+        int color = 0;
+        boolean repeatColor = true;
+        if (mag.rows() < minRow) {
+            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
+            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
+            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
+            for (int i = 0; i < minRow; i++) {
+                for (int j = 0; j < mag.cols() + addWidth; j++) {
+                    if (j < mag.cols()) {
+                        withColorMap.get(0).put(i, j, splited.get(0).get(i, j));
+                        withColorMap.get(1).put(i, j, splited.get(1).get(i, j));
+                        withColorMap.get(2).put(i, j, splited.get(2).get(i, j));
+                    } else {
+                        if (i > (mag.rows() / 2) - 50 && mag.cols() + 20 < j && color < 101 && mag.cols() + 40 > j) {
+                            Color c = ColorBarHelper.getInstance().getColor(color);
+                            withColorMap.get(0).put(i, j, (double) c.getRed());
+                            withColorMap.get(1).put(i, j, (double) c.getGreen());
+                            withColorMap.get(2).put(i, j, (double) c.getBlue());
+                        } else {
+                            withColorMap.get(0).put(i, j, 255.0);
+                            withColorMap.get(1).put(i, j, 255.0);
+                            withColorMap.get(2).put(i, j, 255.0);
+                        }
+                    }
+
+                }
+                if (i > (mag.rows() / 2) - 50 && repeatColor) {
+                    color++;
+
+                }
+                repeatColor = !repeatColor;
+
+            }
+        } else {
+            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
+            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
+            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
+
+            for (int i = 0; i < mag.rows(); i++) {
+                for (int j = 0; j < mag.cols() + addWidth; j++) {
+                    if (j < mag.cols()) {
+                        withColorMap.get(0).put(i, j, splited.get(0).get(i, j));
+                        withColorMap.get(1).put(i, j, splited.get(1).get(i, j));
+                        withColorMap.get(2).put(i, j, splited.get(2).get(i, j));
+                    } else {
+                        if (i > (mag.rows() / 2) - 50 && mag.cols() + 20 < j && color < 101 && mag.cols() + 40 > j) {
+                            Color c = ColorBarHelper.getInstance().getColor(color);
+                            withColorMap.get(0).put(i, j, (double) c.getRed());
+                            withColorMap.get(1).put(i, j, (double) c.getGreen());
+                            withColorMap.get(2).put(i, j, (double) c.getBlue());
+                        } else {
+                            withColorMap.get(0).put(i, j, 255.0);
+                            withColorMap.get(1).put(i, j, 255.0);
+                            withColorMap.get(2).put(i, j, 255.0);
+                        }
+                    }
+
+                }
+                if (i > (mag.rows() / 2) - 50 && repeatColor) {
+                    color++;
+
+                }
+                repeatColor = !repeatColor;
+
+            }
+        }
+        Mat result = new Mat();
+        Core.merge(withColorMap, result);
+
+        Imgcodecs.imwrite(getRealPath() + "\\img\\magnitude-" + getImgName() + ".jpg", result);
 
         return mag;
     }
+
 
     private void shiftDFT(Mat image) {
         image = image.submat(new Rect(0, 0, image.cols() & -2, image.rows() & -2));
@@ -241,5 +331,28 @@ public abstract class AMethodWorker implements IMethodWorker {
         q2.copyTo(q1);
         tmp.copyTo(q2);
     }
+
+
+    private Image createColorScaleImage(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D img2D = image.createGraphics();
+        File outputFile = new File(getRealPath() + "\\img\\colorMap-" + getImgName() + ".jpg");
+
+
+        for (int i = 0; i < 100; i++) {
+            Color c = ColorBarHelper.getInstance().getColor(i);
+
+            img2D.setPaint(c);
+            img2D.fillRect(450, 350 - (16 + (3) * i), 10, 10);
+
+        }
+        try {
+            ImageIO.write(image, "jpg", outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
 
 }

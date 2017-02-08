@@ -21,6 +21,7 @@ html {
 body {
     padding-top: 50px;
     margin-bottom: 60px;
+    background-color: #ececec;
 }
 
 .nav {
@@ -72,6 +73,7 @@ body {
     width: 250px;
 }
 
+
 .Button a {
     letter-spacing: 1px;
     text-decoration: none;
@@ -91,11 +93,23 @@ body {
     padding: 5px;
     width: 350px;
     min-height: 200px;
-    border: 1px solid #7d7d7d;
+    border: 2px solid #bfbfbf;
     border-radius: 3px;
-    background: #e8e8e8;
+    background: #fff;
     list-style: none;
     margin: 2px;
+}
+
+.adding {
+    font-size: 130px;
+    color: #888888;
+
+}
+
+.adding:hover {
+    background-color: #888888;
+    color: #f07d00;
+    border: 2px solid #2B2B2B;
 }
 
 .methodName {
@@ -111,9 +125,11 @@ body {
 .previewOrig {
     float: left
 }
+
 select {
     height: 30px;
     line-height: 30px;
+    min-width: 170px;
 }
 
 table {
@@ -123,7 +139,7 @@ table {
 }
 
 input {
-    width: 115px;
+    min-width: 170px;
 }
 
 td {
@@ -202,4 +218,8 @@ button.closeB {
         margin: 50px;
     }
 
+}
+
+#inputFileToLoad {
+    width: 100px;
 }
