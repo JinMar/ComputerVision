@@ -22,6 +22,9 @@ public abstract class AHougTransform extends AJob {
     private Mat edges;
     private double minDist;
     private int method;
+    private int minLineGap;
+    private int thrashold;
+    private int minLineLenght;
 
     @Override
     public BufferedImage start() throws MinimalArgumentsException {
@@ -75,6 +78,19 @@ public abstract class AHougTransform extends AJob {
                 }
 
             }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Min. Line Gap")) {
+                minLineGap = Integer.parseInt(att.getValue());
+
+            }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Min. délka")) {
+                minLineLenght = Integer.parseInt(att.getValue());
+
+            }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Práh")) {
+                thrashold = Integer.parseInt(att.getValue());
+
+            }
+
         }
     }
 
@@ -98,5 +114,17 @@ public abstract class AHougTransform extends AJob {
             edges = new Mat();
         }
         return edges;
+    }
+
+    public int getMinLineGap() {
+        return minLineGap;
+    }
+
+    public int getThrashold() {
+        return thrashold;
+    }
+
+    public int getMinLineLenght() {
+        return minLineLenght;
     }
 }

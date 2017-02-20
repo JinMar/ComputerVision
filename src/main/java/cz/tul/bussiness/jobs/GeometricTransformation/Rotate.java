@@ -1,5 +1,6 @@
-package cz.tul.bussiness.jobs;
+package cz.tul.bussiness.jobs.GeometricTransformation;
 
+import cz.tul.bussiness.jobs.AJob;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.*;

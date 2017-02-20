@@ -16,11 +16,10 @@ public class LineTransform extends AHougTransform {
 
     @Override
     protected void draw() {
-        int lowThreshold = 50;
-        int ratio = 3;
-        Imgproc.Canny(channels.get(0), getEdges(), lowThreshold, lowThreshold * ratio);
+
+
         Mat lines = new Mat();
-        Imgproc.HoughLinesP(getEdges(), lines, 1, Math.PI / 180, 50, 40, 10);
+        Imgproc.HoughLinesP(channels.get(0), lines, 1, Math.PI / 180, getThrashold(), getMinLineLenght(), getMinLineGap());
 
         for (int i = 0; i < lines.rows(); i++) {
             double[] val = lines.get(i, 0);

@@ -1,9 +1,9 @@
 package cz.tul.bussiness.workers;
 
+import cz.tul.bussiness.jobs.GeometricTransformation.Resize;
+import cz.tul.bussiness.jobs.GeometricTransformation.Rotate;
 import cz.tul.bussiness.jobs.HoughTransformation.CircleTransform;
 import cz.tul.bussiness.jobs.HoughTransformation.LineTransform;
-import cz.tul.bussiness.jobs.Resize;
-import cz.tul.bussiness.jobs.Rotate;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.bussiness.workers.enums.GeometricTransformationEnum;
 import cz.tul.bussiness.workers.enums.HoughTransformationEnum;

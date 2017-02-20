@@ -228,9 +228,14 @@ public class DbProvisioner implements InitializingBean {
         operations.add(rotateMask);
 
         Operation sobel = new Operation();
-        sobel.setName("Sobell");
+        sobel.setName("Sobel");
         sobel.setMethod(fDerivation);
         operations.add(sobel);
+
+        Operation canny = new Operation();
+        canny.setName("Canny");
+        canny.setMethod(fDerivation);
+        operations.add(canny);
 
         Operation laplace = new Operation();
         laplace.setName("Laplacian");
@@ -305,8 +310,9 @@ public class DbProvisioner implements InitializingBean {
 
         operationRegister.register(hOperation.getOperationId(), HSVChannel.class, ChannelsEnum.H.getChannelName());
 
-        operationRegister.register(sobel.getOperationId(), EdgeDetector.class, EdgeDetectorEnum.SOBEL.getDetectorlName());
-        operationRegister.register(laplace.getOperationId(), EdgeDetector.class, EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        operationRegister.register(sobel.getOperationId(), EdgeDetectors.class, EdgeDetectorEnum.SOBEL.getDetectorlName());
+        operationRegister.register(laplace.getOperationId(), EdgeDetectors.class, EdgeDetectorEnum.LAPLACIAN.getDetectorlName());
+        operationRegister.register(canny.getOperationId(), EdgeDetectors.class, EdgeDetectorEnum.CANNY.getDetectorlName());
 
         operationRegister.register(average.getOperationId(), NoiseReducer.class, NoiseReducerEnum.SIMPLEAVERAGING.getReducerName());
         operationRegister.register(median.getOperationId(), NoiseReducer.class, NoiseReducerEnum.MEDIAN.getReducerName());
@@ -344,6 +350,9 @@ public class DbProvisioner implements InitializingBean {
         Attribute method = new Attribute("Metoda");
         Attribute dp = new Attribute("DP");
         Attribute minDist = new Attribute("Min vzdálenost");
+        Attribute ratio = new Attribute("Poměr");
+        Attribute minLen = new Attribute("Min. délka");
+        Attribute maxLineGap = new Attribute("Min. Line Gap");
 
         attributes.add(type);
         attributes.add(channel);
@@ -358,6 +367,8 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(method);
         attributes.add(dp);
         attributes.add(minDist);
+        attributes.add(ratio);
+        attributes.add(minLen);
         attributeDAO.save(attributes);
 
         /*
@@ -416,6 +427,24 @@ public class DbProvisioner implements InitializingBean {
         Map<String, String> useOperationValues = new HashMap<>();
         useOperationValues.put("default", "Výchozí");
         useOperationValues.put("custom", "Vlastní");
+
+        OperationAttributes cannyA = new OperationAttributes();
+        cannyA.setMinValue(0);
+        cannyA.setMaxValue(256);
+        cannyA.setDefaultValues("127");
+        cannyA.setOperation(canny);
+        cannyA.setAttribute(ratio);
+        cannyA.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(cannyA);
+
+        OperationAttributes cannyB = new OperationAttributes();
+        cannyB.setMinValue(0);
+        cannyB.setMaxValue(100);
+        cannyB.setDefaultValues("1");
+        cannyB.setOperation(canny);
+        cannyB.setAttribute(threshold);
+        cannyB.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(cannyB);
 
         OperationAttributes erodeM_A = new OperationAttributes();
         erodeM_A.setMinValue(3);
@@ -590,7 +619,7 @@ public class DbProvisioner implements InitializingBean {
         //HTCmethods.put("HOUGH_MULTI_SCALE", "MULTI SCALE ");
         HTCmethods.put("HOUGH_GRADIENT", "GRADIENT ");
 
-        HTC_B.setDefaultValues("GRADIENT");
+        HTC_B.setDefaultValues("HOUGH_GRADIENT");
 
         HTC_B.setOperation(HTC);
         HTC_B.setAttribute(method);
@@ -608,11 +637,11 @@ public class DbProvisioner implements InitializingBean {
         operationAttributes.add(HTC_C);
 
         OperationAttributes HTL_A = new OperationAttributes();
-        HTL_A.setDefaultValues("15");
+        HTL_A.setDefaultValues("50");
         HTL_A.setMinValue(0);
-        HTL_A.setMaxValue(1000);
+        HTL_A.setMaxValue(256);
         HTL_A.setOperation(HTL);
-        HTL_A.setAttribute(minDist);
+        HTL_A.setAttribute(threshold);
         HTL_A.setAttributeType(AttributeType.NUMBER);
         operationAttributes.add(HTL_A);
 
@@ -623,7 +652,7 @@ public class DbProvisioner implements InitializingBean {
         //HTCmethods.put("HOUGH_MULTI_SCALE", "MULTI SCALE ");
         HTLmethods.put("HOUGH_GRADIENT", "GRADIENT ");
 
-        HTL_B.setDefaultValues("GRADIENT");
+        HTL_B.setDefaultValues("HOUGH_GRADIENT");
 
         HTL_B.setOperation(HTL);
         HTL_B.setAttribute(method);
@@ -632,14 +661,22 @@ public class DbProvisioner implements InitializingBean {
         operationAttributes.add(HTL_B);
 
         OperationAttributes HTL_C = new OperationAttributes();
-        HTL_C.setDefaultValues("0.1");
+        HTL_C.setDefaultValues("40");
         HTL_C.setMinValue(0);
-        HTL_C.setMaxValue(100);
+        HTL_C.setMaxValue(1000);
         HTL_C.setOperation(HTL);
-        HTL_C.setAttribute(dp);
+        HTL_C.setAttribute(minLen);
         HTL_C.setAttributeType(AttributeType.NUMBER);
         operationAttributes.add(HTL_C);
 
+        OperationAttributes HTL_D = new OperationAttributes();
+        HTL_D.setDefaultValues("10");
+        HTL_D.setMinValue(0);
+        HTL_D.setMaxValue(1000);
+        HTL_D.setOperation(HTL);
+        HTL_D.setAttribute(maxLineGap);
+        HTL_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(HTL_D);
 
         OperationAttributes rotateOp_B = new OperationAttributes();
         Map<String, String> interpolations = new HashMap<>();
@@ -776,6 +813,45 @@ public class DbProvisioner implements InitializingBean {
         allowStep_laplace_g.setOperation(laplace);
         allowStep_laplace_g.setAllowoperationId(crOperation.getOperationId());
         allowSteps.add(allowStep_laplace_g);
+
+
+        ////////////////////////////////////
+
+        ////////////////////////////////////
+        AllowStep allowStep_canny_a = new AllowStep();
+        allowStep_canny_a.setOperation(canny);
+        allowStep_canny_a.setAllowoperationId(grayOperation.getOperationId());
+        allowSteps.add(allowStep_canny_a);
+
+        AllowStep allowStep_canny_b = new AllowStep();
+        allowStep_canny_b.setOperation(canny);
+        allowStep_canny_b.setAllowoperationId(redOperation.getOperationId());
+        allowSteps.add(allowStep_canny_b);
+
+        AllowStep allowStep_canny_c = new AllowStep();
+        allowStep_canny_c.setOperation(canny);
+        allowStep_canny_c.setAllowoperationId(greenOperation.getOperationId());
+        allowSteps.add(allowStep_canny_c);
+
+        AllowStep allowStep_canny_d = new AllowStep();
+        allowStep_canny_d.setOperation(canny);
+        allowStep_canny_d.setAllowoperationId(blueOperation.getOperationId());
+        allowSteps.add(allowStep_canny_d);
+
+        AllowStep allowStep_canny_e = new AllowStep();
+        allowStep_canny_e.setOperation(canny);
+        allowStep_canny_e.setAllowoperationId(yOperation.getOperationId());
+        allowSteps.add(allowStep_canny_e);
+
+        AllowStep allowStep_canny_f = new AllowStep();
+        allowStep_canny_f.setOperation(canny);
+        allowStep_canny_f.setAllowoperationId(cbOperation.getOperationId());
+        allowSteps.add(allowStep_canny_f);
+
+        AllowStep allowStep_canny_g = new AllowStep();
+        allowStep_canny_g.setOperation(canny);
+        allowStep_canny_g.setAllowoperationId(crOperation.getOperationId());
+        allowSteps.add(allowStep_canny_g);
 
 
         ////////////////////////////////////
@@ -1221,15 +1297,36 @@ public class DbProvisioner implements InitializingBean {
         allowRotate.setAllowoperationId(originalOperation.getOperationId());
         allowSteps.add(allowRotate);
 
-        AllowStep allowHTC = new AllowStep();
-        allowHTC.setOperation(HTC);
-        allowHTC.setAllowoperationId(redOperation.getOperationId());
-        allowSteps.add(allowHTC);
+        AllowStep allowHTC_A = new AllowStep();
+        allowHTC_A.setOperation(HTC);
+        allowHTC_A.setAllowoperationId(laplace.getOperationId());
+        allowSteps.add(allowHTC_A);
 
-        AllowStep allowHTL = new AllowStep();
-        allowHTL.setOperation(HTL);
-        allowHTL.setAllowoperationId(redOperation.getOperationId());
-        allowSteps.add(allowHTL);
+        AllowStep allowHTC_B = new AllowStep();
+        allowHTC_B.setOperation(HTC);
+        allowHTC_B.setAllowoperationId(sobel.getOperationId());
+        allowSteps.add(allowHTC_B);
+
+        AllowStep allowHTC_C = new AllowStep();
+        allowHTC_C.setOperation(HTC);
+        allowHTC_C.setAllowoperationId(canny.getOperationId());
+        allowSteps.add(allowHTC_C);
+
+        AllowStep allowHTL_A = new AllowStep();
+        allowHTL_A.setOperation(HTL);
+        allowHTL_A.setAllowoperationId(laplace.getOperationId());
+        allowSteps.add(allowHTL_A);
+
+        AllowStep allowHTL_B = new AllowStep();
+        allowHTL_B.setOperation(HTL);
+        allowHTL_B.setAllowoperationId(sobel.getOperationId());
+        allowSteps.add(allowHTL_B);
+
+        AllowStep allowHTL_C = new AllowStep();
+        allowHTL_C.setOperation(HTL);
+        allowHTL_C.setAllowoperationId(canny.getOperationId());
+        allowSteps.add(allowHTL_C);
+
 
         allowStepDAO.save(allowSteps);
     }

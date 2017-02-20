@@ -5,7 +5,8 @@ package cz.tul.bussiness.workers.enums;
  */
 public enum EdgeDetectorEnum {
     SOBEL("sobel"),
-    LAPLACIAN("laplacian");
+    LAPLACIAN("laplacian"),
+    CANNY("canny");
 
 
     private String detectorlName;
