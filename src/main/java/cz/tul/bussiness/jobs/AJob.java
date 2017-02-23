@@ -1,6 +1,7 @@
 package cz.tul.bussiness.jobs;
 
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.Mat;
 import org.slf4j.Logger;
@@ -46,6 +47,13 @@ public abstract class AJob implements IJob {
         return attributes;
     }
 
-    protected abstract void init() throws MinimalArgumentsException;
+    @Override
+    public BufferedImage start() throws MinimalArgumentsException, NoTemplateFound {
+        init();
+        return procces();
+    }
 
+    protected abstract void init() throws MinimalArgumentsException, NoTemplateFound;
+
+    protected abstract BufferedImage procces();
 }

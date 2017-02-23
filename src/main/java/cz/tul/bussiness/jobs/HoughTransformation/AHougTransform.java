@@ -26,13 +26,9 @@ public abstract class AHougTransform extends AJob {
     private int thrashold;
     private int minLineLenght;
 
-    @Override
-    public BufferedImage start() throws MinimalArgumentsException {
-        init();
-        return process();
-    }
 
-    private BufferedImage process() {
+    @Override
+    protected BufferedImage procces() {
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         result = new Mat(BGR.rows(), BGR.cols(), CvType.CV_8UC3);
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
@@ -46,6 +42,7 @@ public abstract class AHougTransform extends AJob {
         return resultImgData;
     }
 
+    @Override
     protected void init() throws MinimalArgumentsException {
 
         for (PartAttributeValue att : getAttributes()) {

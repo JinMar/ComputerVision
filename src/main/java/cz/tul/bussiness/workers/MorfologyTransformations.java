@@ -2,6 +2,7 @@ package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.jobs.MorphologyTransformation.MorphologyTransform;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.bussiness.workers.enums.MorphologyEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import org.opencv.imgproc.Imgproc;
@@ -15,7 +16,7 @@ public class MorfologyTransformations extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(MorfologyTransformations.class);
 
     @Override
-    public void work() throws SelectionLayerException, MinimalArgumentsException {
+    public void work() throws SelectionLayerException, MinimalArgumentsException, NoTemplateFound {
         if (classifier.equals(MorphologyEnum.ERODE.getMorphologyName())) {
             job = new MorphologyTransform(Imgproc.MORPH_ERODE);// zvolit spávnou metodu
             job.setPartAttributeValue(getAttributes());

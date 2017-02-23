@@ -5,6 +5,7 @@ import cz.tul.bussiness.jobs.GeometricTransformation.Rotate;
 import cz.tul.bussiness.jobs.HoughTransformation.CircleTransform;
 import cz.tul.bussiness.jobs.HoughTransformation.LineTransform;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.bussiness.workers.enums.GeometricTransformationEnum;
 import cz.tul.bussiness.workers.enums.HoughTransformationEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
@@ -18,7 +19,7 @@ public class GeometricTransformations extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(GeometricTransformations.class);
 
     @Override
-    public void work() throws SelectionLayerException, MinimalArgumentsException {
+    public void work() throws SelectionLayerException, MinimalArgumentsException, NoTemplateFound {
 
 
         if (classifier.equals(GeometricTransformationEnum.RESIZE.getGgometricTransformationName())) {

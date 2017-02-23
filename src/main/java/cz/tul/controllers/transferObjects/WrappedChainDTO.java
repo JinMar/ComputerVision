@@ -14,6 +14,7 @@ public class WrappedChainDTO implements Serializable {
     private boolean ready;
     private String message;
     private List<PartData> parts;
+    private boolean error;
 
     public WrappedChainDTO() {
 
@@ -32,6 +33,10 @@ public class WrappedChainDTO implements Serializable {
         this.message = message;
     }
 
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
     //GETTERS
     public boolean isReady() {
         return ready;
@@ -43,5 +48,9 @@ public class WrappedChainDTO implements Serializable {
 
     public String getMessage() {
         return message;
+    }
+
+    public boolean isError() {
+        return error;
     }
 }

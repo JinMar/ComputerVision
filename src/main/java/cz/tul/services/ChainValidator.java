@@ -28,6 +28,12 @@ public class ChainValidator {
     @Autowired
     private OperationDAO operationDAO;
 
+    /**
+     * @param chainDtos
+     * @return Vráti hodnotu true když je možné řetěz vyhodnotit.
+     * @throws ImageNotFoundException - Vyvoláno když nejseou načtena data vstupního obrázku
+     */
+
     public boolean validateChain(List<ChainDTO> chainDtos) throws ImageNotFoundException {
         String prew = null;
 
@@ -38,7 +44,8 @@ public class ChainValidator {
             if (prew == null) {
                 prew = operationDAO.getIdOperationByName("Original");
                 if (data.getAttributes().size() == 0) {
-                    throw new ImageNotFoundException("Chain can not be created because input data not contains image date");
+                    logger.warn("Chain can not be created because input data not contains image data");
+                    throw new ImageNotFoundException("Chain can not be created because input data not contains image data");
                 }
             } else {
                 allowedOp = new ArrayList<>();

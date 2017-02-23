@@ -16,8 +16,6 @@ public class LineTransform extends AHougTransform {
 
     @Override
     protected void draw() {
-
-
         Mat lines = new Mat();
         Imgproc.HoughLinesP(channels.get(0), lines, 1, Math.PI / 180, getThrashold(), getMinLineLenght(), getMinLineGap());
 

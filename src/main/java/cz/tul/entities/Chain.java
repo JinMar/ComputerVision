@@ -24,6 +24,9 @@ public class Chain implements Serializable, CustomEntity {
     @Column(name = "STATE")
     private String state;
 
+    @Column(name = "MESSAGE")
+    private String message;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chain")
     private Set<Part> chainParts = new HashSet<>();
 
@@ -48,6 +51,11 @@ public class Chain implements Serializable, CustomEntity {
     public void setState(String state) {
         this.state = state;
     }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     //GETTERS
 
     public String getChainId() {
@@ -64,5 +72,9 @@ public class Chain implements Serializable, CustomEntity {
 
     public String getState() {
         return state;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

@@ -1,5 +1,6 @@
 package cz.tul.repositories;
 
+import cz.tul.controllers.transferObjects.ChainInfoDTO;
 import cz.tul.entities.Chain;
 import cz.tul.entities.Part;
 import cz.tul.entities.StateEnum;
@@ -47,14 +48,29 @@ public class ChainDAO extends BasicRepositoryAbstract {
 
     }
 
-    public boolean isChainCompleted(String id) {
-        int count = -1;
-        String hql = " FROM Chain c where c.chainId = :chain and c.state = :state ";
+    public ChainInfoDTO isChainCompleted(String id) {
+
+        String hql = " FROM Chain c where c.chainId = :chain ";
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
-        query.setParameter("state", StateEnum.COMPLETE.getState());
         query.setParameter("chain", id);
-        count = query.list().size();
-        return count == 1;
+        List<Chain> chains = query.list();
+
+        switch (chains.get(0).getState()) {
+            case "active":
+                return new ChainInfoDTO(id, "", StateEnum.ACTIVE);
+
+            case "complete":
+                return new ChainInfoDTO(id, "", StateEnum.COMPLETE);
+
+            case "processing":
+                return new ChainInfoDTO(id, "", StateEnum.PROCESSING);
+
+            case "error":
+            default:
+                return new ChainInfoDTO(id, chains.get(0).getMessage(), StateEnum.ERROR);
+
+        }
+
     }
 
     public Chain getChainById(String key) {

@@ -19,11 +19,7 @@ public class CircleTransform extends AHougTransform {
         double x = 0.0;
         double y = 0.0;
         int r = 0;
-        int lowThreshold = 40;
-        int ratio = 3;
 
-        //TODO cany pryč
-        // Imgproc.Canny(channels.get(0), getEdges(), lowThreshold, lowThreshold * ratio);
         Mat circles = new Mat();
         Imgproc.HoughCircles(channels.get(0), circles, getMethod(), getRho(), getMinDist());
         for (int i = 0; i < circles.cols(); i++) {

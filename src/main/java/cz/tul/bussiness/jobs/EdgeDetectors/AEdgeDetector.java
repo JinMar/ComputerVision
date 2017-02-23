@@ -24,12 +24,6 @@ public abstract class AEdgeDetector extends AJob {
     private int lowThreshold;
     private int ratio;
 
-    @Override
-    public BufferedImage start() throws MinimalArgumentsException {
-        init();
-        return procces();
-
-    }
 
     @Override
     protected void init() throws MinimalArgumentsException {
@@ -45,7 +39,8 @@ public abstract class AEdgeDetector extends AJob {
         }
     }
 
-    private BufferedImage procces() {
+    @Override
+    protected BufferedImage procces() {
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         BGR.put(0, 0, sourceData);

@@ -38,28 +38,7 @@ public class MorphologyTransform extends AJob {
     @Override
     public BufferedImage start() throws MinimalArgumentsException {
         init();
-        Mat element = null;
-        if (morphologyType != -1) {
-            if (!defaultShape) {
-                element = getElement(size, shape);
-            } else {
-                try {
-                    BufferedImage data = ImageIO.read(new ByteArrayInputStream(customlement));
-                    Mat newBGR = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC3);
-                    newBGR.put(0, 0, ((DataBufferByte) data.getRaster().getDataBuffer()).getData());
-                    Mat gray = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC3);
-                    element = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC1);
-                    Imgproc.cvtColor(newBGR, gray, Imgproc.COLOR_RGB2GRAY);
-                    Imgproc.threshold(gray, element, 127, 255, Imgproc.THRESH_BINARY);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-            return processMorphology(element);
-        } else {
-            throw new IllegalArgumentException("Wrong morphologyType: " + morphologyType);
-        }
+        return procces();
     }
 
     @Override
@@ -85,6 +64,32 @@ public class MorphologyTransform extends AJob {
                 continue;
             }
 
+        }
+    }
+
+    @Override
+    protected BufferedImage procces() {
+        Mat element = null;
+        if (morphologyType != -1) {
+            if (!defaultShape) {
+                element = getElement(size, shape);
+            } else {
+                try {
+                    BufferedImage data = ImageIO.read(new ByteArrayInputStream(customlement));
+                    Mat newBGR = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC3);
+                    newBGR.put(0, 0, ((DataBufferByte) data.getRaster().getDataBuffer()).getData());
+                    Mat gray = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC3);
+                    element = new Mat(data.getHeight(), data.getWidth(), CvType.CV_8UC1);
+                    Imgproc.cvtColor(newBGR, gray, Imgproc.COLOR_RGB2GRAY);
+                    Imgproc.threshold(gray, element, 127, 255, Imgproc.THRESH_BINARY);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return processMorphology(element);
+        } else {
+            throw new IllegalArgumentException("Wrong morphologyType: " + morphologyType);
         }
     }
 

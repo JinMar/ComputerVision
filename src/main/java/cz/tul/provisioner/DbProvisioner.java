@@ -77,6 +77,10 @@ public class DbProvisioner implements InitializingBean {
         Function segment = new Function();
         segment.setName("Segmentor");
         functions.add(segment);
+        Function tmpMatching = new Function();
+        tmpMatching.setName("Template Matching");
+        functions.add(tmpMatching);
+
 
         Function geometricTransformation = new Function();
         geometricTransformation.setName("Geom. Transformations");
@@ -144,6 +148,11 @@ public class DbProvisioner implements InitializingBean {
         gTransformation.setFunction(geometricTransformation);
         gTransformation.setName("Geom. Transformations");
         methods.add(gTransformation);
+
+        Method tmplMatching = new Method();
+        tmplMatching.setFunction(tmpMatching);
+        tmplMatching.setName("Geom. Transformations");
+        methods.add(tmplMatching);
 
         methodDAO.save(methods);
 
@@ -292,6 +301,11 @@ public class DbProvisioner implements InitializingBean {
         HTL.setMethod(gTransformation);
         operations.add(HTL);
 
+        Operation tempMatching = new Operation();
+        tempMatching.setName("Template Matching");
+        tempMatching.setMethod(tmplMatching);
+        operations.add(tempMatching);
+
 
         operationDAO.save(operations);
 
@@ -334,6 +348,9 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(rotating.getOperationId(), GeometricTransformations.class, GeometricTransformationEnum.ROTATE.getGgometricTransformationName());
         operationRegister.register(HTC.getOperationId(), GeometricTransformations.class, HoughTransformationEnum.CIRCLE.getGgometricTransformationName());
         operationRegister.register(HTL.getOperationId(), GeometricTransformations.class, HoughTransformationEnum.LINE.getGgometricTransformationName());
+
+        operationRegister.register(tempMatching.getOperationId(), TemplateSearch.class, TemplateEnum.TM.getTemplateName());
+
 
         Attribute step = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
@@ -696,6 +713,45 @@ public class DbProvisioner implements InitializingBean {
         rotateOp_B.setAttributeType(AttributeType.SELECT);
         rotateOp_B.setOptions(interpolations);
         operationAttributes.add(rotateOp_B);
+
+        OperationAttributes tmplM_A = new OperationAttributes();
+        Map<String, String> tmplMethods = new HashMap<>();
+        tmplMethods.put(TemplateEnum.TM_CCOEFF.getTemplateName(), TemplateEnum.TM_CCOEFF.getTemplateName());
+        tmplMethods.put(TemplateEnum.TM_CCOEFF_NORMED.getTemplateName(), TemplateEnum.TM_CCORR_NORMED.getTemplateName());
+        tmplMethods.put(TemplateEnum.TM_CCORR.getTemplateName(), TemplateEnum.TM_CCORR.getTemplateName());
+        tmplMethods.put(TemplateEnum.TM_CCORR_NORMED.getTemplateName(), TemplateEnum.TM_CCORR_NORMED.getTemplateName());
+        tmplMethods.put(TemplateEnum.TM_SQDIFF.getTemplateName(), TemplateEnum.TM_SQDIFF.getTemplateName());
+        tmplMethods.put(TemplateEnum.TM_SQDIFF_NORMED.getTemplateName(), TemplateEnum.TM_SQDIFF_NORMED.getTemplateName());
+        tmplM_A.setDefaultValues(TemplateEnum.TM_CCOEFF.getTemplateName());
+        tmplM_A.setOperation(tempMatching);
+        tmplM_A.setAttribute(method);
+        tmplM_A.setAttributeType(AttributeType.SELECT);
+        tmplM_A.setOptions(tmplMethods);
+        operationAttributes.add(tmplM_A);
+
+        OperationAttributes tmplM_B = new OperationAttributes();
+        tmplM_B.setOperation(tempMatching);
+        tmplM_B.setAttribute(mask);
+        tmplM_B.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(tmplM_B);
+
+        OperationAttributes tmplM_C = new OperationAttributes();
+        Map<String, String> tmplMethods_A = new HashMap<>();
+        tmplMethods_A.put("Red", "Red");
+        tmplMethods_A.put("Green", "Green");
+        tmplMethods_A.put("Blue", "Blue");
+        tmplMethods_A.put("Gray", "Gray");
+        tmplMethods_A.put("Y", "Y");
+        tmplMethods_A.put("Cb", "Cb");
+        tmplMethods_A.put("Cr", "Cr");
+        tmplM_C.setDefaultValues("Gray");
+        tmplM_C.setOperation(tempMatching);
+        tmplM_C.setAttribute(channel);
+        tmplM_C.setAttributeType(AttributeType.SELECT);
+        tmplM_C.setOptions(tmplMethods_A);
+        operationAttributes.add(tmplM_C);
+
+
         operationDAO.save(operationAttributes);
 
 
@@ -1327,6 +1383,40 @@ public class DbProvisioner implements InitializingBean {
         allowHTL_C.setAllowoperationId(canny.getOperationId());
         allowSteps.add(allowHTL_C);
 
+        AllowStep allowStep_tmpl_A = new AllowStep();
+        allowStep_tmpl_A.setOperation(tempMatching);
+        allowStep_tmpl_A.setAllowoperationId(redOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_A);
+
+        AllowStep allowStep_tmpl_B = new AllowStep();
+        allowStep_tmpl_B.setOperation(tempMatching);
+        allowStep_tmpl_B.setAllowoperationId(greenOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_B);
+
+        AllowStep allowStep_tmpl_C = new AllowStep();
+        allowStep_tmpl_C.setOperation(tempMatching);
+        allowStep_tmpl_C.setAllowoperationId(blueOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_C);
+
+        AllowStep allowStep_tmpl_D = new AllowStep();
+        allowStep_tmpl_D.setOperation(tempMatching);
+        allowStep_tmpl_D.setAllowoperationId(grayOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_D);
+
+        AllowStep allowStep_tmpl_E = new AllowStep();
+        allowStep_tmpl_E.setOperation(tempMatching);
+        allowStep_tmpl_E.setAllowoperationId(yOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_E);
+
+        AllowStep allowStep_tmpl_F = new AllowStep();
+        allowStep_tmpl_F.setOperation(tempMatching);
+        allowStep_tmpl_F.setAllowoperationId(cbOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_F);
+
+        AllowStep allowStep_tmpl_G = new AllowStep();
+        allowStep_tmpl_G.setOperation(tempMatching);
+        allowStep_tmpl_G.setAllowoperationId(crOperation.getOperationId());
+        allowSteps.add(allowStep_tmpl_G);
 
         allowStepDAO.save(allowSteps);
     }

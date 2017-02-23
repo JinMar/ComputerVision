@@ -101,17 +101,27 @@ public class JsonReceive {
         String chainId = requestData.get(0).getChainId();
         logger.info("Chain screening {}", chainId);
         WrappedChainDTO result = new WrappedChainDTO();
-
-        if (contentProviderService.isChainReady(chainId)) {
-            result.setMessage("Chain is ready !!!");
-            result.setParts(contentProviderService.getCompletedParts(chainId));
-            result.setReady(true);
-        } else {
-            result.setMessage("Chain is not ready !!!");
-            result.setParts(contentProviderService.getCompletedParts(chainId));
-            result.setReady(false);
+        ChainInfoDTO info = contentProviderService.isChainReady(chainId);
+        switch (info.getState()) {
+            case COMPLETE:
+                result.setMessage("Chain is ready !!!");
+                result.setParts(contentProviderService.getCompletedParts(chainId));
+                result.setReady(true);
+                result.setError(false);
+                break;
+            case ACTIVE:
+            case PROCESSING:
+                result.setMessage("Chain is not ready !!!");
+                result.setParts(contentProviderService.getCompletedParts(chainId));
+                result.setReady(false);
+                result.setError(false);
+                break;
+            case ERROR:
+                result.setMessage("Failed -" + info.getMessage());
+                result.setParts(contentProviderService.getCompletedParts(chainId));
+                result.setReady(true);
+                result.setError(true);
         }
-
 
         return result;
     }

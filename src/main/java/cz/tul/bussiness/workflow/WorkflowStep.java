@@ -1,6 +1,7 @@
 package cz.tul.bussiness.workflow;
 
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.bussiness.register.MethodFactory;
 import cz.tul.bussiness.register.exceptions.IllegalInputException;
 import cz.tul.bussiness.workers.IMethodWorker;
@@ -27,14 +28,14 @@ public class WorkflowStep {
     private Part part;
     private PartDAO partDAO;
 
-    public WorkflowStep(BufferedImage sourceImage, Part part, boolean firstStep, PartDAO partDAO) throws NoDataFound, SelectionLayerException {
+    public WorkflowStep(BufferedImage sourceImage, Part part, boolean firstStep, PartDAO partDAO) throws NoDataFound, SelectionLayerException, IllegalAccessException, NoTemplateFound, MinimalArgumentsException, InstantiationException, IllegalInputException, ClassNotFoundException {
         this.sourceImage = sourceImage;
         this.part = part;
         this.partDAO = partDAO;
         makeStep(firstStep);
     }
 
-    private void makeStep(boolean firstStep) throws NoDataFound, SelectionLayerException {
+    private void makeStep(boolean firstStep) throws NoDataFound, SelectionLayerException, MinimalArgumentsException, NoTemplateFound, IllegalInputException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         logger.info("WorkflowStep started");
         IMethodWorker methodWorker = null;
         if (sourceImage == null && !firstStep) {
@@ -56,16 +57,6 @@ public class WorkflowStep {
         } catch (NullPointerException np) {
             part.setState("ERROR");
             partDAO.update(part);
-        } catch (IllegalInputException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (MinimalArgumentsException e) {
-            e.printStackTrace();
         }
 
         if (methodWorker != null) {

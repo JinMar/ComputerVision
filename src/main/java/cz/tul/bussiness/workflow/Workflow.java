@@ -1,5 +1,8 @@
 package cz.tul.bussiness.workflow;
 
+import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
+import cz.tul.bussiness.register.exceptions.IllegalInputException;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import cz.tul.bussiness.workflow.exceptions.NoDataFound;
 import cz.tul.entities.Chain;
@@ -22,7 +25,7 @@ public class Workflow {
     private static final Logger logger = LoggerFactory.getLogger(Workflow.class);
     private ChainDAO chainDAO;
     private PartDAO partDAO;
-
+    private String message = "";
     private Chain chain;
 
     private List<Part> sortedParts;
@@ -57,19 +60,38 @@ public class Workflow {
     }
 
     private BufferedImage processStep(BufferedImage data, Part part, boolean firstStep) throws NoDataFound, SelectionLayerException {
-        WorkflowStep processedStep = new WorkflowStep(data, part, firstStep, partDAO);
-        BufferedImage result = processedStep.getData();
-        if (result != null) {
+        WorkflowStep processedStep = null;
+        BufferedImage result = null;
+        try {
+            processedStep = new WorkflowStep(data, part, firstStep, partDAO);
+            result = processedStep.getData();
+            if (result != null) {
 
-            part.setState(StateEnum.COMPLETE.getState());
-        } else {
-            if (firstStep) {
                 part.setState(StateEnum.COMPLETE.getState());
             } else {
-                part.setState(StateEnum.ERROR.getState());
+                if (firstStep) {
+                    part.setState(StateEnum.COMPLETE.getState());
+                } else {
+                    part.setState(StateEnum.ERROR.getState());
+                }
             }
+
+        } catch (IllegalAccessException e) {
+            message = e.getMessage();
+        } catch (NoTemplateFound e) {
+            message = e.getMessage();
+        } catch (MinimalArgumentsException e) {
+            message = e.getMessage();
+        } catch (InstantiationException e) {
+            message = e.getMessage();
+        } catch (IllegalInputException e) {
+            message = e.getMessage();
+        } catch (ClassNotFoundException e) {
+            message = e.getMessage();
+        } finally {
+            partDAO.update(part);
         }
-        partDAO.update(part);
+
         return result;
 
     }
@@ -85,6 +107,7 @@ public class Workflow {
             case ERROR:
                 chain.setState(StateEnum.ERROR.getState());
                 logger.error("Error occurred");
+                chain.setMessage(message);
                 break;
             case COMPLETE:
                 logger.info("Chain with id: " + chain.getChainId() + " is completed");
@@ -95,8 +118,6 @@ public class Workflow {
         chainDAO.update(chain);
 
     }
-
-
 
 
 }

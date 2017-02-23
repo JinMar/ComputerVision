@@ -222,8 +222,8 @@ public class ContentProviderService {
         return chain.getChainId();
     }
 
-    public boolean isChainReady(String chainId) {
-        boolean result = chainDAO.isChainCompleted(chainId);
+    public ChainInfoDTO isChainReady(String chainId) {
+        ChainInfoDTO result = chainDAO.isChainCompleted(chainId);
         logger.info("Chain is ready: " + result);
         return result;
     }

@@ -98,6 +98,7 @@ $(document).ready(function () {
             }
         });
     }
+
     function loadChain() {
 
         var dataToSend = [];
@@ -121,7 +122,14 @@ $(document).ready(function () {
             success: function (data) {
 
                 if (data.ready == true) {
-
+                    if (data.error == true) {
+                        $(".message").empty();
+                        $(".message").append("<div class='alert alert-danger'>" +
+                            "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" +
+                            " <strong>FAILED!</strong> " + data.message + "</div>");
+                        alert(data.error);
+                        alert(data.message);
+                    }
 
                     clearInterval(interval);
                     reDraw(data);
@@ -140,6 +148,7 @@ $(document).ready(function () {
             }
         });
     }
+
     function reDraw(data) {
         $('#sortable li').each(function () {
             var number = this.id.split("-")[1];

@@ -22,8 +22,20 @@ public class Resize extends AJob {
 
 
     @Override
-    public BufferedImage start() throws MinimalArgumentsException {
-        init();
+    protected void init() throws MinimalArgumentsException {
+        int tmp = 0;
+        for (PartAttributeValue att : getAttributes()) {
+            if (att.getOperationAttributes().getAttribute().getName().equals("Velikost")) {
+                tmp = Integer.parseInt(att.getValue());
+                size = tmp / 100.0;
+            }
+
+
+        }
+    }
+
+    @Override
+    protected BufferedImage procces() {
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         result = new Mat((int) (BGR.rows() * size), (int) (BGR.cols() * size), CvType.CV_8UC3);
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
@@ -41,19 +53,5 @@ public class Resize extends AJob {
         BufferedImage resultImgData = new BufferedImage(result.cols(), result.rows(), BufferedImage.TYPE_3BYTE_BGR);
         resultImgData.getRaster().setDataElements(0, 0, result.cols(), result.rows(), finalData);
         return resultImgData;
-    }
-
-
-    @Override
-    protected void init() throws MinimalArgumentsException {
-        int tmp = 0;
-        for (PartAttributeValue att : getAttributes()) {
-            if (att.getOperationAttributes().getAttribute().getName().equals("Velikost")) {
-                tmp = Integer.parseInt(att.getValue());
-                size = tmp / 100.0;
-            }
-
-
-        }
     }
 }

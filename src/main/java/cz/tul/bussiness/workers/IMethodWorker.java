@@ -1,6 +1,7 @@
 package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
+import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import cz.tul.entities.PartAttributeValue;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 public interface IMethodWorker {
     String getRealPath();
 
-    void work() throws SelectionLayerException, MinimalArgumentsException;
+    void work() throws SelectionLayerException, MinimalArgumentsException, NoTemplateFound;
 
     void setAttributes(Set<PartAttributeValue> attributes);
 
