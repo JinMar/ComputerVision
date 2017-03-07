@@ -33,6 +33,7 @@ public abstract class AMethodWorker implements IMethodWorker {
     protected Mat BGR;
     protected List<Mat> channels = new ArrayList<>();
     private IJob work;
+    protected BufferedImage originalImageData;
 
     public IJob getWork() {
         return work;
@@ -104,6 +105,11 @@ public abstract class AMethodWorker implements IMethodWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setOriginalImageData(BufferedImage originalImageData) {
+        this.originalImageData = originalImageData;
     }
 
     private void createhist() {

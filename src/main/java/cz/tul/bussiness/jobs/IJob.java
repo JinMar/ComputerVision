@@ -16,4 +16,6 @@ public interface IJob {
     void setPartAttributeValue(Set<PartAttributeValue> attributeValues);
 
     void setImgData(BufferedImage imgData);
+
+    void setOriginalImgData(BufferedImage imgData);
 }

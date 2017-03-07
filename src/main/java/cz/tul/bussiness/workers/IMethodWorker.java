@@ -14,6 +14,13 @@ import java.util.Set;
 public interface IMethodWorker {
     String getRealPath();
 
+    /**
+     * Metoda vykoná požadovanou funkci
+     *
+     * @throws SelectionLayerException   - Výjimka  je vyhozena v případě když, není vybrána správná vrstva pro zpracování, možnosti jsou 0, 1, 2
+     * @throws MinimalArgumentsException - Výjimka je vyhozena v případě, že funkce nemá dostatečné množství argumentů
+     * @throws NoTemplateFound           - Výjimka je vyhozena v případě že neni zadána šablona pro template matching
+     */
     void work() throws SelectionLayerException, MinimalArgumentsException, NoTemplateFound;
 
     void setAttributes(Set<PartAttributeValue> attributes);
@@ -27,4 +34,8 @@ public interface IMethodWorker {
     void saveImg();
 
     void setClassifier(String classifier);
+
+    void setOriginalImageData(BufferedImage originalImageData);
+
+
 }

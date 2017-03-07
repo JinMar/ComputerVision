@@ -28,11 +28,17 @@ public abstract class AJob implements IJob {
     protected List<Mat> channels = new ArrayList<>();
     protected List<Mat> channelsRGB = new ArrayList<>();
     protected byte[] finalData;
+    protected BufferedImage originalImgData;
 
     @Override
     public void setImgData(BufferedImage imgData) {
         this.imgData = imgData;
 
+    }
+
+    @Override
+    public void setOriginalImgData(BufferedImage originalImgData) {
+        this.originalImgData = originalImgData;
     }
 
     @Override

@@ -75,7 +75,7 @@ public class DbProvisioner implements InitializingBean {
         morphology.setName("Morphology operations");
         functions.add(morphology);
         Function segment = new Function();
-        segment.setName("Segmentor");
+        segment.setName("Segmentation");
         functions.add(segment);
         Function tmpMatching = new Function();
         tmpMatching.setName("Template Matching");
@@ -134,6 +134,11 @@ public class DbProvisioner implements InitializingBean {
         thresholding.setName("Thresholding");
         methods.add(thresholding);
 
+        Method distancTransform = new Method();
+        distancTransform.setFunction(segment);
+        distancTransform.setName("Distance trensfrom.");
+        methods.add(distancTransform);
+
         Method bin = new Method();
         bin.setFunction(morphology);
         bin.setName("Binary");
@@ -151,7 +156,7 @@ public class DbProvisioner implements InitializingBean {
 
         Method tmplMatching = new Method();
         tmplMatching.setFunction(tmpMatching);
-        tmplMatching.setName("Geom. Transformations");
+        tmplMatching.setName("Template Matching");
         methods.add(tmplMatching);
 
         methodDAO.save(methods);
@@ -306,8 +311,17 @@ public class DbProvisioner implements InitializingBean {
         tempMatching.setMethod(tmplMatching);
         operations.add(tempMatching);
 
+        Operation distTransfrom = new Operation();
+        distTransfrom.setName("Distance Transform");
+        distTransfrom.setMethod(distancTransform);
+        operations.add(distTransfrom);
 
-        operationDAO.save(operations);
+        Operation watershed = new Operation();
+        watershed.setName("Watershed");
+        watershed.setMethod(distancTransform);
+        operations.add(watershed);
+
+        operationDAO.save(watershed);
 
 
         operationRegister.register(originalOperation.getOperationId(), OriginalRGB.class, ChannelsEnum.ORIGINAL.getChannelName());
@@ -337,6 +351,8 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(THRESH_TOZERO.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_TOZERO.getSegmentorName());
         operationRegister.register(THRESH_TRUNC.getOperationId(), Segmentation.class, SegmentorEnum.THRESH_TRUNC.getSegmentorName());
         operationRegister.register(colorSeg.getOperationId(), Segmentation.class, SegmentorEnum.COLORING.getSegmentorName());
+        operationRegister.register(distTransfrom.getOperationId(), SegmentationW.class, SegmentorEnum.DISTANCETRANSFORM.getSegmentorName());
+        operationRegister.register(watershed.getOperationId(), SegmentationW.class, SegmentorEnum.WATERSHED.getSegmentorName());
 
         operationRegister.register(erode.getOperationId(), MorfologyTransformations.class, MorphologyEnum.ERODE.getMorphologyName());
         operationRegister.register(dilate.getOperationId(), MorfologyTransformations.class, MorphologyEnum.DILATE.getMorphologyName());
@@ -370,6 +386,7 @@ public class DbProvisioner implements InitializingBean {
         Attribute ratio = new Attribute("Poměr");
         Attribute minLen = new Attribute("Min. délka");
         Attribute maxLineGap = new Attribute("Min. Line Gap");
+        Attribute metrics = new Attribute("Metrika");
 
         attributes.add(type);
         attributes.add(channel);
@@ -386,6 +403,7 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(minDist);
         attributes.add(ratio);
         attributes.add(minLen);
+        attributes.add(metrics);
         attributeDAO.save(attributes);
 
         /*
@@ -751,6 +769,30 @@ public class DbProvisioner implements InitializingBean {
         tmplM_C.setOptions(tmplMethods_A);
         operationAttributes.add(tmplM_C);
 
+        OperationAttributes dstTrans_A = new OperationAttributes();
+        Map<String, String> distTransMethods_A = new HashMap<>();
+        distTransMethods_A.put("DIST_L1", "DIST_L1");
+        distTransMethods_A.put("DIST_L2", "DIST_L2");
+        distTransMethods_A.put("DIST_C", "DIST_C");
+        dstTrans_A.setDefaultValues("DIST_L1");
+        dstTrans_A.setOperation(distTransfrom);
+        dstTrans_A.setAttribute(metrics);
+        dstTrans_A.setAttributeType(AttributeType.SELECT);
+        dstTrans_A.setOptions(distTransMethods_A);
+        operationAttributes.add(dstTrans_A);
+
+
+        OperationAttributes dstTrans_B = new OperationAttributes();
+        Map<String, String> distTransMethods_B = new HashMap<>();
+        distTransMethods_B.put("DIST_MASK_3", "3×3");
+        distTransMethods_B.put("DIST_MASK_5", "5×5");
+        dstTrans_B.setDefaultValues("DIST_MASK_3");
+        dstTrans_B.setOperation(distTransfrom);
+        dstTrans_B.setAttribute(mask);
+        dstTrans_B.setAttributeType(AttributeType.SELECT);
+        dstTrans_B.setOptions(distTransMethods_B);
+        operationAttributes.add(dstTrans_B);
+
 
         operationDAO.save(operationAttributes);
 
@@ -947,6 +989,12 @@ public class DbProvisioner implements InitializingBean {
         allowStep_threshold_g.setAllowoperationId(grayOperation.getOperationId());
         allowSteps.add(allowStep_threshold_g);
 
+        AllowStep allowStep_threshold_h = new AllowStep();
+        allowStep_threshold_h.setOperation(THRESH_BINARY);
+        allowStep_threshold_h.setAllowoperationId(distTransfrom.getOperationId());
+        allowSteps.add(allowStep_threshold_h);
+
+
         //
         AllowStep allowStep_threshold_aa = new AllowStep();
         allowStep_threshold_aa.setOperation(THRESH_BINARY_INV);
@@ -979,9 +1027,14 @@ public class DbProvisioner implements InitializingBean {
         allowSteps.add(allowStep_threshold_ff);
 
         AllowStep allowStep_threshold_gg = new AllowStep();
-        allowStep_threshold_gg.setOperation(THRESH_TOZERO);
+        allowStep_threshold_gg.setOperation(THRESH_BINARY_INV);
         allowStep_threshold_gg.setAllowoperationId(grayOperation.getOperationId());
         allowSteps.add(allowStep_threshold_gg);
+
+        AllowStep allowStep_threshold_hh = new AllowStep();
+        allowStep_threshold_hh.setOperation(THRESH_BINARY_INV);
+        allowStep_threshold_hh.setAllowoperationId(distTransfrom.getOperationId());
+        allowSteps.add(allowStep_threshold_hh);
         //
         AllowStep allowStep_threshold_aaa = new AllowStep();
         allowStep_threshold_aaa.setOperation(THRESH_TOZERO);
@@ -1017,6 +1070,11 @@ public class DbProvisioner implements InitializingBean {
         allowStep_threshold_ggg.setOperation(THRESH_TOZERO);
         allowStep_threshold_ggg.setAllowoperationId(crOperation.getOperationId());
         allowSteps.add(allowStep_threshold_ggg);
+
+        AllowStep allowStep_threshold_hhh = new AllowStep();
+        allowStep_threshold_hhh.setOperation(THRESH_TOZERO);
+        allowStep_threshold_hhh.setAllowoperationId(distTransfrom.getOperationId());
+        allowSteps.add(allowStep_threshold_hhh);
 ////////////
         AllowStep allowStep_threshold_aaaa = new AllowStep();
         allowStep_threshold_aaaa.setOperation(THRESH_TRUNC);
@@ -1052,6 +1110,11 @@ public class DbProvisioner implements InitializingBean {
         allowStep_threshold_gggg.setOperation(THRESH_TRUNC);
         allowStep_threshold_gggg.setAllowoperationId(crOperation.getOperationId());
         allowSteps.add(allowStep_threshold_gggg);
+
+        AllowStep allowStep_threshold_hhhh = new AllowStep();
+        allowStep_threshold_hhhh.setOperation(THRESH_TRUNC);
+        allowStep_threshold_hhhh.setAllowoperationId(distTransfrom.getOperationId());
+        allowSteps.add(allowStep_threshold_hhhh);
         //////////////////////////////////
         AllowStep allowStep_coloring_a = new AllowStep();
         allowStep_coloring_a.setOperation(colorSeg);
@@ -1417,6 +1480,79 @@ public class DbProvisioner implements InitializingBean {
         allowStep_tmpl_G.setOperation(tempMatching);
         allowStep_tmpl_G.setAllowoperationId(crOperation.getOperationId());
         allowSteps.add(allowStep_tmpl_G);
+///
+        AllowStep allowDistTrans_A = new AllowStep();
+        allowDistTrans_A.setOperation(distTransfrom);
+        allowDistTrans_A.setAllowoperationId(open.getOperationId());
+        allowSteps.add(allowDistTrans_A);
+
+        AllowStep allowDistTrans_B = new AllowStep();
+        allowDistTrans_B.setOperation(distTransfrom);
+        allowDistTrans_B.setAllowoperationId(close.getOperationId());
+        allowSteps.add(allowDistTrans_B);
+
+        AllowStep allowDistTrans_C = new AllowStep();
+        allowDistTrans_C.setOperation(distTransfrom);
+        allowDistTrans_C.setAllowoperationId(erode.getOperationId());
+        allowSteps.add(allowDistTrans_C);
+
+        AllowStep allowDistTrans_D = new AllowStep();
+        allowDistTrans_D.setOperation(distTransfrom);
+        allowDistTrans_D.setAllowoperationId(dilate.getOperationId());
+        allowSteps.add(allowDistTrans_D);
+
+        AllowStep allowDistTrans_E = new AllowStep();
+        allowDistTrans_E.setOperation(distTransfrom);
+        allowDistTrans_E.setAllowoperationId(THRESH_BINARY.getOperationId());
+        allowSteps.add(allowDistTrans_E);
+
+        AllowStep allowDistTrans_F = new AllowStep();
+        allowDistTrans_F.setOperation(distTransfrom);
+        allowDistTrans_F.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        allowSteps.add(allowDistTrans_F);
+
+        AllowStep allowDistTrans_G = new AllowStep();
+        allowDistTrans_G.setOperation(distTransfrom);
+        allowDistTrans_G.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        allowSteps.add(allowDistTrans_G);
+
+        AllowStep allowDistTrans_H = new AllowStep();
+        allowDistTrans_H.setOperation(distTransfrom);
+        allowDistTrans_H.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        allowSteps.add(allowDistTrans_H);
+
+        AllowStep allowDistTrans_I = new AllowStep();
+        allowDistTrans_I.setOperation(distTransfrom);
+        allowDistTrans_I.setAllowoperationId(topHat.getOperationId());
+        allowSteps.add(allowDistTrans_I);
+
+        //
+
+        AllowStep allowDWatershed_A = new AllowStep();
+        allowDWatershed_A.setOperation(watershed);
+        allowDWatershed_A.setAllowoperationId(THRESH_BINARY.getOperationId());
+        allowSteps.add(allowDWatershed_A);
+
+        AllowStep allowDWatershed_B = new AllowStep();
+        allowDWatershed_B.setOperation(watershed);
+        allowDWatershed_B.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
+        allowSteps.add(allowDWatershed_B);
+
+        AllowStep allowDWatershed_C = new AllowStep();
+        allowDWatershed_C.setOperation(watershed);
+        allowDWatershed_C.setAllowoperationId(THRESH_TOZERO.getOperationId());
+        allowSteps.add(allowDWatershed_C);
+
+        AllowStep allowDWatershed_D = new AllowStep();
+        allowDWatershed_D.setOperation(watershed);
+        allowDWatershed_D.setAllowoperationId(THRESH_TRUNC.getOperationId());
+        allowSteps.add(allowDWatershed_D);
+
+        AllowStep allowDWatershed_E = new AllowStep();
+        allowDWatershed_E.setOperation(watershed);
+        allowDWatershed_E.setAllowoperationId(colorSeg.getOperationId());
+        allowSteps.add(allowDWatershed_E);
+
 
         allowStepDAO.save(allowSteps);
     }

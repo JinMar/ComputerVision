@@ -27,11 +27,13 @@ public class WorkflowStep {
     private BufferedImage sourceImage = null;
     private Part part;
     private PartDAO partDAO;
+    private BufferedImage originallImageSource;
 
-    public WorkflowStep(BufferedImage sourceImage, Part part, boolean firstStep, PartDAO partDAO) throws NoDataFound, SelectionLayerException, IllegalAccessException, NoTemplateFound, MinimalArgumentsException, InstantiationException, IllegalInputException, ClassNotFoundException {
+    public WorkflowStep(BufferedImage sourceImage, Part part, boolean firstStep, PartDAO partDAO, BufferedImage originallImageSource) throws NoDataFound, SelectionLayerException, IllegalAccessException, NoTemplateFound, MinimalArgumentsException, InstantiationException, IllegalInputException, ClassNotFoundException {
         this.sourceImage = sourceImage;
         this.part = part;
         this.partDAO = partDAO;
+        this.originallImageSource = originallImageSource;
         makeStep(firstStep);
     }
 
@@ -49,6 +51,7 @@ public class WorkflowStep {
             methodWorker.setAttributes(attributesPart);
             methodWorker.setImgName(part.getPartId());
             methodWorker.setImgData(sourceImage);
+            methodWorker.setOriginalImageData(originallImageSource);
             methodWorker.work();
             part.setUrl("/img/" + part.getPartId() + ".jpg");
             part.setHistogramUrl("/img/histogram-" + part.getPartId() + ".jpg");
@@ -71,6 +74,10 @@ public class WorkflowStep {
 
     public void setPartDAO(PartDAO partDAO) {
         this.partDAO = partDAO;
+    }
+
+    public void setOriginallImageSource(BufferedImage originallImageSource) {
+        this.originallImageSource = originallImageSource;
     }
 
     public BufferedImage getData() {

@@ -27,7 +27,7 @@ public class Workflow {
     private PartDAO partDAO;
     private String message = "";
     private Chain chain;
-
+    private BufferedImage originalImageData;
     private List<Part> sortedParts;
 
 
@@ -47,6 +47,7 @@ public class Workflow {
         boolean firstStep = true;
         for (Part part : sortedParts) {
             try {
+
                 data = processStep(data, part, firstStep);
             } catch (NoDataFound noDataFound) {
                 noDataFound.printStackTrace();
@@ -63,7 +64,14 @@ public class Workflow {
         WorkflowStep processedStep = null;
         BufferedImage result = null;
         try {
-            processedStep = new WorkflowStep(data, part, firstStep, partDAO);
+            if (firstStep) {
+                processedStep = new WorkflowStep(data, part, firstStep, partDAO, null);
+                originalImageData = processedStep.getData();
+
+            } else {
+                processedStep = new WorkflowStep(data, part, firstStep, partDAO, originalImageData);
+
+            }
             result = processedStep.getData();
             if (result != null) {
 
@@ -78,16 +86,25 @@ public class Workflow {
 
         } catch (IllegalAccessException e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } catch (NoTemplateFound e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } catch (MinimalArgumentsException e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } catch (InstantiationException e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } catch (IllegalInputException e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } catch (ClassNotFoundException e) {
             message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
+        } catch (UnsupportedOperationException e) {
+            message = e.getMessage();
+            part.setState(StateEnum.ERROR.getState());
         } finally {
             partDAO.update(part);
         }
