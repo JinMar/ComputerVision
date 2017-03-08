@@ -61,5 +61,5 @@ public abstract class AJob implements IJob {
 
     protected abstract void init() throws MinimalArgumentsException, NoTemplateFound;
 
-    protected abstract BufferedImage procces();
+    protected abstract BufferedImage procces() throws NoTemplateFound;
 }

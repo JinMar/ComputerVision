@@ -2,7 +2,7 @@ package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
-import cz.tul.bussiness.jobs.templateMatching.TemplateMatching;
+import cz.tul.bussiness.jobs.functions.TemplateMatching;
 import cz.tul.bussiness.workers.enums.TemplateEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import org.slf4j.Logger;

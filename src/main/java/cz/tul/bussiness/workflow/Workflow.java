@@ -106,6 +106,7 @@ public class Workflow {
             message = e.getMessage();
             part.setState(StateEnum.ERROR.getState());
         } finally {
+
             partDAO.update(part);
         }
 

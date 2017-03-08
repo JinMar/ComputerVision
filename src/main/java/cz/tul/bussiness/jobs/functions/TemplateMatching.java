@@ -1,4 +1,4 @@
-package cz.tul.bussiness.jobs.templateMatching;
+package cz.tul.bussiness.jobs.functions;
 
 import cz.tul.bussiness.jobs.AJob;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;

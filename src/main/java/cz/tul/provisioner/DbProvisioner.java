@@ -77,9 +77,9 @@ public class DbProvisioner implements InitializingBean {
         Function segment = new Function();
         segment.setName("Segmentation");
         functions.add(segment);
-        Function tmpMatching = new Function();
-        tmpMatching.setName("Template Matching");
-        functions.add(tmpMatching);
+        Function othterFCE = new Function();
+        othterFCE.setName("Other functions");
+        functions.add(othterFCE);
 
 
         Function geometricTransformation = new Function();
@@ -155,9 +155,14 @@ public class DbProvisioner implements InitializingBean {
         methods.add(gTransformation);
 
         Method tmplMatching = new Method();
-        tmplMatching.setFunction(tmpMatching);
+        tmplMatching.setFunction(othterFCE);
         tmplMatching.setName("Template Matching");
         methods.add(tmplMatching);
+
+        Method grabCut = new Method();
+        grabCut.setFunction(othterFCE);
+        grabCut.setName("GrabCut");
+        methods.add(grabCut);
 
         methodDAO.save(methods);
 
@@ -311,6 +316,16 @@ public class DbProvisioner implements InitializingBean {
         tempMatching.setMethod(tmplMatching);
         operations.add(tempMatching);
 
+        Operation gCut = new Operation();
+        gCut.setName("Rect");
+        gCut.setMethod(grabCut);
+        operations.add(gCut);
+
+        Operation gCutM = new Operation();
+        gCutM.setName("Mask");
+        gCutM.setMethod(grabCut);
+        operations.add(gCutM);
+
         Operation distTransfrom = new Operation();
         distTransfrom.setName("Distance Transform");
         distTransfrom.setMethod(distancTransform);
@@ -366,7 +381,8 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(HTL.getOperationId(), GeometricTransformations.class, HoughTransformationEnum.LINE.getGgometricTransformationName());
 
         operationRegister.register(tempMatching.getOperationId(), TemplateSearch.class, TemplateEnum.TM.getTemplateName());
-
+        operationRegister.register(gCut.getOperationId(), ExtractForeground.class, ExtractForegroundEnum.EXTRACT_FOREGROUND.getExtractForegroundName());
+        operationRegister.register(gCutM.getOperationId(), ExtractForeground.class, ExtractForegroundEnum.EXTRACT_FOREGROUND_MASK.getExtractForegroundName());
 
         Attribute step = new Attribute("Krok");
         Attribute shape = new Attribute("Tvar");
@@ -387,6 +403,10 @@ public class DbProvisioner implements InitializingBean {
         Attribute minLen = new Attribute("Min. délka");
         Attribute maxLineGap = new Attribute("Min. Line Gap");
         Attribute metrics = new Attribute("Metrika");
+        Attribute startX = new Attribute("Počatek X");
+        Attribute startY = new Attribute("Počatek Y");
+        Attribute w = new Attribute("Výška");
+        Attribute h = new Attribute("Šířka");
 
         attributes.add(type);
         attributes.add(channel);
@@ -792,6 +812,45 @@ public class DbProvisioner implements InitializingBean {
         dstTrans_B.setAttributeType(AttributeType.SELECT);
         dstTrans_B.setOptions(distTransMethods_B);
         operationAttributes.add(dstTrans_B);
+
+
+        OperationAttributes grapCat_A = new OperationAttributes();
+        grapCat_A.setOperation(gCut);
+        grapCat_A.setDefaultValues("0");
+        grapCat_A.setMinValue(0);
+        grapCat_A.setAttribute(startX);
+        grapCat_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(grapCat_A);
+
+        OperationAttributes grapCat_B = new OperationAttributes();
+        grapCat_B.setOperation(gCut);
+        grapCat_B.setDefaultValues("0");
+        grapCat_B.setMinValue(0);
+        grapCat_B.setAttribute(startY);
+        grapCat_B.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(grapCat_B);
+
+        OperationAttributes grapCat_C = new OperationAttributes();
+        grapCat_C.setOperation(gCut);
+        grapCat_C.setDefaultValues("0");
+        grapCat_C.setMinValue(0);
+        grapCat_C.setAttribute(h);
+        grapCat_C.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(grapCat_C);
+
+        OperationAttributes grapCat_D = new OperationAttributes();
+        grapCat_D.setOperation(gCut);
+        grapCat_D.setDefaultValues("0");
+        grapCat_D.setMinValue(0);
+        grapCat_D.setAttribute(w);
+        grapCat_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(grapCat_D);
+
+        OperationAttributes grapCatM_A = new OperationAttributes();
+        grapCatM_A.setOperation(gCutM);
+        grapCatM_A.setAttribute(mask);
+        grapCatM_A.setAttributeType(AttributeType.IMAGE);
+        operationAttributes.add(grapCatM_A);
 
 
         operationDAO.save(operationAttributes);
@@ -1553,6 +1612,15 @@ public class DbProvisioner implements InitializingBean {
         allowDWatershed_E.setAllowoperationId(colorSeg.getOperationId());
         allowSteps.add(allowDWatershed_E);
 
+        AllowStep grabCut_A = new AllowStep();
+        grabCut_A.setOperation(gCut);
+        grabCut_A.setAllowoperationId(originalOperation.getOperationId());
+        allowSteps.add(grabCut_A);
+
+        AllowStep grabCut_B = new AllowStep();
+        grabCut_B.setOperation(gCutM);
+        grabCut_B.setAllowoperationId(originalOperation.getOperationId());
+        allowSteps.add(grabCut_B);
 
         allowStepDAO.save(allowSteps);
     }

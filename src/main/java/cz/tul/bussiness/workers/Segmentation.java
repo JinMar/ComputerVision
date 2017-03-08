@@ -16,6 +16,11 @@ import java.util.*;
 /**
  * Created by Bc. Marek Jindrák on 19.10.2016.
  */
+
+/**
+ * @deprecated Logika by měla být přesunuta do SegmentationW
+ */
+@Deprecated()
 public class Segmentation extends AMethodWorker {
     private static final Logger logger = LoggerFactory.getLogger(Segmentation.class);
     private int threshold;
