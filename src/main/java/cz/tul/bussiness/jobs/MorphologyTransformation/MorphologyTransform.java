@@ -4,10 +4,7 @@ import cz.tul.bussiness.jobs.AJob;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.entities.PartAttributeValue;
 import cz.tul.utilities.Utility;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,8 @@ public class MorphologyTransform extends AJob {
     private byte[] customlement = null;
     private boolean defaultShape = false;
     private int morphologyType = -1;
+    private int countOfIteration = 0;
+
 
     public MorphologyTransform(int morphologyType) {
         this.morphologyType = morphologyType;
@@ -46,6 +45,10 @@ public class MorphologyTransform extends AJob {
         for (PartAttributeValue att : getAttributes()) {
             if (att.getOperationAttributes().getAttribute().getName().equals("Velikost")) {
                 size = Integer.parseInt(att.getValue());
+                continue;
+            }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Iteration")) {
+                countOfIteration = Integer.parseInt(att.getValue());
                 continue;
             }
 
@@ -99,7 +102,7 @@ public class MorphologyTransform extends AJob {
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
         BGR.put(0, 0, sourceData);
         Core.split(BGR, channels);
-        Imgproc.morphologyEx(channels.get(0), result, morphologyType, element);
+        Imgproc.morphologyEx(channels.get(0), result, morphologyType, element, new Point(-1, -1), countOfIteration);
         Mat BGR = new Mat(channels.get(0).rows(), channels.get(0).cols(), CvType.CV_8UC3);
         List<Mat> RGB_ = new ArrayList<>();
         RGB_.add(result);
@@ -121,6 +124,12 @@ public class MorphologyTransform extends AJob {
         if (type.equals("rectangle")) {
             result = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(size, size));
         }
+        return result;
+    }
+
+    public static Mat transform(Mat source, int morphologyType, Mat element, int iterationCount) {
+        Mat result = new Mat(source.rows(), source.cols(), CvType.CV_8UC1);
+        Imgproc.morphologyEx(source, result, morphologyType, element, new Point(-1, -1), iterationCount);
         return result;
     }
 }

@@ -407,6 +407,17 @@ public class DbProvisioner implements InitializingBean {
         Attribute startY = new Attribute("Počatek Y");
         Attribute w = new Attribute("Výška");
         Attribute h = new Attribute("Šířka");
+        Attribute iteration = new Attribute("Iteration");
+
+        Attribute aIteration = new Attribute("A Iterace");
+        Attribute bIteration = new Attribute("B Iterace");
+        Attribute aThresh = new Attribute("A práh");
+        Attribute bThresh = new Attribute("B práh");
+        Attribute aMoType = new Attribute("A. Typ moph. t. ");
+        Attribute bMoType = new Attribute("B. Typ moph. t. ");
+        Attribute aThresType = new Attribute("A Thresh type");
+        Attribute bThresType = new Attribute("B Thresh type");
+
 
         attributes.add(type);
         attributes.add(channel);
@@ -424,6 +435,15 @@ public class DbProvisioner implements InitializingBean {
         attributes.add(ratio);
         attributes.add(minLen);
         attributes.add(metrics);
+        attributes.add(aIteration);
+        attributes.add(bIteration);
+        attributes.add(aThresh);
+        attributes.add(bThresh);
+        attributes.add(aMoType);
+        attributes.add(bMoType);
+        attributes.add(aThresType);
+        attributes.add(bThresType);
+        attributes.add(iteration);
         attributeDAO.save(attributes);
 
         /*
@@ -528,6 +548,15 @@ public class DbProvisioner implements InitializingBean {
         erodeM_C.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(erodeM_C);
 
+        OperationAttributes erodeM_D = new OperationAttributes();
+        erodeM_D.setOperation(erode);
+        erodeM_D.setAttribute(iteration);
+        erodeM_D.setMinValue(1);
+        erodeM_D.setMaxValue(15);
+        erodeM_D.setDefaultValues("1");
+        erodeM_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(erodeM_D);
+
 
 ////
         OperationAttributes dilateM_A = new OperationAttributes();
@@ -552,6 +581,15 @@ public class DbProvisioner implements InitializingBean {
         dilateM_C.setAttribute(mask);
         dilateM_C.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(dilateM_C);
+
+        OperationAttributes dilateM_D = new OperationAttributes();
+        dilateM_D.setOperation(dilate);
+        dilateM_D.setAttribute(iteration);
+        dilateM_D.setMinValue(1);
+        dilateM_D.setMaxValue(15);
+        dilateM_D.setDefaultValues("1");
+        dilateM_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(dilateM_D);
 
 
 ////
@@ -578,6 +616,15 @@ public class DbProvisioner implements InitializingBean {
         openM_C.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(openM_C);
 
+        OperationAttributes openM_D = new OperationAttributes();
+        openM_D.setOperation(open);
+        openM_D.setAttribute(iteration);
+        openM_D.setMinValue(1);
+        openM_D.setMaxValue(15);
+        openM_D.setDefaultValues("1");
+        openM_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(openM_D);
+
 
 ////
         OperationAttributes closeM_A = new OperationAttributes();
@@ -603,6 +650,15 @@ public class DbProvisioner implements InitializingBean {
         closeM_C.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(closeM_C);
 
+        OperationAttributes closeM_D = new OperationAttributes();
+        closeM_D.setOperation(close);
+        closeM_D.setAttribute(iteration);
+        closeM_D.setMinValue(1);
+        closeM_D.setMaxValue(15);
+        closeM_D.setDefaultValues("1");
+        closeM_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(closeM_D);
+
 
 ////
         OperationAttributes topHatM_A = new OperationAttributes();
@@ -627,6 +683,15 @@ public class DbProvisioner implements InitializingBean {
         topHatM_C.setAttribute(mask);
         topHatM_C.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(topHatM_C);
+
+        OperationAttributes topHatM_D = new OperationAttributes();
+        topHatM_D.setOperation(topHat);
+        topHatM_D.setAttribute(iteration);
+        topHatM_D.setMinValue(1);
+        topHatM_D.setMaxValue(15);
+        topHatM_D.setDefaultValues("1");
+        topHatM_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(topHatM_D);
 
 
 /////
@@ -851,6 +916,57 @@ public class DbProvisioner implements InitializingBean {
         grapCatM_A.setAttribute(mask);
         grapCatM_A.setAttributeType(AttributeType.IMAGE);
         operationAttributes.add(grapCatM_A);
+
+        /*
+        * Attribute aIteration = new Attribute("A Iterace");
+        Attribute bIteration = new Attribute("B Iterace");
+        Attribute aThresh = new Attribute("A práh");
+        Attribute bThresh = new Attribute("B práh");
+        Attribute aMoType = new Attribute("A. Typ moph. t. ");
+        Attribute bMoType = new Attribute("B. Typ moph. t. ");
+        Attribute aThresType = new Attribute("A Thresh type");
+        Attribute bThresType = new Attribute("B Thresh type");
+        * */
+
+        OperationAttributes waterShed_A = new OperationAttributes();
+        waterShed_A.setOperation(watershed);
+        waterShed_A.setAttribute(aThresh);
+        waterShed_A.setMinValue(0);
+        waterShed_A.setMaxValue(255);
+        waterShed_A.setDefaultValues("128");
+        waterShed_A.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(waterShed_A);
+
+        OperationAttributes waterShed_B = new OperationAttributes();
+        waterShed_B.setOperation(watershed);
+        waterShed_B.setAttribute(bThresh);
+        waterShed_B.setMinValue(0);
+        waterShed_B.setMaxValue(255);
+        waterShed_B.setDefaultValues("20");
+        waterShed_B.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(waterShed_B);
+
+
+        OperationAttributes waterShed_D = new OperationAttributes();
+        waterShed_D.setOperation(watershed);
+        waterShed_D.setAttribute(bIteration);
+        waterShed_D.setMinValue(0);
+        waterShed_D.setMaxValue(15);
+        waterShed_D.setDefaultValues("3");
+        waterShed_D.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(waterShed_D);
+
+        OperationAttributes waterShed_E = new OperationAttributes();
+        waterShed_E.setOperation(watershed);
+        waterShed_E.setMinValue(0);
+        waterShed_E.setMaxValue(10);
+        waterShed_E.setDefaultValues("3");
+        waterShed_E.setAttribute(size);
+        waterShed_E.setAttributeType(AttributeType.NUMBER);
+        operationAttributes.add(waterShed_E);
+
+
+
 
 
         operationDAO.save(operationAttributes);
@@ -1392,7 +1508,7 @@ public class DbProvisioner implements InitializingBean {
         AllowStep morphologyErode_b = new AllowStep();
         morphologyErode_b.setOperation(erode);
         morphologyErode_b.setAllowoperationId(THRESH_BINARY_INV.getOperationId());
-        allowSteps.add(morphologyErode_a);
+        allowSteps.add(morphologyErode_b);
 
         AllowStep morphologyErode_c = new AllowStep();
         morphologyErode_c.setOperation(erode);
@@ -1611,6 +1727,27 @@ public class DbProvisioner implements InitializingBean {
         allowDWatershed_E.setOperation(watershed);
         allowDWatershed_E.setAllowoperationId(colorSeg.getOperationId());
         allowSteps.add(allowDWatershed_E);
+
+//TODO Testovací jen abych to rozchodil
+        AllowStep allowDWatershed_TEST = new AllowStep();
+        allowDWatershed_TEST.setOperation(watershed);
+        allowDWatershed_TEST.setAllowoperationId(originalOperation.getOperationId());
+        allowSteps.add(allowDWatershed_TEST);
+
+        AllowStep allowDWatershed_TEST2 = new AllowStep();
+        allowDWatershed_TEST2.setOperation(colorSeg);
+        allowDWatershed_TEST2.setAllowoperationId(watershed.getOperationId());
+        allowSteps.add(allowDWatershed_TEST2);
+
+        AllowStep allowDWatershed_TEST3 = new AllowStep();
+        allowDWatershed_TEST3.setOperation(THRESH_BINARY);
+        allowDWatershed_TEST3.setAllowoperationId(watershed.getOperationId());
+        allowSteps.add(allowDWatershed_TEST3);
+
+        AllowStep allowDWatershed_TEST4 = new AllowStep();
+        allowDWatershed_TEST4.setOperation(THRESH_BINARY_INV);
+        allowDWatershed_TEST4.setAllowoperationId(watershed.getOperationId());
+        allowSteps.add(allowDWatershed_TEST4);
 
         AllowStep grabCut_A = new AllowStep();
         grabCut_A.setOperation(gCut);
