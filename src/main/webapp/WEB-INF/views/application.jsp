@@ -83,31 +83,34 @@
         </div>
     </div>
 </div>
+
 <div class="container">
-    <div class="row">
-        <div class="message">
-        </div>
-        <h2>Vítejte na stránkách diplomové práce</h2>
-
-
-        <ul id="sortable" class="col-xs-12 col-sm-12 col-md-12">
-            <li id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
-                <img src="/img/test.png" class="img-thumbnail previewOrig" alt="Cinque Terre" width="152">
-                <div class="methodName">
-                    <p>ZÁKALDNÍ OBRÁZEK</p>
-                </div>
-                <form class="input-group" id="img2b64">
-                    <input id="inputFileToLoad" type="file"/>
-                </form>
-            </li>
-            <li class="add">
-                <input class="adding methodItem" style="font-family:Helvetica" type="button" value="+">
-            </li>
-            <!-- Here will be new methods -->
-
-        </ul>
+    <h2>Vítejte na stránkách diplomové práce</h2>
+    <div class="message">
     </div>
+    <div class="cnt">
+        <div class="row">
 
+
+            <ul id="sortable" class="col-xs-12 col-sm-12 col-md-12">
+                <li id="init_img" class="col-xs-12 col-sm-12 col-md-12 methodItem">
+                    <img src="/img/noImg.jpg" class="img-thumbnail previewOrig" alt="Cinque Terre" width="152">
+                    <div class="methodName">
+                        <p>ZÁKALDNÍ OBRÁZEK</p>
+                    </div>
+                    <form class="input-group" id="img2b64">
+                        <input id="inputFileToLoad" type="file"/>
+                    </form>
+                </li>
+                <li class="add">
+                    <input class="adding methodItem" style="font-family:Helvetica" type="button" value="+">
+                </li>
+                <!-- Here will be new methods -->
+
+            </ul>
+        </div>
+
+    </div>
 </div>
 <div class="clr"><img class="hide" id="hiddenImg"></div>
 <footer class="footer">

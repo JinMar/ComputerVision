@@ -73,7 +73,6 @@ body {
     width: 250px;
 }
 
-
 .Button a {
     letter-spacing: 1px;
     text-decoration: none;
@@ -91,7 +90,6 @@ body {
 
 .methodItem {
     padding: 5px;
-    width: 350px;
     min-height: 200px;
     border: 2px solid #bfbfbf;
     border-radius: 3px;
@@ -100,10 +98,22 @@ body {
     margin: 2px;
 }
 
-.adding {
-    font-size: 130px;
+.add {
+    list-style: none;
     color: #888888;
 
+}
+
+.adding {
+    width: 350px;
+    min-height: 200px;
+    border: 2px solid #bfbfbf;
+    border-radius: 3px;
+    background: #fff;
+    list-style: none;
+
+    text-align: center;
+    font-size: 130px;
 }
 
 .adding:hover {
@@ -112,10 +122,19 @@ body {
     border: 2px solid #2B2B2B;
 }
 
+p {
+    padding: 0;
+    margin: 0;
+}
+
 .methodName {
     float: left;
     margin-left: 3px;
-    width: 130px;
+    width: 140px;
+}
+
+input[type="file"] {
+    color: transparent;
 }
 
 .preview {
@@ -129,7 +148,7 @@ body {
 select {
     height: 30px;
     line-height: 30px;
-    min-width: 170px;
+    width: 170px;
 }
 
 table {
@@ -164,6 +183,10 @@ button.closeB {
     clear: both;
 }
 
+.row-centered {
+    text-align: center;
+}
+
 @media only screen and (min-width: 320px) {
     #logoTUL {
         vertical-align: middle;
@@ -171,6 +194,24 @@ button.closeB {
         max-width: 220px;
         text-align: center;
         margin: 10px;
+    }
+
+    .methodItem {
+
+        width: 360px;
+    }
+
+    #sortable {
+        padding-left: 15px;
+    }
+
+    .cnt {
+        width: 375px;
+        margin: 0 auto;
+    }
+
+    .tbw {
+        width: 188px;
     }
 }
 
@@ -183,6 +224,24 @@ button.closeB {
         text-align: center;
         margin: 25px;
     }
+
+    .methodItem {
+
+        width: 360px;
+    }
+
+    #sortable {
+        padding-left: 13px;
+    }
+
+    .cnt {
+        width: 375px;
+        margin: 0 auto;
+    }
+
+    .tbw {
+        width: 188px;
+    }
 }
 
 /* Small Devices, Tablets */
@@ -194,6 +253,24 @@ button.closeB {
         text-align: center;
         margin: 30px
     }
+
+    .methodItem {
+
+        width: 360px;
+    }
+
+    #sortable {
+        padding-left: 6px;
+    }
+
+    .cnt {
+        width: 768px;
+        margin: 0 auto;
+    }
+
+    .tbw {
+        width: 188px;
+    }
 }
 
 /* Medium Devices, Desktops */
@@ -204,6 +281,24 @@ button.closeB {
         max-width: 800px;
         text-align: center;
         margin: 50px;
+    }
+
+    .methodItem {
+
+        width: 375px;
+    }
+
+    #sortable {
+        padding-left: 0px;
+    }
+
+    .cnt {
+        width: 760px;
+        margin: 0 auto;
+    }
+
+    .tbw {
+        width: 197px;
     }
 }
 
@@ -218,8 +313,28 @@ button.closeB {
         margin: 50px;
     }
 
+    #sortable {
+        padding-left: 15px;
+
+    }
+
+    .methodItem {
+
+        width: 375px;
+    }
+
+    .cnt {
+        width: 1200px;
+        margin: 0 auto;
+    }
+
+    .tbw {
+        width: 197px;
+    }
+
 }
 
 #inputFileToLoad {
     width: 100px;
+    margin-left: 4px;
 }

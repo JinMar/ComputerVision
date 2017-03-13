@@ -11,6 +11,7 @@ $(document).ready(function () {
     var testData;
     var arraz1 = [];
     var allmethod = [];
+    var localMaxRows = 0;
     var minHeigh = 200;
     var firstItem = {
         "position": 0,
@@ -20,6 +21,7 @@ $(document).ready(function () {
 
     var itemIMG;
     var itemIMG2;
+    var lastImageLoaded;
     var imageMap = [];
     window.onload = getFunction1s();
 
@@ -36,6 +38,7 @@ $(document).ready(function () {
                 $('.previewOrig')
                     .attr('src', e.target.result);
                 itemIMG = e.target.result;
+                lastImageLoaded = e.target.result;
 
             };
             reader.readAsDataURL(file);
@@ -47,6 +50,8 @@ $(document).ready(function () {
         console.log("ukládama data 2 ");
         var inputData = [];
         var inputDataItem;
+        minHeigh = $('#init_img').height() + 15;
+        resize2(minHeigh);
 
         inputDataItem = {
             "value": base64Img,
@@ -154,6 +159,7 @@ $(document).ready(function () {
             var number = this.id.split("-")[1];
             removeFCE(number)
         });
+
         count = 0;
         imageMap = [];
         for (var key in data.parts) {
@@ -165,13 +171,14 @@ $(document).ready(function () {
                 tempURL = '/img/wait.gif';
             } else {
                 tempURL = recieveData.url;
+                lastImageLoaded = recieveData.url;
             }
             if (recieveData.mURL == null || recieveData.hURL == null) {
                 $(".add").before($("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
                     "<a href='" + tempURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
                     "<img src='" + tempURL + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/></a>" +
                     "<div class='methodName'>" +
-                    "<table id ='tab-" + count + "'cellspacing='0'>" +
+                    "<table id ='tab-" + count + "'cellspacing='0' class='tbw'>" +
                     "<tr id='tblRow-0' >" +
                     "<td width='50%'>" +
 
@@ -215,11 +222,12 @@ $(document).ready(function () {
                     "<a href='" + tempURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
                     "<img src='" + tempURL + "' class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/></a>" +
                     "<div class='methodName'>" +
-                    "<table id ='tab-" + count + "'cellspacing='0'>" +
+                    "<table id ='tab-" + count + "'cellspacing='0' class='tbw'>" +
                     " <tr id='tblRow-0' >" +
-                    "<td width='50%'>" +
+                    "<td width='10%'>" +
                     "<a href='" + recieveData.mURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
                     "<img src='" + '/img/mag.jpg' + "' class='img-thumbnail additional-info'  id='img-" + count + "' alt='Cinque Terre' width='50'/></a>" +
+                    "</td><td width='28%'>" +
                     "<a href='" + recieveData.hURL + "' data-lightbox='image-" + count + "' data-title='My caption'>" +
                     "<img src='" + '/img/frek.jpg' + "' class='img-thumbnail additional-info'  id='img-" + count + "' alt='Cinque Terre' width='50'/></a>" +
                     "</td>" +
@@ -354,7 +362,12 @@ $(document).ready(function () {
 
                 $('#param-' + key + "-" + count).attr("data-key");
                 $('#param-' + key + "-" + count).data("key", stored.operationAttributesId);
+                if (key >= localMaxRows) {
+                    localMaxRows = key + 1;
+                    minHeigh = $("#attachment-" + count).height() + 15;
 
+                    alert(minHeigh);
+                }
 
             }
 
@@ -366,6 +379,7 @@ $(document).ready(function () {
 
     function removeAtribute(par) {
         $("#" + par).remove();
+
     }
 
     function resize() {
@@ -379,7 +393,7 @@ $(document).ready(function () {
                 var number = this.id.split("-")[1];
                 var table = document.getElementById('tbl-' + number);
 
-                var heigh = parseInt($("#" + this.id).height()) + 15;
+                var heigh = parseInt($("#" + this.id).height()) + 10;
 
 
                 console.log(this.id + " : " + heigh);
@@ -424,7 +438,7 @@ $(document).ready(function () {
         $(".add").before($("<li id='attachment-" + count + "'class='col-xs-12 col-sm-12 col-md-12 methodItem'>" +
             "<img class='img-thumbnail preview' id='img-" + count + "' alt='Cinque Terre' width='152'/>" +
             "<div class='methodName'>" +
-            "<table id ='tab-" + count + "'cellspacing='0'>" +
+            "<table id ='tab-" + count + "'cellspacing='0' class='tbw'>" +
             " <tr id='tblRow-1' >" +
             "<td width='90%'>" +
             "<select class='function' id='fce-" + count + "' name='comp'>" +
@@ -461,10 +475,14 @@ $(document).ready(function () {
 
         if (itemIMG == null) {
             $('#img-' + count)
-                .attr('src', '/img/test.png');
+                .attr('src', '/img/noImg.jpg');
         } else {
-            $('#img-' + count)
-                .attr('src', itemIMG)
+
+            if (lastImageLoaded == null) {
+                $('#img-' + count).attr('src', itemIMG)
+            } else {
+                $('#img-' + count).attr('src', lastImageLoaded)
+            }
         }
 
 
@@ -721,18 +739,16 @@ $(document).ready(function () {
                         }
                         $('#param-' + key + "-" + currentPositionElement).attr("data-key");
                         $('#param-' + key + "-" + currentPositionElement).data("key", recieveData.operationAttributesId);
-
+                        alert("key: " + key + " localMaxRows: " + localMaxRows);
+                        if (key >= localMaxRows) {
+                            localMaxRows = key + 1;
+                            minHeigh = $("#attachment-" + currentPositionElement).height() + 15;
+                            alert("min " + minHeigh);
+                            resize2(minHeigh);
+                        }
                     }
                 }
-                var minHeighnew = 200;
-                if (data.attributesDTOs.length > 0) {
-                    minHeighnew += 40 * data.attributesDTOs.length;
-                    if (minHeigh < minHeighnew) {
-                        minHeigh = minHeighnew;
-                    }
 
-                    resize2(minHeigh);
-                }
 
             },
             error: function (data, status, er) {
@@ -743,8 +759,6 @@ $(document).ready(function () {
 
     });
     $(document).on('change', '.fileToload', encodeImageFileAsURL2(function (base64Img) {
-
-
         var targetElement = base64Img[0];
         console.log("ukládama data do mapy " + targetElement);
         $("#" + targetElement).attr("data-dataimg");
@@ -760,15 +774,12 @@ $(document).ready(function () {
             var reader = new FileReader();
             reader.onloadend = function () {
                 var map = {};
-
                 map[0] = idElement;
                 map[1] = reader.result;
                 cb(map);
             };
             reader.onload = function (e) {
-
                 itemIMG2 = e.target.result;
-                alert(itemIMG2);
             };
             reader.readAsDataURL(file);
         }
