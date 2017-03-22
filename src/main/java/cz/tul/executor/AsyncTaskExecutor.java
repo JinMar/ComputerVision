@@ -36,7 +36,7 @@ public class AsyncTaskExecutor {
 
     @Scheduled(fixedDelay = 2000)
     public void execute() {
-        Task asyncTask = new Task();
+
         int temp = executor.getMaxPoolSize() - executor.getActiveCount() - 1;
 
         if (temp > 0) {
@@ -48,6 +48,7 @@ public class AsyncTaskExecutor {
                 chainDAO.update(chains);
                 try {
                     for (Chain chain : chains) {
+                        Task asyncTask = new Task();
                         asyncTask.execute(chain, chainDAO, partDAO);
                     }
                 } catch (InterruptedException e) {

@@ -1,4 +1,4 @@
-package cz.tul.bussiness.jobs.functions;
+package cz.tul.bussiness.jobs.imagerecognition;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;

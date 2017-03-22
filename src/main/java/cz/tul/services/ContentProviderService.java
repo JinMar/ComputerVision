@@ -28,6 +28,8 @@ public class ContentProviderService {
     private final String METHOD_WITHOUT_ATTRIBUTE = "-2";
 
     @Autowired
+    AllowStepDAO allowStepDAO;
+    @Autowired
     private MethodDAO methodDAO;
     @Autowired
     private AttributeDAO attributeDAO;
@@ -175,6 +177,54 @@ public class ContentProviderService {
         return attributesDTOs;
     }
 
+    /**
+     * Vrátí podporované kroky
+     */
+    public List<AllowStepsDTO> getAllowSteps() {
+        List<AllowStep> as = allowStepDAO.getAllAllowedSteps();
+        List<AllowStepsDTO> result = new ArrayList<>();
+        AllowStepDTO asd = null;
+
+        List<AllowStepDTO> asds = new ArrayList<>();
+        String fName = "", mName = "", oName = "";
+        String fNameFollow = "", mNameFollow = "", oNameFollow = "";
+        for (AllowStep a : as) {
+            if (a != null) {
+
+                fName = a.getAllowoperationId().getMethod().getFunction().getName();
+                mName = a.getAllowoperationId().getMethod().getName();
+                oName = a.getAllowoperationId().getName();
+                if (asd == null) {
+                    asd = new AllowStepDTO(fName, mName, oName);
+                    fNameFollow = a.getOperation().getMethod().getFunction().getName();
+                    mNameFollow = a.getOperation().getMethod().getName();
+                    oNameFollow = a.getOperation().getName();
+                    asds.add(new AllowStepDTO(fNameFollow, mNameFollow, oNameFollow));
+                    continue;
+                }
+                if (asd.getFunctionName().equals(fName) && asd.getMethodName().equals(mName) && asd.getOperationName().equals(oName)) {
+                    fNameFollow = a.getOperation().getMethod().getFunction().getName();
+                    mNameFollow = a.getOperation().getMethod().getName();
+                    oNameFollow = a.getOperation().getName();
+                    asds.add(new AllowStepDTO(fNameFollow, mNameFollow, oNameFollow));
+                } else {
+                    asds = Utility.getSortSteps(asds);
+                    result.add(new AllowStepsDTO(asd, asds));
+                    asd = new AllowStepDTO(fName, mName, oName);
+                    fNameFollow = a.getOperation().getMethod().getFunction().getName();
+                    mNameFollow = a.getOperation().getMethod().getName();
+                    oNameFollow = a.getOperation().getName();
+                    asds = new ArrayList<>();
+                    asds.add(new AllowStepDTO(fNameFollow, mNameFollow, oNameFollow));
+
+                }
+
+            }
+        }
+
+
+        return result;
+    }
 
     /**
      * Vytváří samotný řetěz i jeho části
@@ -299,7 +349,21 @@ public class ContentProviderService {
         this.partAttributeValueDAO = partAttributeValueDAO;
     }
 
+    public void setAllowStepDAO(AllowStepDAO allowStepDAO) {
+        this.allowStepDAO = allowStepDAO;
+    }
 
+    public void setFunctionDAO(FunctionDAO functionDAO) {
+        this.functionDAO = functionDAO;
+    }
+
+    public void setOperationDAO(OperationDAO operationDAO) {
+        this.operationDAO = operationDAO;
+    }
+
+    public void setOperationAttributesDAO(OperationAttributesDAO operationAttributesDAO) {
+        this.operationAttributesDAO = operationAttributesDAO;
+    }
     //GETTERS
 
 
@@ -323,5 +387,19 @@ public class ContentProviderService {
         return partAttributeValueDAO;
     }
 
+    public AllowStepDAO getAllowStepDAO() {
+        return allowStepDAO;
+    }
 
+    public FunctionDAO getFunctionDAO() {
+        return functionDAO;
+    }
+
+    public OperationDAO getOperationDAO() {
+        return operationDAO;
+    }
+
+    public OperationAttributesDAO getOperationAttributesDAO() {
+        return operationAttributesDAO;
+    }
 }

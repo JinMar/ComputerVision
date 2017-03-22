@@ -16,7 +16,8 @@ public class FunctionDAO extends BasicRepositoryAbstract {
     private static final Logger logger = LoggerFactory.getLogger(FunctionDAO.class);
 
     public List<Function> getAllFunctions() {
-        Query query = getQuery("from Function f order by f.name");
+        Query query = getQuery("from Function f where  f.name != :name order by f.name ");
+        query.setParameter("name", "Original");
         return (List<Function>) query.list();
 
     }

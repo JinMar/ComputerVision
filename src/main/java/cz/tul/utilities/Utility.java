@@ -1,5 +1,6 @@
 package cz.tul.utilities;
 
+import cz.tul.controllers.transferObjects.AllowStepDTO;
 import cz.tul.controllers.transferObjects.AttributesDTO;
 import cz.tul.entities.Part;
 import cz.tul.entities.PartAttributeValue;
@@ -38,6 +39,18 @@ public class Utility {
                 if (p1.getPosition() < p2.getPosition())
                     return -1;
                 return 0;
+            }
+        });
+        return result;
+    }
+
+    public static List<AllowStepDTO> getSortSteps(List<AllowStepDTO> chainParts) {
+        List<AllowStepDTO> result = new ArrayList(chainParts);
+
+        Collections.sort(result, new Comparator<AllowStepDTO>() {
+            @Override
+            public int compare(AllowStepDTO p1, AllowStepDTO p2) {
+                return p1.getMethodName().compareTo(p2.getMethodName());
             }
         });
         return result;

@@ -1,4 +1,4 @@
-package cz.tul.bussiness.jobs.functions;
+package cz.tul.bussiness.jobs.imagerecognition;
 
 import cz.tul.bussiness.jobs.AJob;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;

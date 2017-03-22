@@ -23,6 +23,9 @@ public abstract class AEdgeDetector extends AJob {
     private Mat edges;
     private int lowThreshold;
     private int ratio;
+    //Aperture size. It can be CV_SCHARR , 1, 3, 5, or 7.
+    private int size;
+    private int scale;
 
 
     @Override
@@ -34,6 +37,14 @@ public abstract class AEdgeDetector extends AJob {
             }
             if (att.getOperationAttributes().getAttribute().getName().equals("Poměr")) {
                 ratio = Integer.parseInt(att.getValue());
+
+            }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Velikost")) {
+                size = Integer.parseInt(att.getValue());
+
+            }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Scale")) {
+                scale = Integer.parseInt(att.getValue());
 
             }
         }
@@ -88,5 +99,21 @@ public abstract class AEdgeDetector extends AJob {
 
     public void setRatio(int ratio) {
         this.ratio = ratio;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 }

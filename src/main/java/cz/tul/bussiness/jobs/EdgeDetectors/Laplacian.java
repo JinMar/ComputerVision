@@ -17,7 +17,7 @@ public class Laplacian extends AEdgeDetector {
     @Override
     protected void findEdges() {
         Imgproc.GaussianBlur(channels.get(0), channels.get(0), new Size(3, 3), 0, 0, BORDER_DEFAULT);
-        Imgproc.Laplacian(channels.get(0), getEdges(), channels.get(0).depth(), 1, 1, BORDER_DEFAULT);
+        Imgproc.Laplacian(channels.get(0), getEdges(), channels.get(0).depth(), getSize(), getScale(), BORDER_DEFAULT);
         convertScaleAbs(getEdges(), getEdges());
     }
 }

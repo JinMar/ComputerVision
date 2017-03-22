@@ -1,4 +1,4 @@
-package cz.tul.bussiness.jobs.functions;
+package cz.tul.bussiness.jobs.imagerecognition;
 
 import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import org.opencv.core.CvType;

@@ -30,6 +30,7 @@ public abstract class AJob implements IJob {
     protected byte[] finalData;
     protected BufferedImage originalImgData;
 
+
     @Override
     public void setImgData(BufferedImage imgData) {
         this.imgData = imgData;

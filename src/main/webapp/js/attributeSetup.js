@@ -68,7 +68,7 @@ $(document).ready(function () {
 
 
     function sendAjax(dataToSend) {
-        // alert(JSON.stringify(dataToSend));
+        console.log(JSON.stringify(dataToSend));
 
 
         $.ajax({
@@ -132,8 +132,7 @@ $(document).ready(function () {
                         $(".message").append("<div class='alert alert-danger'>" +
                             "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" +
                             " <strong>FAILED!</strong> " + data.message + "</div>");
-                        alert(data.error);
-                        alert(data.message);
+
                     }
 
                     clearInterval(interval);
@@ -366,7 +365,7 @@ $(document).ready(function () {
                     localMaxRows = key + 1;
                     minHeigh = $("#attachment-" + count).height() + 15;
 
-                    alert(minHeigh);
+
                 }
 
             }
@@ -739,11 +738,13 @@ $(document).ready(function () {
                         }
                         $('#param-' + key + "-" + currentPositionElement).attr("data-key");
                         $('#param-' + key + "-" + currentPositionElement).data("key", recieveData.operationAttributesId);
-                        alert("key: " + key + " localMaxRows: " + localMaxRows);
+
+
                         if (key >= localMaxRows) {
                             localMaxRows = key + 1;
                             minHeigh = $("#attachment-" + currentPositionElement).height() + 15;
-                            alert("min " + minHeigh);
+
+
                             resize2(minHeigh);
                         }
                     }

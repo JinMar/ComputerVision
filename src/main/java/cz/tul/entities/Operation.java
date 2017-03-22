@@ -28,6 +28,9 @@ public class Operation implements Serializable, CustomEntity {
     @OneToMany(mappedBy = "operation")
     private Set<OperationAttributes> operationAttributes = new HashSet<>();
 
+    @OneToMany(mappedBy = "allowoperationId")
+    private Set<AllowStep> allowStepss = new HashSet<>();
+
     @OneToMany(mappedBy = "operation")
     private Set<AllowStep> allowSteps = new HashSet<>();
 
@@ -80,5 +83,11 @@ public class Operation implements Serializable, CustomEntity {
         this.allowSteps = allowSteps;
     }
 
+    public Set<AllowStep> getAllowStepss() {
+        return allowStepss;
+    }
 
+    public void setAllowStepss(Set<AllowStep> allowStepss) {
+        this.allowStepss = allowStepss;
+    }
 }

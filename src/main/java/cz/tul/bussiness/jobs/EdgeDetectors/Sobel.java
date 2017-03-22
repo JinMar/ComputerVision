@@ -17,7 +17,7 @@ public class Sobel extends AEdgeDetector {
     @Override
     protected void findEdges() {
         Imgproc.GaussianBlur(channels.get(0), channels.get(0), new Size(3, 3), 0, 0, BORDER_DEFAULT);
-        Imgproc.Sobel(channels.get(0), getEdges(), channels.get(0).depth(), 1, 1, 3, 3, 1, BORDER_DEFAULT);
+        Imgproc.Sobel(channels.get(0), getEdges(), channels.get(0).depth(), 1, 1, getSize(), getScale(), 1, BORDER_DEFAULT);
         convertScaleAbs(getEdges(), getEdges());
     }
 }

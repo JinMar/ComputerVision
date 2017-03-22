@@ -104,6 +104,7 @@ public class Workflow {
             part.setState(StateEnum.ERROR.getState());
         } catch (UnsupportedOperationException e) {
             message = e.getMessage();
+            e.printStackTrace();
             part.setState(StateEnum.ERROR.getState());
         } finally {
 

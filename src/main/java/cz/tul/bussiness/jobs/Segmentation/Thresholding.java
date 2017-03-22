@@ -17,45 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Bc. Marek Jindrák on 27.02.2017.
+ * Created by Bc. Marek Jindrák on 15.03.2017.
  */
-public class DistanceTransform extends AJob {
-    private static final Logger logger = LoggerFactory.getLogger(DistanceTransform.class);
-    private int maskSize;
-    private int maskType;
+public class Thresholding extends AJob {
+    private static final Logger logger = LoggerFactory.getLogger(Thresholding.class);
+    private int thresholdType;
+    private int threshold;
+
+    public Thresholding(int thresholdType) {
+        this.thresholdType = thresholdType;
+    }
 
     @Override
     protected void init() throws MinimalArgumentsException, NoTemplateFound {
         for (PartAttributeValue att : getAttributes()) {
-            if (att.getOperationAttributes().getAttribute().getName().equals("Maska")) {
-                switch (att.getValue()) {
-                    case "DIST_MASK_3":
-                        maskSize = Imgproc.DIST_MASK_3;
-                        break;
-                    case "DIST_MASK_5":
-                        maskSize = Imgproc.DIST_MASK_5;
-                        break;
-                    default:
-                        maskSize = Imgproc.DIST_MASK_3;
-                        logger.warn("Default mask size was choosen: 3×3");
-                }
-            }
-            if (att.getOperationAttributes().getAttribute().getName().equals("Metrika")) {
-                switch (att.getValue()) {
-                    case "DIST_L1":
-                        maskType = Imgproc.DIST_L1;
-                        break;
-                    case "DIST_L2":
-                        maskType = Imgproc.DIST_L2;
-                        break;
-                    case "DIST_C":
-                        maskType = Imgproc.DIST_C;
-                        break;
-
-                    default:
-                        logger.warn("Default distance metrics was choosen: the simple euclidean distance");
-
-                }
+            if (att.getOperationAttributes().getAttribute().getName().equals("Práh")) {
+                threshold = Integer.parseInt(att.getValue());
             }
 
 
@@ -63,18 +40,16 @@ public class DistanceTransform extends AJob {
     }
 
     @Override
-    protected BufferedImage procces() {
+    protected BufferedImage procces() throws NoTemplateFound {
         BGR = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         result = new Mat(BGR.rows(), BGR.cols(), CvType.CV_8UC1);
-
         sourceData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
         BGR.put(0, 0, sourceData);
         Core.split(BGR, channels);
-        Imgproc.distanceTransform(channels.get(0), result, maskType, maskSize, CvType.CV_8UC1);
+        Imgproc.threshold(channels.get(0), result, threshold, 255, thresholdType);
 
         Mat BGR = new Mat(channels.get(0).rows(), channels.get(0).cols(), CvType.CV_8UC3);
         List<Mat> RGB_ = new ArrayList<>();
-
         RGB_.add(result);
         RGB_.add(result);
         RGB_.add(result);

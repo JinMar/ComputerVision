@@ -429,7 +429,7 @@
                 return;
             }
 
-            // If there are functions bound, to execute
+            // If there are imagerecognition bound, to execute
             readyList.resolveWith(document, [jQuery]);
 
             // Trigger any bound ready events
@@ -439,7 +439,7 @@
         },
 
         // See test/unit/core.js for details concerning isFunction.
-        // Since version 1.3, DOM methods and functions like alert
+        // Since version 1.3, DOM methods and imagerecognition like alert
         // aren't supported. They return false on IE (#2968).
         isFunction: function (obj) {
             return jQuery.type(obj) === "function";
@@ -966,7 +966,7 @@
                             // detach all dom ready events
                             detach();
 
-                            // and execute any waiting functions
+                            // and execute any waiting imagerecognition
                             jQuery.ready();
                         }
                     })();
@@ -2822,7 +2822,7 @@
                 cached = compilerCache[selector + " "];
 
             if (!cached) {
-                // Generate a function of recursive functions that can be used to check each element
+                // Generate a function of recursive imagerecognition that can be used to check each element
                 if (!group) {
                     group = tokenize(selector);
                 }
@@ -4736,7 +4736,7 @@
     }
 
     /*
-     * Helper functions for managing events -- not part of the public interface.
+     * Helper imagerecognition for managing events -- not part of the public interface.
      * Props to Dean Edwards' addEvent library for many of the ideas.
      */
     jQuery.event = {
@@ -7030,7 +7030,7 @@
                 }
 
                 // Fixes #8908, it can be done more correctly by specifing setters in cssHooks,
-                // but it would mean to define eight (for every problematic property) identical functions
+                // but it would mean to define eight (for every problematic property) identical imagerecognition
                 if (!jQuery.support.clearCloneStyle && value === "" && name.indexOf("background") === 0) {
                     style[name] = "inherit";
                 }
@@ -7786,7 +7786,7 @@
         return this;
     };
 
-// Attach a bunch of functions for handling common AJAX events
+// Attach a bunch of imagerecognition for handling common AJAX events
     jQuery.each(["ajaxStart", "ajaxStop", "ajaxComplete", "ajaxError", "ajaxSuccess", "ajaxSend"], function (i, type) {
         jQuery.fn[type] = function (fn) {
             return this.on(type, fn);

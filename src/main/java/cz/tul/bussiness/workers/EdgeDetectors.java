@@ -37,7 +37,6 @@ public class EdgeDetectors extends AMethodWorker {
             setImgData(job.start());
         }
 
-
         saveImg();
 
     }

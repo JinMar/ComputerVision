@@ -302,6 +302,19 @@ button.closeB {
     }
 }
 
+.about td {
+    padding-left: 5px;
+}
+
+.about {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.dl {
+    padding-left: 20px;
+}
+
 /* Large Devices, Wide Screens */
 @media only screen and (min-width: 1200px) {
     #logoTUL {

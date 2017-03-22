@@ -54,23 +54,7 @@
             </button>
             <a class="navbar-brand" href="#">DevTUL</a>
         </div>
-        <div id="navbar" class="navbar-collapse collapse">
-
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Home</a></li>
-                <li><a href="news">Novinky</a></li>
-                <li><a href="task">Zadání</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Dokumentace</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="userdocs">Uživatelská dokumentace</a></li>
-                        <li><a href="devdoc">Vývojáøská dokumentace</a></li>
-                    </ul>
-                </li>
-                <li><a href="function">Funkce</a></li>
-
-            </ul>
-        </div>
+        <%@include file="menu.jsp" %>
         <!--/.nav-->
     </div>
 </nav>

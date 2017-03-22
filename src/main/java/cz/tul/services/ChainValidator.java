@@ -51,7 +51,7 @@ public class ChainValidator {
                 allowedOp = new ArrayList<>();
                 operation = operationDAO.getOperationById(data.getOperationId());
                 for (AllowStep as : operation.getAllowSteps()) {
-                    allowedOp.add(as.getAllowoperationId());
+                    allowedOp.add(as.getAllowoperationId().getOperationId());
                 }
                 if (!allowedOp.contains(prew)) {
                     return !allowed;

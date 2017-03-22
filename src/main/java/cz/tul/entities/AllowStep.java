@@ -14,11 +14,12 @@ public class AllowStep implements Serializable, CustomEntity {
     @Column(name = "allowstep_id")
     private String allowStepId;
 
-    @Column(name = "allowoperation_Id")
-    private String allowoperationId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "allowoperationId", referencedColumnName = "OPERATION_ID")
+    private Operation allowoperationId;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "OPERATION_ID")
+    @JoinColumn(name = "operation", referencedColumnName = "OPERATION_ID")
     private Operation operation;
 
 
@@ -35,11 +36,11 @@ public class AllowStep implements Serializable, CustomEntity {
         this.allowStepId = allowStepId;
     }
 
-    public String getAllowoperationId() {
+    public Operation getAllowoperationId() {
         return allowoperationId;
     }
 
-    public void setAllowoperationId(String allowoperationId) {
+    public void setAllowoperationId(Operation allowoperationId) {
         this.allowoperationId = allowoperationId;
     }
 

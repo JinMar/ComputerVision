@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="windows-1250" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -42,12 +43,11 @@
             <a class="navbar-brand" href="#">DevTUL</a>
         </div>
         <%@include file="menu.jsp" %>
-        <!--/.nav-->
+
     </div>
 </nav>
 
 
-<!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
 
@@ -56,26 +56,24 @@
         </div>
     </div>
 </div>
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12">
 
-            <h2>Vítejte na stránkách semestrálního projektu</h2>
+<div id="accordion">
+    <div class="container">
 
-            <p>Tato stránka vznikla v rámci semestrálního projektu a bude se
-                zabývat zpracováním obrazu.
-            </p>
-            <p>Nejprve na tìchto stánkách budou
-                implementovány jednodušší techniky pro zpracování obrazu, které
-                budou v prùbìhu roku rozvíjeny a stanou se základními kameny pro
-                techniky složitìjší. </p>
-            <p>Cílem této práce je vytvoøit komplexní systém,
-                který umožní uživateli zpracovávat obraz skrze webové rozhraní.
-            </p>
-        </div>
+
+        <c:forEach items="${allowSteps}" var="step">
+            <h3>${step.basicStep.functionName} - ${step.basicStep.methodName} - ${step.basicStep.operationName} </h3>
+            <div>
+                <ol>
+                    <c:forEach items="${step.allowSteps}" var="it">
+                        <li> ${it.functionName} - ${it.methodName} - ${it.operationName}</li>
+                    </c:forEach>
+                </ol>
+            </div>
+        </c:forEach>
     </div>
-    <div class="wraper"><p class="Button"><a href="/application">Spustit aplikaci</a></p></div>
 </div>
+</body>
 <footer class="footer">
 
     <p>&copy; Semestrální projekt 2016. All rights reserved. Design by Marek Jindrák.</p>

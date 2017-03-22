@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public abstract class AMethodWorker implements IMethodWorker {
     protected BufferedImage imgData;
     protected String classifier;
     protected byte[] sourceData;
+    private byte[] localImgData;
     protected Mat BGR;
     protected List<Mat> channels = new ArrayList<>();
     private IJob work;
@@ -97,14 +99,20 @@ public abstract class AMethodWorker implements IMethodWorker {
         logger.info("Output" + getRealPath() + "\\img\\" + getImgName() + ".jpg");
         try {
             ImageIO.write(imgData, "jpg", outputFile);
-            if (!channels.isEmpty()) {
-                createhist();
+
+            if (!channels.isEmpty() || job != null) {
+                localImgData = ((DataBufferByte) imgData.getRaster().getDataBuffer()).getData();
+                createHist();
                 transformImage();
-                createColorScaleImage(800, 600);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void type(BufferedImage type) {
+        logger.info("cvType: " + CvType.typeToString(type.getType()));
     }
 
     @Override
@@ -112,12 +120,13 @@ public abstract class AMethodWorker implements IMethodWorker {
         this.originalImageData = originalImageData;
     }
 
-    private void createhist() {
-        BufferedImage histData;
-        File outputFile = null;
+    private void createHist() {
+
+        File outputFile;
+        type(imgData);
         Mat mergedChannels = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         List<Mat> localChannles = new ArrayList<>();
-        mergedChannels.put(0, 0, sourceData);
+        mergedChannels.put(0, 0, localImgData);
         Core.split(mergedChannels, localChannles);
 
         int rows = 600;
@@ -178,37 +187,26 @@ public abstract class AMethodWorker implements IMethodWorker {
     private void transformImage() {
         Mat mergedChannels = new Mat(imgData.getHeight(), imgData.getWidth(), CvType.CV_8UC3);
         List<Mat> localChannles = new ArrayList<>();
-        mergedChannels.put(0, 0, sourceData);
+        mergedChannels.put(0, 0, localImgData);
         Core.split(mergedChannels, localChannles);
-
         Mat complexImage = new Mat();
         Mat image = localChannles.get(0);
         List<Mat> planes = new ArrayList<>();
         Mat padded = optimizeImageDim(image);
         padded.convertTo(padded, CvType.CV_32F);
-        // prepare the image planes to obtain the complex image
         planes.add(padded);
         planes.add(Mat.zeros(padded.size(), CvType.CV_32F));
-        // prepare a complex image for performing the dft
         Core.merge(planes, complexImage);
-
-        // dft
         Core.dft(complexImage, complexImage);
-
-        // optimize the image resulting from the dft operation
         createOptimizedMagnitude(complexImage);
 
 
     }
 
     private Mat optimizeImageDim(Mat image) {
-        // init
         Mat padded = new Mat();
-        // get the optimal rows size for dft
         int addPixelRows = Core.getOptimalDFTSize(image.rows());
-        // get the optimal cols size for dft
         int addPixelCols = Core.getOptimalDFTSize(image.cols());
-        // apply the optimal cols and rows size to the image
         Core.copyMakeBorder(image, padded, 0, addPixelRows - image.rows(), 0, addPixelCols - image.cols(),
                 Core.BORDER_CONSTANT, Scalar.all(0));
 
@@ -216,32 +214,22 @@ public abstract class AMethodWorker implements IMethodWorker {
     }
 
     private Mat createOptimizedMagnitude(Mat complexImage) {
-        // init
+
         List<Mat> newPlanes = new ArrayList<>();
         Mat mag = new Mat();
         int addWidth = 60;
         int minRow = 150;
-        // split the comples image in two planes
         Core.split(complexImage, newPlanes);
-        // compute the magnitude
         Core.magnitude(newPlanes.get(0), newPlanes.get(1), mag);
-
-        // move to a logarithmic scale
         Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
         Core.log(mag, mag);
-        // optionally reorder the 4 quadrants of the magnitude image
         this.shiftDFT(mag);
-        // normalize the magnitude image for the visualization
-        // and OpenCV need images with value between 0 and 255
-        // convert back to CV_8UC1
         mag.convertTo(mag, CvType.CV_8UC1);
         Core.normalize(mag, mag, 0, 255, Core.NORM_MINMAX, CvType.CV_8UC1);
-
-        // you can also write on disk the resulting image...
         Imgproc.applyColorMap(mag, mag, Imgproc.COLORMAP_JET);
-
         List<Mat> withColorMap = new ArrayList<>();
         List<Mat> splited = new ArrayList<>();
+
         Core.split(mag, splited);
         int color = 0;
         boolean repeatColor = true;
@@ -336,28 +324,6 @@ public abstract class AMethodWorker implements IMethodWorker {
         q1.copyTo(tmp);
         q2.copyTo(q1);
         tmp.copyTo(q2);
-    }
-
-
-    private Image createColorScaleImage(int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D img2D = image.createGraphics();
-        File outputFile = new File(getRealPath() + "\\img\\colorMap-" + getImgName() + ".jpg");
-
-
-        for (int i = 0; i < 100; i++) {
-            Color c = ColorBarHelper.getInstance().getColor(i);
-
-            img2D.setPaint(c);
-            img2D.fillRect(450, 350 - (16 + (3) * i), 10, 10);
-
-        }
-        try {
-            ImageIO.write(image, "jpg", outputFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return image;
     }
 
 

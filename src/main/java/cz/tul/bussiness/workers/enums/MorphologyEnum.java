@@ -8,6 +8,10 @@ public enum MorphologyEnum {
     DILATE("dilate"),
     OPEN("open"),
     CLOSE("close"),
+    ERODEGS("erodeGS"),
+    DILATEGS("dilateGS"),
+    OPENGS("openGS"),
+    CLOSEGS("closeGS"),
     TOPHAT("tophhat");
     private String morphologyName;
 
