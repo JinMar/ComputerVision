@@ -33,13 +33,13 @@ public abstract class BasicRepositoryAbstract {
 
     @Transactional
     public <T extends CustomEntity> void update(T entity) {
-        sessionFactory.getCurrentSession().update(entity);
+        sessionFactory.getCurrentSession().merge(entity);
     }
 
     @Transactional
     public <T extends CustomEntity> void update(List<T> entities) {
         for (T entity : entities) {
-            sessionFactory.getCurrentSession().update(entity);
+            sessionFactory.getCurrentSession().merge(entity);
         }
 
     }

@@ -2,9 +2,9 @@ package cz.tul.bussiness.workers;
 
 import cz.tul.bussiness.jobs.IJob;
 import cz.tul.bussiness.register.OperationRegister;
-import cz.tul.bussiness.workers.helper.ColorBarHelper;
 import cz.tul.entities.PartAttributeValue;
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -213,93 +213,112 @@ public abstract class AMethodWorker implements IMethodWorker {
         return padded;
     }
 
-    private Mat createOptimizedMagnitude(Mat complexImage) {
+    private Mat generateColorBar() {
+        List<Mat> colorBar = new ArrayList<>();
+        Mat layer = new Mat(256, 1, CvType.CV_8UC1);
+        Mat result = new Mat();
+        for (int i = 0; i < 256; i++) {
+            layer.put(i, 0, 255 - i);
+        }
+        colorBar.add(layer);
+        colorBar.add(layer);
+        colorBar.add(layer);
+        Core.merge(colorBar, result);
+        Imgproc.applyColorMap(result, result, Imgproc.COLORMAP_JET);
+        return result;
+    }
 
+    private Mat createOptimizedMagnitude(Mat complexImage) {
+        double[] white = new double[]{255, 255, 255};
+        double[] black = new double[]{0, 0, 0};
         List<Mat> newPlanes = new ArrayList<>();
         Mat mag = new Mat();
-        int addWidth = 60;
-        int minRow = 150;
+        Mat result;
+        int addWidth = 70;
+        int minRow = 280;
+        int ofset = 0;
+        int color = 0;
         Core.split(complexImage, newPlanes);
         Core.magnitude(newPlanes.get(0), newPlanes.get(1), mag);
         Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
         Core.log(mag, mag);
+        Core.MinMaxLocResult rep = Core.minMaxLoc(mag);
+        System.out.printf("%f %f ", rep.maxVal, rep.minVal);
         this.shiftDFT(mag);
         mag.convertTo(mag, CvType.CV_8UC1);
         Core.normalize(mag, mag, 0, 255, Core.NORM_MINMAX, CvType.CV_8UC1);
         Imgproc.applyColorMap(mag, mag, Imgproc.COLORMAP_JET);
-        List<Mat> withColorMap = new ArrayList<>();
+
         List<Mat> splited = new ArrayList<>();
 
         Core.split(mag, splited);
-        int color = 0;
-        boolean repeatColor = true;
+        ofset = 0;
         if (mag.rows() < minRow) {
-            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
-            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
-            withColorMap.add(new Mat(minRow, mag.cols() + addWidth, CvType.CV_8UC1));
-            for (int i = 0; i < minRow; i++) {
-                for (int j = 0; j < mag.cols() + addWidth; j++) {
-                    if (j < mag.cols()) {
-                        withColorMap.get(0).put(i, j, splited.get(0).get(i, j));
-                        withColorMap.get(1).put(i, j, splited.get(1).get(i, j));
-                        withColorMap.get(2).put(i, j, splited.get(2).get(i, j));
-                    } else {
-                        if (i > (mag.rows() / 2) - 50 && mag.cols() + 20 < j && color < 101 && mag.cols() + 40 > j) {
-                            Color c = ColorBarHelper.getInstance().getColor(color);
-                            withColorMap.get(0).put(i, j, (double) c.getRed());
-                            withColorMap.get(1).put(i, j, (double) c.getGreen());
-                            withColorMap.get(2).put(i, j, (double) c.getBlue());
-                        } else {
-                            withColorMap.get(0).put(i, j, 255.0);
-                            withColorMap.get(1).put(i, j, 255.0);
-                            withColorMap.get(2).put(i, j, 255.0);
-                        }
-                    }
-
-                }
-                if (i > (mag.rows() / 2) - 50 && repeatColor) {
-                    color++;
-
-                }
-                repeatColor = !repeatColor;
-
-            }
-        } else {
-            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
-            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
-            withColorMap.add(new Mat(mag.rows(), mag.cols() + addWidth, CvType.CV_8UC1));
-
-            for (int i = 0; i < mag.rows(); i++) {
-                for (int j = 0; j < mag.cols() + addWidth; j++) {
-                    if (j < mag.cols()) {
-                        withColorMap.get(0).put(i, j, splited.get(0).get(i, j));
-                        withColorMap.get(1).put(i, j, splited.get(1).get(i, j));
-                        withColorMap.get(2).put(i, j, splited.get(2).get(i, j));
-                    } else {
-                        if (i > (mag.rows() / 2) - 50 && mag.cols() + 20 < j && color < 101 && mag.cols() + 40 > j) {
-                            Color c = ColorBarHelper.getInstance().getColor(color);
-                            withColorMap.get(0).put(i, j, (double) c.getRed());
-                            withColorMap.get(1).put(i, j, (double) c.getGreen());
-                            withColorMap.get(2).put(i, j, (double) c.getBlue());
-                        } else {
-                            withColorMap.get(0).put(i, j, 255.0);
-                            withColorMap.get(1).put(i, j, 255.0);
-                            withColorMap.get(2).put(i, j, 255.0);
-                        }
-                    }
-
-                }
-                if (i > (mag.rows() / 2) - 50 && repeatColor) {
-                    color++;
-
-                }
-                repeatColor = !repeatColor;
-
-            }
+            ofset = minRow - mag.rows();
         }
-        Mat result = new Mat();
-        Core.merge(withColorMap, result);
+        result = new Mat(mag.rows() + (ofset * 2), mag.cols() + addWidth, CvType.CV_8UC3);
 
+
+        Mat colorBar = generateColorBar();
+
+        for (int i = 0; i < result.rows(); i++) {
+            for (int j = 0; j < result.cols(); j++) {
+                if (j < mag.cols()) {
+                    if (i > ofset && i < mag.rows() + ofset) {
+                        result.put(i, j, mag.get(i - ofset, j));
+                    } else {
+                        result.put(i, j, white);
+                    }
+
+                } else {
+                    if (i > (result.rows() / 2) - 128 && mag.cols() + 20 < j && color < 255 && mag.cols() + 40 > j) {
+
+                        result.put(i, j, colorBar.get(color, 0));
+
+
+                    } else if (i > (result.rows() / 2) - 128 && i < (result.rows() / 2) + 128) {
+
+                        if (mag.cols() + 20 == j || mag.cols() + 40 == j) {
+                            result.put(i, j, black);
+                        } else {
+
+                            result.put(i, j, white);
+                        }
+                    } else if (i == (result.rows() / 2) - 128 || i == (result.rows() / 2) + 128) {
+
+                        if (mag.cols() + 20 <= j && mag.cols() + 40 >= j) {
+                            result.put(i, j, black);
+                        } else {
+
+                            result.put(i, j, white);
+                        }
+                    } else {
+
+                        result.put(i, j, white);
+                    }
+                }
+
+            }
+            if (i > (result.rows() / 2) - 128 && color < 256) {
+                color++;
+            }
+
+
+        }
+
+
+        int max = (int) rep.maxVal;
+
+        if (max + 0.45 < rep.maxVal) {
+
+            max++;
+        }
+        if (max >= 10) {
+            Imgproc.putText(result, "" + max, new Point(mag.cols() + 10, (result.rows() / 2) - 132), 4, 1, new Scalar(0, 0, 0), 1);
+        } else {
+            Imgproc.putText(result, "" + max, new Point(mag.cols() + 10, (result.rows() / 2) - 132), 4, 1, new Scalar(0, 0, 0), 1);
+        }
+        Imgproc.putText(result, "0", new Point(mag.cols() + 20, (result.rows() / 2) + 152), 4, 1, new Scalar(0, 0, 0), 1);
         Imgcodecs.imwrite(getRealPath() + "\\img\\magnitude-" + getImgName() + ".jpg", result);
 
         return mag;
