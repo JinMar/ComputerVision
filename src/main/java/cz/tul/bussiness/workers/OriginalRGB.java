@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -29,6 +30,10 @@ public class OriginalRGB extends AMethodWorker {
         ImageIO.setUseCache(false);
         try {
             setImgData(ImageIO.read(new ByteArrayInputStream(imageBytes)));
+            BufferedImage convertedImg = new BufferedImage(imgData.getWidth(), imgData.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+            convertedImg.getGraphics().drawImage(imgData, 0, 0, null);
+            setImgData(convertedImg);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
