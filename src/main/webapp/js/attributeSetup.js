@@ -117,12 +117,10 @@ $(document).ready(function () {
 
         console.log(JSON.stringify(dataToSend));
         $.ajax({
-            url: "/rest/isChainReady",
-            type: 'POST',
+            url: "/rest/isChainReady/" + testData.chainId,
+            type: 'GET',
             dataType: 'json',
-            data: JSON.stringify(dataToSend),
             contentType: 'application/json',
-            mimeType: 'application/json',
             cache: false,
             success: function (data) {
 
@@ -416,7 +414,7 @@ $(document).ready(function () {
     function getFunction1s() {
         $.ajax({
             url: "/rest/getFunctions",
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
             contentType: 'application/json',
             mimeType: 'application/json',
@@ -597,9 +595,9 @@ $(document).ready(function () {
         $("#tbl-" + currentPositionElement).empty();
         dataToSend.push(item);
         $.ajax({
-            url: "/rest/getMethod",
-            type: 'POST',
-            data: JSON.stringify(dataToSend),
+            url: "/rest/getMethod/" + $("#" + this.id).val(),
+            type: 'GET',
+
             dataType: 'json',
             contentType: 'application/json',
             mimeType: 'application/json',
@@ -634,8 +632,8 @@ $(document).ready(function () {
 
         dataToSend.push(item);
         $.ajax({
-            url: "/rest/getOperation",
-            type: 'POST',
+            url: "/rest/getOperation/ " + $("#" + this.id).val(),
+            type: 'GET',
             data: JSON.stringify(dataToSend),
             dataType: 'json',
             contentType: 'application/json',
@@ -670,9 +668,9 @@ $(document).ready(function () {
         updateSendButtonPosition(currentPositionElement);
         dataToSend.push(item);
         $.ajax({
-            url: "/rest/getAttributes",
-            type: 'POST',
-            data: JSON.stringify(dataToSend),
+            url: "/rest/getAttributes/" + $("#" + this.id).val() + "/" + this.id,
+            type: 'GET',
+
             dataType: 'json',
             contentType: 'application/json',
             mimeType: 'application/json',

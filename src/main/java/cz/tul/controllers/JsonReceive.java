@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,7 +48,7 @@ public class JsonReceive {
         return msg;
     }
 
-    @RequestMapping(value = "/getFunctions", method = RequestMethod.POST)
+    @RequestMapping(value = "/getFunctions", method = RequestMethod.GET)
     public
     @ResponseBody
     List<ListDataDTO> getFunctions() {
@@ -60,45 +57,44 @@ public class JsonReceive {
         return result;
     }
 
-    @RequestMapping(value = "/getMethod", method = RequestMethod.POST)
+    @RequestMapping(value = "/getMethod/{methodId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<ListDataDTO> getMethod(@RequestBody final List<RequestData> requestData) {
-        String functionId = requestData.get(0).getObjectId();
-        logger.info("Getting method for id: " + functionId);
-        List<ListDataDTO> result = contentProviderService.getAllMethodByFunctionId(functionId);
+    List<ListDataDTO> getMethod(@PathVariable("methodId") String methodId) {
+
+        logger.info("Getting method for id: " + methodId);
+        List<ListDataDTO> result = contentProviderService.getAllMethodByFunctionId(methodId);
         return result;
     }
 
 
-    @RequestMapping(value = "/getOperation", method = RequestMethod.POST)
+    @RequestMapping(value = "/getOperation/{methodId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<ListDataDTO> getOperation(@RequestBody final List<RequestData> requestData) {
-        String methodId = requestData.get(0).getObjectId();
-        String functionId = requestData.get(0).getObjectId2();
+    List<ListDataDTO> getOperation(@PathVariable("methodId") String methodId) {
+
         logger.info("Getting operation for id: " + methodId);
         List<ListDataDTO> result = contentProviderService.getOperationByMethodId(methodId);
         return result;
     }
 
-    @RequestMapping(value = "/getAttributes", method = RequestMethod.POST)
+    @RequestMapping(value = "/getAttributes/{operationId}/{pageAttributeId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    WrappedAtrDTO getAttributes(@RequestBody final List<RequestData> requestData) {
-        String idOperation = requestData.get(0).getObjectId();
-        logger.info("getting atributes for operation with id {}", idOperation);
-        List<AttributesDTO> result = contentProviderService.getAttributesByOperationId(idOperation);
-        WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(Utility.getSortAttributesDTO(result), requestData.get(0).getPageAttributeId());
+    WrappedAtrDTO getAttributes(@PathVariable("operationId") String operationId, @PathVariable("pageAttributeId") String pageAttributeId) {
+
+        logger.info("getting atributes for operation with id {}", operationId);
+        List<AttributesDTO> result = contentProviderService.getAttributesByOperationId(operationId);
+        WrappedAtrDTO wrappedAtrDTO = new WrappedAtrDTO(Utility.getSortAttributesDTO(result), pageAttributeId);
 
         return wrappedAtrDTO;
     }
 
-    @RequestMapping(value = "/isChainReady", method = RequestMethod.POST)
+    @RequestMapping(value = "/isChainReady/{chainId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    WrappedChainDTO isChainReady(@RequestBody final List<Message> requestData) {
-        String chainId = requestData.get(0).getChainId();
+    WrappedChainDTO isChainReady(@PathVariable("chainId") String chainId) {
+
         logger.info("Chain screening {}", chainId);
         WrappedChainDTO result = new WrappedChainDTO();
         ChainInfoDTO info = contentProviderService.isChainReady(chainId);

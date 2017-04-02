@@ -243,7 +243,7 @@ public abstract class AMethodWorker implements IMethodWorker {
         Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
         Core.log(mag, mag);
         Core.MinMaxLocResult rep = Core.minMaxLoc(mag);
-        System.out.printf("%f %f ", rep.maxVal, rep.minVal);
+
         this.shiftDFT(mag);
         mag.convertTo(mag, CvType.CV_8UC1);
         Core.normalize(mag, mag, 0, 255, Core.NORM_MINMAX, CvType.CV_8UC1);
