@@ -34,7 +34,7 @@ public class AsyncTaskExecutor {
     ChainDAO chainDAO;
 
 
-    @Scheduled(fixedDelay = 4000)
+    @Scheduled(fixedDelay = 1000)
     public void execute() {
 
         int activeTasks = executor.getActiveCount();

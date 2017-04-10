@@ -141,10 +141,6 @@ public class DbProvisioner implements InitializingBean {
         thresholding.setName("Thresholding");
         methods.add(thresholding);
 
-        Method distancTransform = new Method();
-        distancTransform.setFunction(morphology);
-        distancTransform.setName("Distance trensfrom.");
-        methods.add(distancTransform);
 
         Method bin = new Method();
         bin.setFunction(morphology);
@@ -398,7 +394,7 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(THRESH_BINARY_INV.getOperationId(), SegmentationW.class, SegmentorEnum.THRESH_BINARY_INV.getSegmentorName());
         operationRegister.register(THRESH_TOZERO.getOperationId(), SegmentationW.class, SegmentorEnum.THRESH_TOZERO.getSegmentorName());
         operationRegister.register(THRESH_TRUNC.getOperationId(), SegmentationW.class, SegmentorEnum.THRESH_TRUNC.getSegmentorName());
-        operationRegister.register(distTransfrom.getOperationId(), SegmentationW.class, SegmentorEnum.DISTANCETRANSFORM.getSegmentorName());
+
         operationRegister.register(watershed.getOperationId(), SegmentationW.class, SegmentorEnum.WATERSHED.getSegmentorName());
 
         operationRegister.register(erode.getOperationId(), MorfologyTransformations.class, MorphologyEnum.ERODE.getMorphologyName());
@@ -410,6 +406,7 @@ public class DbProvisioner implements InitializingBean {
         operationRegister.register(open_a.getOperationId(), MorfologyTransformations.class, MorphologyEnum.OPENGS.getMorphologyName());
         operationRegister.register(close_a.getOperationId(), MorfologyTransformations.class, MorphologyEnum.CLOSEGS.getMorphologyName());
         operationRegister.register(topHat.getOperationId(), MorfologyTransformations.class, MorphologyEnum.TOPHAT.getMorphologyName());
+        operationRegister.register(distTransfrom.getOperationId(), MorfologyTransformations.class, MorphologyEnum.DISTANCETRANSFORM.getMorphologyName());
 
         operationRegister.register(resizing.getOperationId(), GeometricTransformations.class, GeometricTransformationEnum.RESIZE.getGgometricTransformationName());
         operationRegister.register(rotating.getOperationId(), GeometricTransformations.class, GeometricTransformationEnum.ROTATE.getGgometricTransformationName());
@@ -2192,6 +2189,58 @@ public class DbProvisioner implements InitializingBean {
         allowDWatershed_E.setAllowoperationId(colorSeg);
         allowSteps.add(allowDWatershed_E);
 
+        //
+
+
+        AllowStep allowDWatershed_F = new AllowStep();
+        allowDWatershed_F.setOperation(watershed);
+        allowDWatershed_F.setAllowoperationId(blueOperation);
+        allowSteps.add(allowDWatershed_F);
+
+        AllowStep allowDWatershed_G = new AllowStep();
+        allowDWatershed_G.setOperation(watershed);
+        allowDWatershed_G.setAllowoperationId(greenOperation);
+        allowSteps.add(allowDWatershed_G);
+
+        AllowStep allowDWatershed_H = new AllowStep();
+        allowDWatershed_H.setOperation(watershed);
+        allowDWatershed_H.setAllowoperationId(redOperation);
+        allowSteps.add(allowDWatershed_H);
+
+        AllowStep allowDWatershed_I = new AllowStep();
+        allowDWatershed_I.setOperation(watershed);
+        allowDWatershed_I.setAllowoperationId(crOperation);
+        allowSteps.add(allowDWatershed_I);
+
+        AllowStep allowDWatershed_J = new AllowStep();
+        allowDWatershed_J.setOperation(watershed);
+        allowDWatershed_J.setAllowoperationId(cbOperation);
+        allowSteps.add(allowDWatershed_J);
+
+        AllowStep allowDWatershed_K = new AllowStep();
+        allowDWatershed_K.setOperation(watershed);
+        allowDWatershed_K.setAllowoperationId(yOperation);
+        allowSteps.add(allowDWatershed_K);
+
+        AllowStep allowDWatershed_L = new AllowStep();
+        allowDWatershed_L.setOperation(watershed);
+        allowDWatershed_L.setAllowoperationId(grayOperation);
+        allowSteps.add(allowDWatershed_L);
+
+        AllowStep allowDWatershed_M = new AllowStep();
+        allowDWatershed_M.setOperation(watershed);
+        allowDWatershed_M.setAllowoperationId(originalOperation);
+        allowSteps.add(allowDWatershed_M);
+
+        AllowStep allowDWatershed_N = new AllowStep();
+        allowDWatershed_N.setOperation(watershed);
+        allowDWatershed_N.setAllowoperationId(originalOperation);
+        allowSteps.add(allowDWatershed_N);
+
+        AllowStep allowDWatershed_O = new AllowStep();
+        allowDWatershed_O.setOperation(watershed);
+        allowDWatershed_O.setAllowoperationId(distTransfrom);
+        allowSteps.add(allowDWatershed_O);
 
         AllowStep allowDWatershed_TEST = new AllowStep();
         allowDWatershed_TEST.setOperation(watershed);

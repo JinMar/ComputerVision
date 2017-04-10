@@ -5,7 +5,6 @@ import cz.tul.bussiness.jobs.MorphologyTransformation.MorphologyTransform;
 import cz.tul.bussiness.jobs.exceptions.MinimalArgumentsException;
 import cz.tul.bussiness.jobs.exceptions.NoTemplateFound;
 import cz.tul.bussiness.workers.enums.MorphologyEnum;
-import cz.tul.bussiness.workers.enums.SegmentorEnum;
 import cz.tul.bussiness.workers.exceptions.SelectionLayerException;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ public class MorfologyTransformations extends AMethodWorker {
 
     @Override
     public void work() throws SelectionLayerException, MinimalArgumentsException, NoTemplateFound {
-        if (classifier.equals(SegmentorEnum.DISTANCETRANSFORM.getSegmentorName())) {
+        if (classifier.equals(MorphologyEnum.DISTANCETRANSFORM.getMorphologyName())) {
             job = new DistanceTransform();// zvolit spávnou metodu
             job.setPartAttributeValue(getAttributes());
             job.setImgData(imgData);

@@ -12,7 +12,8 @@ public enum MorphologyEnum {
     DILATEGS("dilateGS"),
     OPENGS("openGS"),
     CLOSEGS("closeGS"),
-    TOPHAT("tophhat");
+    TOPHAT("tophhat"),
+    DISTANCETRANSFORM("distancetransform");
     private String morphologyName;
 
     MorphologyEnum(String key) {
