@@ -35,9 +35,20 @@ public class Workflow {
         this.chain = chin;
         this.chainDAO = chainDAO;
         this.partDAO = partDAO;
-        sortedParts = Utility.getSortPart(chain.getChainParts(), partDAO);
-        startWorkFlow();
-        finishWorkflow();
+
+    }
+
+    public boolean run() {
+        boolean result;
+        try {
+            sortedParts = Utility.getSortPart(chain.getChainParts(), partDAO);
+            startWorkFlow();
+            finishWorkflow();
+            result = true;
+        } catch (Exception e) {
+            result = false;
+        }
+        return result;
     }
 
 

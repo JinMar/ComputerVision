@@ -57,13 +57,13 @@ public class JsonReceive {
         return result;
     }
 
-    @RequestMapping(value = "/getMethod/{methodId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getMethod/{functionId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<ListDataDTO> getMethod(@PathVariable("methodId") String methodId) {
+    List<ListDataDTO> getMethod(@PathVariable("functionId") String functionId) {
 
-        logger.info("Getting method for id: " + methodId);
-        List<ListDataDTO> result = contentProviderService.getAllMethodByFunctionId(methodId);
+        logger.info("Getting method for id: " + functionId);
+        List<ListDataDTO> result = contentProviderService.getAllMethodByFunctionId(functionId);
         return result;
     }
 

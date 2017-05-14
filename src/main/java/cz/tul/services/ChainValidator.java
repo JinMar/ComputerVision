@@ -3,7 +3,6 @@ package cz.tul.services;
 import cz.tul.controllers.transferObjects.ChainDTO;
 import cz.tul.entities.AllowStep;
 import cz.tul.entities.Operation;
-import cz.tul.repositories.AllowStepDAO;
 import cz.tul.repositories.OperationDAO;
 import cz.tul.services.exceptions.ImageNotFoundException;
 import org.slf4j.Logger;
@@ -23,8 +22,7 @@ import java.util.List;
 public class ChainValidator {
     private static final Logger logger = LoggerFactory.getLogger(ChainValidator.class);
 
-    @Autowired
-    private AllowStepDAO allowStepDAO;
+
     @Autowired
     private OperationDAO operationDAO;
 

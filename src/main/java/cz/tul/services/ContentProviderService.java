@@ -70,6 +70,10 @@ public class ContentProviderService {
         return getWrappedMethods(methodDAO.getMethodsById(functionId));
     }
 
+    /**
+     * @param methods
+     * @return
+     */
     private List<ListDataDTO> getWrappedMethods(List<Method> methods) {
         List<ListDataDTO> listDataDTOs = new ArrayList<>();
 

@@ -1,6 +1,5 @@
 package cz.tul.controllers;
 
-import cz.tul.bussiness.register.OperationRegister;
 import cz.tul.config.ViewConst;
 import cz.tul.controllers.transferObjects.AllowStepsDTO;
 import cz.tul.services.ContentProviderService;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -19,7 +17,6 @@ import java.util.List;
  * Created by Marek on 21.07.2016.
  */
 @Controller
-@RequestMapping("/")
 public class BasicController {
     private static final Logger logger = LoggerFactory.getLogger(BasicController.class);
     @Autowired
@@ -27,10 +24,10 @@ public class BasicController {
 
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView index(Model model) {
-        ModelAndView view = new ModelAndView(ViewConst.INDEX);
+    public String index(Model model) {
+
         logger.info("Index načten");
-        return view;
+        return ViewConst.INDEX;
     }
 
     @RequestMapping(value = "/application", method = RequestMethod.GET)
@@ -51,14 +48,7 @@ public class BasicController {
     public String devDoc(Model model) {
         List<AllowStepsDTO> as = contentProviderService.getAllowSteps();
         model.addAttribute("allowSteps", as);
-        logger.info("Stránka se zadáním byla načtena");
         return ViewConst.DEVDOC;
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public void test(Model model) {
-        OperationRegister operationRegister = OperationRegister.getInstance();
-        logger.info("test bezi");
     }
 
 

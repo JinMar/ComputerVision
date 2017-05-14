@@ -1,7 +1,6 @@
 package cz.tul.bussiness.register;
 
 import cz.tul.bussiness.register.exceptions.IllegalInputException;
-import cz.tul.bussiness.register.exceptions.NoMethodFoundException;
 import cz.tul.bussiness.workers.IMethodWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +54,6 @@ public class OperationRegister implements Serializable {
 
     }
 
-    /**
-     * Metoda vrací seznam vztahu metody vuci modelu, ktery ji realne vykona
-     *
-     * @return Map<String, IMethodWorker>
-     */
-    public Map<String, Class<? extends IMethodWorker>> getRelations() throws NoMethodFoundException {
-        if (relation.isEmpty()) {
-            throw new NoMethodFoundException();
-        }
-        return relation;
-    }
 
     public Class<? extends IMethodWorker> getRelation(String key) throws IllegalInputException {
         if (!relation.containsKey(key)) {

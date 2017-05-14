@@ -78,7 +78,7 @@
 </div>
 <footer class="footer">
 
-    <p>&copy; Semestrální projekt 2016. All rights reserved. Design by Marek Jindrák.</p>
+    <p>&copy; Diplomová práce 2017. All rights reserved. Design by Marek Jindrák.</p>
 
 </footer>
 

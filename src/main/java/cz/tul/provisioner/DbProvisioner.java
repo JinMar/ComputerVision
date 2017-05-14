@@ -44,11 +44,13 @@ public class DbProvisioner implements InitializingBean {
     ServletContext servletContext;
 
 
-    private OperationRegister operationRegister = OperationRegister.getInstance();
+    private OperationRegister operationRegister;
 
 
     @Override
     public void afterPropertiesSet() throws Exception {
+
+        operationRegister = OperationRegister.getInstance();
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
 
@@ -2051,6 +2053,77 @@ public class DbProvisioner implements InitializingBean {
         allowRotate.setOperation(rotating);
         allowRotate.setAllowoperationId(originalOperation);
         allowSteps.add(allowRotate);
+/////
+        AllowStep allowResizeA = new AllowStep();
+        allowResizeA.setOperation(resizing);
+        allowResizeA.setAllowoperationId(redOperation);
+        allowSteps.add(allowResizeA);
+
+        AllowStep allowRotateA = new AllowStep();
+        allowRotateA.setOperation(rotating);
+        allowRotateA.setAllowoperationId(redOperation);
+        allowSteps.add(allowRotateA);
+
+        AllowStep allowResizeB = new AllowStep();
+        allowResizeB.setOperation(resizing);
+        allowResizeB.setAllowoperationId(greenOperation);
+        allowSteps.add(allowResizeB);
+
+        AllowStep allowRotateB = new AllowStep();
+        allowRotateB.setOperation(rotating);
+        allowRotateB.setAllowoperationId(greenOperation);
+        allowSteps.add(allowRotateB);
+
+        AllowStep allowResizeC = new AllowStep();
+        allowResizeC.setOperation(resizing);
+        allowResizeC.setAllowoperationId(blueOperation);
+        allowSteps.add(allowResizeC);
+
+        AllowStep allowRotateC = new AllowStep();
+        allowRotateC.setOperation(rotating);
+        allowRotateC.setAllowoperationId(blueOperation);
+        allowSteps.add(allowRotateC);
+
+        AllowStep allowResizeD = new AllowStep();
+        allowResizeD.setOperation(resizing);
+        allowResizeD.setAllowoperationId(grayOperation);
+        allowSteps.add(allowResizeD);
+
+        AllowStep allowRotateD = new AllowStep();
+        allowRotateD.setOperation(rotating);
+        allowRotateD.setAllowoperationId(grayOperation);
+        allowSteps.add(allowRotateD);
+
+        AllowStep allowResizeE = new AllowStep();
+        allowResizeE.setOperation(resizing);
+        allowResizeE.setAllowoperationId(yOperation);
+        allowSteps.add(allowResizeE);
+
+        AllowStep allowRotateE = new AllowStep();
+        allowRotateE.setOperation(rotating);
+        allowRotateE.setAllowoperationId(yOperation);
+        allowSteps.add(allowRotateE);
+
+        AllowStep allowResizeF = new AllowStep();
+        allowResizeF.setOperation(resizing);
+        allowResizeF.setAllowoperationId(cbOperation);
+        allowSteps.add(allowResizeF);
+
+        AllowStep allowRotateF = new AllowStep();
+        allowRotateF.setOperation(rotating);
+        allowRotateF.setAllowoperationId(cbOperation);
+        allowSteps.add(allowRotateF);
+
+        AllowStep allowResizeG = new AllowStep();
+        allowResizeG.setOperation(resizing);
+        allowResizeG.setAllowoperationId(crOperation);
+        allowSteps.add(allowResizeG);
+
+        AllowStep allowRotateG = new AllowStep();
+        allowRotateG.setOperation(rotating);
+        allowRotateG.setAllowoperationId(crOperation);
+        allowSteps.add(allowRotateG);
+
 
         AllowStep allowHTC_A = new AllowStep();
         allowHTC_A.setOperation(HTC);

@@ -48,7 +48,7 @@ public class AsyncTaskExecutor {
                 chainDAO.update(chains);
                 for (Chain chain : chains) {
 
-                    Task2 asyncTask = new Task2(chain, chainDAO, partDAO);
+                    Task asyncTask = new Task(chain, chainDAO, partDAO);
 
                     executor.execute(asyncTask);
                 }

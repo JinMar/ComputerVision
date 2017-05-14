@@ -69,7 +69,7 @@
 </div>
 
 <div class="container">
-    <h2>Vítejte na stránkách diplomové práce</h2>
+    <h2>Systém pro analýzu obrazu</h2>
     <div class="message">
     </div>
     <div class="cnt">
@@ -99,7 +99,7 @@
 <div class="clr"><img class="hide" id="hiddenImg"></div>
 <footer class="footer">
 
-    <p>&copy; Semestrální projekt 2016. All rights reserved. Design by Marek Jindrák.</p>
+    <p>&copy; Diplomová práce 2017. All rights reserved. Design by Marek Jindrák.</p>
 
 </footer>
 

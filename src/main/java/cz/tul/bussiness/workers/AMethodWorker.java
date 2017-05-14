@@ -248,9 +248,7 @@ public abstract class AMethodWorker implements IMethodWorker {
         mag.convertTo(mag, CvType.CV_8UC1);
         Core.normalize(mag, mag, 0, 255, Core.NORM_MINMAX, CvType.CV_8UC1);
         Imgproc.applyColorMap(mag, mag, Imgproc.COLORMAP_JET);
-
         List<Mat> splited = new ArrayList<>();
-
         Core.split(mag, splited);
         ofset = 0;
         if (mag.rows() < minRow) {
@@ -269,19 +267,15 @@ public abstract class AMethodWorker implements IMethodWorker {
                     } else {
                         result.put(i, j, white);
                     }
-
                 } else {
                     if (i > (result.rows() / 2) - 128 && mag.cols() + 20 < j && color < 255 && mag.cols() + 40 > j) {
 
                         result.put(i, j, colorBar.get(color, 0));
-
-
                     } else if (i > (result.rows() / 2) - 128 && i < (result.rows() / 2) + 128) {
 
                         if (mag.cols() + 20 == j || mag.cols() + 40 == j) {
                             result.put(i, j, black);
                         } else {
-
                             result.put(i, j, white);
                         }
                     } else if (i == (result.rows() / 2) - 128 || i == (result.rows() / 2) + 128) {
@@ -289,7 +283,6 @@ public abstract class AMethodWorker implements IMethodWorker {
                         if (mag.cols() + 20 <= j && mag.cols() + 40 >= j) {
                             result.put(i, j, black);
                         } else {
-
                             result.put(i, j, white);
                         }
                     } else {
@@ -297,20 +290,13 @@ public abstract class AMethodWorker implements IMethodWorker {
                         result.put(i, j, white);
                     }
                 }
-
             }
             if (i > (result.rows() / 2) - 128 && color < 256) {
                 color++;
             }
-
-
         }
-
-
         int max = (int) rep.maxVal;
-
         if (max + 0.45 < rep.maxVal) {
-
             max++;
         }
         if (max >= 10) {
