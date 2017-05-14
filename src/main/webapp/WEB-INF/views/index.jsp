@@ -47,7 +47,6 @@
 </nav>
 
 
-<!-- Main component for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
 
@@ -60,9 +59,9 @@
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
 
-            <h2>Vítejte na stránkách semestrálního projektu</h2>
+            <h2>Vítejte na stránkách diplomové práce</h2>
 
-            <p>Tato stránka vznikla v rámci semestrálního projektu a bude se
+            <p>Tato stránka vznikla v rámci diplomové pracé u a bude se
                 zabývat zpracováním obrazu.
             </p>
             <p>Nejprve na tìchto stánkách budou
